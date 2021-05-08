@@ -8,6 +8,10 @@ export default function Layout() {
         <NavLink to="/">Home</NavLink>
         {" / "}
         <NavLink to="about">About</NavLink>
+        {" / "}
+        <NavLink to="users">Users</NavLink>
+        {" / "}
+        <NavLink to="users/gal">Gal</NavLink>
       </nav>
       <Outlet />
     </>

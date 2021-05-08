@@ -2,42 +2,26 @@ import React from "react";
 import { PartialRouteObject } from "react-router";
 import { useRoutes } from "react-router-dom";
 import Layout from "../app/layout";
+import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
+import { routeTreeIntoReactRouterRoute } from "./routeTreeIntoReactRouterRoute";
 
 const routeElementsObject = loadFiles();
 
 export default function App() {
-  const routes = React.useMemo<PartialRouteObject[]>(() => {
-    const partials: PartialRouteObject[] = [];
-    for (const route in routeElementsObject) {
-      const Component = routeElementsObject[route];
-      partials.push({ path: route, element: <Component /> });
-    }
-    return [
-      {
-        path: "/*",
-        element: <Layout />,
-        children: partials,
-      },
-    ];
-  }, [routeElementsObject]);
-  const element = useRoutes(routes);
-
+  const element = useRoutes([
+    {
+      element: <Layout />,
+      children: routeElementsObject,
+    },
+  ]);
   return element;
 }
 
-function loadFiles(): Record<string, React.ComponentType> {
+function loadFiles(): PartialRouteObject[] {
   const files = import.meta.glob("../app/routes/**/*.tsx");
-  const routes: Record<string, React.ComponentType> = {};
 
-  for (const filename in files) {
-    const path = filename
-      .replace(/^\.\.\/app\/routes/, "")
-      .replace(/\.[tj]sx?$/, "")
-      .replace(/@/, ":")
-      .replace(/\/index$/, "/");
-    routes[path] = React.lazy(files[filename] as any);
-  }
+  const routeTree = createRouteTreeFromImportGlob(files);
+  const routes = routeTreeIntoReactRouterRoute(routeTree);
 
-  console.log(routes);
   return routes;
 }
