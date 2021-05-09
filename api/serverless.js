@@ -5,9 +5,10 @@ import template from "../dist/server/template";
 
 /**
  * @param {Request} req
+ * @param {Response} res
  */
 export default async (req, res) => {
-  const { status, data } = await renderRequest(
+  const { status, data, contentType } = await renderRequest(
     {
       template,
       manifest,
@@ -17,5 +18,5 @@ export default async (req, res) => {
       headers: [["Accept", String(req.headers.get("accept"))]],
     })
   );
-  res.status(status).send(data);
+  res.status(status).setHeader("Content-Type", contentType).send(data);
 };

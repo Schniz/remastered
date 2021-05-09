@@ -92,7 +92,8 @@ export async function renderRequest(
     // your actual source code.
     vite?.ssrFixStacktrace(e);
     console.error(e);
-    return { status: 500, data: e.message, contentType: "text/plain" };
+    const message = request.headers.has("x-debug") ? String(e) : e.message;
+    return { status: 500, data: message, contentType: "text/plain" };
   }
 }
 
