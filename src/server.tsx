@@ -5,6 +5,22 @@ import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
 
+function findDistRoot() {
+  if (isProd) {
+    try {
+      require.resolve("../dist/server/entry-server.js");
+      return path.join(__dirname, "../dist");
+    } catch (e) {}
+
+    try {
+      require.resolve("../server/entry-server.js");
+      return path.join(__dirname, "..");
+    } catch (e) {}
+
+    throw new Error(`Can't find stuff here!!!`);
+  }
+}
+
 export async function createServer() {
   const app = fastify();
   await app.register(fastifyExpress);
@@ -15,11 +31,13 @@ export async function createServer() {
         server: { middlewareMode: true },
       });
 
+  const distRoot = findDistRoot();
+
   if (vite) {
     app.use(vite.middlewares);
   } else {
     await app.register(fastifyStatic, {
-      root: path.join(__dirname, "../dist/client/assets"),
+      root: path.join(distRoot!, "client/assets"),
       prefix: "/assets/",
     });
   }
@@ -71,11 +89,12 @@ async function getViteHandlers(
   manifest?: Record<string, string[]>;
 }> {
   if (!vite) {
+    const distRoot = findDistRoot()!;
     return {
-      serverEntry: require("../dist/server/entry-server.js"),
-      manifest: require("../dist/client/ssr-manifest.json"),
+      serverEntry: require(path.join(distRoot, "server/entry-server.js")),
+      manifest: require(path.join(distRoot, "client/ssr-manifest.json")),
       template: fs.readFileSync(
-        path.join(__dirname, "../dist/client/index.html"),
+        path.join(distRoot, "client/index.html"),
         "utf8"
       ),
     };
