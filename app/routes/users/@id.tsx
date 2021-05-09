@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { useRouteData } from "../../../src/LoaderContext";
 import { LoaderFn } from "../../../src/routeTypes";
 
 const database: Record<string, unknown> = {
@@ -12,12 +13,14 @@ export const loader: LoaderFn<unknown> = async ({ params }) => {
   return database[params.id];
 };
 
-export default function User(props: { data: { name: string } }) {
+export default function User() {
   const { id } = useParams();
+  const { name } = useRouteData<{ name: string }>();
+
   return (
     <>
       <div>User {id}!</div>
-      <div>Name: {props.data.name}</div>
+      <div>Name: {name}</div>
     </>
   );
 }

@@ -2,6 +2,10 @@ import { RouteTree } from "./createRouteTreeFromImportGlob";
 import React from "react";
 import { Outlet, RouteObject } from "react-router";
 
+export const RouteKeyContext = React.createContext<string | undefined>(
+  undefined
+);
+
 export function routeTreeIntoReactRouterRoute(
   routeTree: RouteTree
 ): CustomRouteObject[] {
@@ -10,7 +14,11 @@ export function routeTreeIntoReactRouterRoute(
   for (const key in routeTree) {
     const branch = routeTree[key];
     const Element = branch.element ?? Outlet;
-    const element = <Element />;
+    const element = (
+      <RouteKeyContext.Provider value={`../app/routes/${branch.filepath}`}>
+        <Element />
+      </RouteKeyContext.Provider>
+    );
     routes.push({
       caseSensitive: true,
       path: key,
