@@ -1,4 +1,5 @@
 import React from "react";
+import { LoaderContext } from "./LoaderContext";
 
 type State =
   | {
@@ -49,6 +50,7 @@ export function DynamicImportComponentRenderer(props: {
   contextKey?: string;
 }): React.ReactElement {
   const ctx = React.useContext(DynamicImportComponentContext);
+  const loaderCtx = React.useContext(LoaderContext);
 
   const [state, setState] = React.useState<State>(
     props.initialState ?? { tag: "loading" }
@@ -80,7 +82,8 @@ export function DynamicImportComponentRenderer(props: {
       return <div>Error: {String(state.error)}</div>;
     }
     case "loaded": {
-      return <state.component />;
+      // @ts-ignore
+      return <state.component data={loaderCtx.get(props.contextKey)} />;
     }
   }
 }

@@ -55,7 +55,7 @@ export async function createServer() {
       url,
       vite
     );
-    reply.status(status).send(data);
+    reply.status(status).header("Content-Type", "text/html").send(data);
   });
 
   return app;
@@ -68,13 +68,13 @@ export async function renderRequest(
 ): Promise<{ data: string; status: number }> {
   try {
     const { render } = handlers.serverEntry;
-    const { app, scripts } = await render(url, handlers.manifest);
+    const { app, scripts, status } = await render(url, handlers.manifest);
 
     // 5. Inject the app-rendered HTML into the template.
     const html = handlers.template
       .replace(`<!--ssr-outlet-->`, app)
       .replace("<!--ssr-scripts-->", scripts);
-    return { status: 200, data: html };
+    return { status, data: html };
   } catch (e) {
     // If an error is caught, let vite fix the stracktrace so it maps back to
     // your actual source code.

@@ -5,37 +5,71 @@ import { MemoryRouter, matchRoutes, RouteMatch } from "react-router";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
-import { buildRouteComponentBag } from "./buildRouteComponentBag";
+import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
+import { LoaderContext } from "./LoaderContext";
 
 export async function render(
   url: string,
   manifest?: Record<string, string[]>
-): Promise<{ app: string; scripts: string }> {
+): Promise<{ app: string; scripts: string; status: number }> {
   const routes = routeElementsObject;
   const found = matchRoutes(routes, url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
-  const loadedComponents = await buildRouteComponentBag(foundRouteKeys);
+  const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
+  const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
+  const loaderContext = new Map<string, unknown>();
+  let loaderNotFound = false;
+
+  for (const relevantRoute of relevantRoutes.values()) {
+    if (relevantRoute.loader) {
+      const loaderResult = await relevantRoute.loader({
+        params: relevantRoute.givenRoute.params,
+      });
+      loaderContext.set(relevantRoute.key, loaderResult);
+
+      if (loaderResult === null || loaderResult === undefined) {
+        loaderNotFound = true;
+      }
+    }
+  }
+
+  if (loaderNotFound) {
+    return { app: "Page not found", status: 404, scripts: "" };
+  }
 
   const scripts =
-    buildScripts(foundRouteKeys, manifest) + buildWindowValues(found);
+    buildScripts(
+      foundRouteKeys.map((x) => x.routeKey),
+      manifest
+    ) + buildWindowValues(found, loaderContext);
 
   const string = ReactDOMServer.renderToString(
-    <DynamicImportComponentContext.Provider value={loadedComponents}>
-      <MemoryRouter initialEntries={[url]} initialIndex={0}>
-        <App />
-      </MemoryRouter>
-    </DynamicImportComponentContext.Provider>
+    <LoaderContext.Provider value={loaderContext}>
+      <DynamicImportComponentContext.Provider value={loadedComponents}>
+        <MemoryRouter initialEntries={[url]} initialIndex={0}>
+          <App />
+        </MemoryRouter>
+      </DynamicImportComponentContext.Provider>
+    </LoaderContext.Provider>
   );
-  return { app: string, scripts };
+  return { app: string, scripts, status: 200 };
 }
 
-function getRouteKeys(routes: RouteMatch[]): string[] {
+function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
   return _(routes)
-    .map((a) => a.route)
-    .map<string | undefined>((a: CustomRouteObject) => a.routeFile)
+    .map<EnhancedRoute | undefined>((a) => {
+      const routeKey = (a.route as CustomRouteObject).routeFile;
+      if (routeKey) {
+        return { ...a, routeKey };
+      }
+    })
     .compact()
     .value();
 }
+
+type EnhancedRoute = RouteMatch & {
+  routeKey: string;
+};
 
 function buildScripts(
   routeKeys: string[],
@@ -69,15 +103,26 @@ function buildScripts(
     .join("");
 }
 
-function buildWindowValues(routes: RouteMatch[] | null): string {
-  if (!routes) return "";
+function buildWindowValues(
+  routes: RouteMatch[],
+  loaderContext: Map<string, unknown>
+): string {
   const routeFiles = _(routes)
     .map((route) => {
       return (route.route as CustomRouteObject).routeFile;
     })
     .compact()
     .value();
-  return `<script>window.__REMASTERED_SSR_ROUTES=JSON.parse(${JSON.stringify(
-    JSON.stringify(routeFiles)
-  )})</script>`;
+  const data = {
+    __REMASTERED_SSR_ROUTES: routeFiles,
+    __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
+  };
+  const stringified = _(data)
+    .map((value, key) => {
+      return `window.${key}=JSON.parse(${JSON.stringify(
+        JSON.stringify(value)
+      )});`;
+    })
+    .join("");
+  return `<script>${stringified}</script>`;
 }
