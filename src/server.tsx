@@ -1,43 +1,39 @@
 import fastify from "fastify";
-import { createServer as createViteServer } from "vite";
+import { createServer as createViteServer, ViteDevServer } from "vite";
 import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
+import fastifyStatic from "fastify-static";
 
 async function createServer() {
   const app = fastify();
   await app.register(fastifyExpress);
 
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-  });
+  const vite = isProd
+    ? undefined
+    : await createViteServer({
+        server: { middlewareMode: true },
+      });
 
-  app.use(vite.middlewares);
+  if (vite) {
+    app.use(vite.middlewares);
+  } else {
+    await app.register(fastifyStatic, {
+      root: path.join(__dirname, "../dist/client/assets"),
+      prefix: "/assets/",
+    });
+  }
 
   app.all("*", async (req, reply) => {
     const url = req.url;
 
     try {
-      // 1. Read index.html
-      let template = fs.readFileSync(
-        path.resolve(__dirname, "../index.html"),
-        "utf-8"
+      const { template, serverEntry, manifest } = await getViteHandlers(
+        vite,
+        req.url
       );
-
-      // 2. Apply vite HTML transforms. This injects the vite HMR client, and
-      //    also applies HTML transforms from Vite plugins, e.g. global preambles
-      //    from @vitejs/plugin-react-refresh
-      template = await vite.transformIndexHtml(url, template);
-
-      // 3. Load the server entry. vite.ssrLoadModule automatically transforms
-      //    your ESM source code to be usable in Node.js! There is no bundling
-      //    required, and provides efficient invalidation similar to HMR.
-      const { render } = await vite.ssrLoadModule("/src/entry-server.tsx");
-
-      // 4. render the app HTML. This assumes entry-server.js's exported `render`
-      //    function calls appropriate framework SSR APIs,
-      //    e.g. ReactDOMServer.renderToString()
-      const { app, scripts } = await render(url, vite);
+      const { render } = serverEntry;
+      const { app, scripts } = await render(url, manifest);
 
       // 5. Inject the app-rendered HTML into the template.
       const html = template
@@ -48,7 +44,7 @@ async function createServer() {
     } catch (e) {
       // If an error is caught, let vite fix the stracktrace so it maps back to
       // your actual source code.
-      vite.ssrFixStacktrace(e);
+      vite?.ssrFixStacktrace(e);
       console.error(e);
       reply.status(500).send(e.message);
     }
@@ -57,3 +53,35 @@ async function createServer() {
 }
 
 createServer();
+
+async function getViteHandlers(
+  vite: ViteDevServer | undefined,
+  url: string
+): Promise<{
+  template: string;
+  serverEntry: any;
+  manifest?: Record<string, string[]>;
+}> {
+  if (!vite) {
+    return {
+      serverEntry: require("../dist/server/entry-server.js"),
+      manifest: require("../dist/client/ssr-manifest.json"),
+      template: fs.readFileSync(
+        path.join(__dirname, "../dist/client/index.html"),
+        "utf8"
+      ),
+    };
+  } else {
+    const rawTemplate = fs.readFileSync(
+      path.join(__dirname, "../index.html"),
+      "utf8"
+    );
+    const template = await vite.transformIndexHtml(url, rawTemplate);
+    return {
+      serverEntry: await vite.ssrLoadModule("/src/entry-server.tsx"),
+      template,
+    };
+  }
+}
+
+const isProd = process.env.NODE_ENV === "production";

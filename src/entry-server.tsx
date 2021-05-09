@@ -8,14 +8,16 @@ import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteComponentBag } from "./buildRouteComponentBag";
 
 export async function render(
-  url: string
+  url: string,
+  manifest?: Record<string, string[]>
 ): Promise<{ app: string; scripts: string }> {
   const routes = routeElementsObject;
   const found = matchRoutes(routes, url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
   const loadedComponents = await buildRouteComponentBag(foundRouteKeys);
 
-  const scripts = buildScripts(found) + buildWindowValues(found);
+  const scripts =
+    buildScripts(foundRouteKeys, manifest) + buildWindowValues(found);
 
   const string = ReactDOMServer.renderToString(
     <DynamicImportComponentContext.Provider value={loadedComponents}>
@@ -35,13 +37,30 @@ function getRouteKeys(routes: RouteMatch[]): string[] {
     .value();
 }
 
-function buildScripts(routes: RouteMatch[]): string {
-  return _(routes)
-    .map((a) => a.route)
-    .map<string | undefined>((a: CustomRouteObject) =>
-      a.routeFile ? `/app/routes/${a.routeFile}` : undefined
-    )
-    .compact()
+function buildScripts(
+  routeKeys: string[],
+  manifest?: Record<string, string[]>
+): string {
+  if (manifest) {
+    const preload = _(manifest)
+      .entries()
+      .filter(([key]) => {
+        return routeKeys.some((routeKey) => {
+          return key.endsWith(`/app/routes/${routeKey}`);
+        });
+      })
+      .map(([, v]) => v)
+      .flatten()
+      .map((url) => {
+        return <link rel="modulepreload" href={url} key={url} />;
+      })
+      .value();
+
+    return ReactDOMServer.renderToStaticMarkup(<>{preload}</>);
+  }
+
+  return _(routeKeys)
+    .map((routeFile) => `/app/routes/${routeFile}`)
     .map((url) => {
       return ReactDOMServer.renderToStaticMarkup(
         <link rel="modulepreload" href={url} />
