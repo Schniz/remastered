@@ -1,7 +1,7 @@
 import { renderRequest } from "../src/server";
-import manifest from "../client/ssr-manifest.json";
-import serverEntry from "../server/entry-server";
-import template from "../server/template";
+import manifest from "./ssr-manifest.json";
+import serverEntry from "./entry-server";
+import template from "./template";
 
 export default async (req, res) => {
   const { status, data } = await renderRequest(
