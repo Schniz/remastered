@@ -16,7 +16,7 @@ export default async (req, res) => {
       serverEntry,
     },
     new Request(req.url, {
-      headers: [["Accept", String(req.headers.get("accept"))]],
+      headers: [["Accept", String(req.headers.accept)]],
     })
   );
   res.status(status).setHeader("Content-Type", contentType).send(data);
