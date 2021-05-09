@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
 
-async function createServer() {
+export async function createServer() {
   const app = fastify();
   await app.register(fastifyExpress);
 
@@ -49,10 +49,18 @@ async function createServer() {
       reply.status(500).send(e.message);
     }
   });
+
+  return app;
+}
+
+async function main() {
+  const app = await createServer();
   app.listen(3000);
 }
 
-createServer();
+if (require.main === module) {
+  main();
+}
 
 async function getViteHandlers(
   vite: ViteDevServer | undefined,
