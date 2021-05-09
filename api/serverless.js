@@ -19,5 +19,6 @@ export default async (req, res) => {
       headers: [["Accept", String(req.headers.accept)]],
     })
   );
-  res.status(status).setHeader("Content-Type", contentType).send(data);
+  res.status(status).setHeader("Content-Type", contentType);
+  res.send(data);
 };
