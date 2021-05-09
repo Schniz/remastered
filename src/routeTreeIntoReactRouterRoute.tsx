@@ -1,21 +1,28 @@
 import { RouteTree } from "./createRouteTreeFromImportGlob";
 import React from "react";
-import { Outlet, PartialRouteObject } from "react-router";
+import { Outlet, RouteObject } from "react-router";
 
 export function routeTreeIntoReactRouterRoute(
   routeTree: RouteTree
-): PartialRouteObject[] {
-  const routes: PartialRouteObject[] = [];
+): CustomRouteObject[] {
+  const routes: CustomRouteObject[] = [];
 
   for (const key in routeTree) {
-    const { children, element } = routeTree[key];
-    const Element = element ?? Outlet;
+    const branch = routeTree[key];
+    const Element = branch.element ?? Outlet;
+    const element = <Element />;
     routes.push({
+      caseSensitive: true,
       path: key,
-      element: <Element />,
-      children: routeTreeIntoReactRouterRoute(children),
+      element,
+      children: routeTreeIntoReactRouterRoute(branch.children),
+      routeFile: branch.filepath,
     });
   }
 
   return routes;
 }
+
+export type CustomRouteObject = RouteObject & {
+  routeFile?: string;
+};

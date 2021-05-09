@@ -1,39 +1,39 @@
 import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
 
-const LAZY_COMPONENT = Symbol.for("lazy component");
-jest.mock("react", () => ({
-  lazy: () => LAZY_COMPONENT,
-}));
-
 test("routes", () => {
   const result = createRouteTreeFromImportGlob({
-    "../app/routes/users/@id.tsx": someComponent,
-    "../app/routes/users.tsx": someComponent,
-    "../app/routes/about.tsx": someComponent,
-    "../app/routes/index.tsx": someComponent,
-    "../app/routes/users.register.tsx": someComponent,
+    "../app/routes/users/@id.tsx": SomeComponent,
+    "../app/routes/users.tsx": SomeComponent,
+    "../app/routes/about.tsx": SomeComponent,
+    "../app/routes/index.tsx": SomeComponent,
+    "../app/routes/users.register.tsx": SomeComponent,
   });
   expect(result).toEqual({
     "/": {
-      element: LAZY_COMPONENT,
+      element: SomeComponent,
       children: {},
+      filepath: "index.tsx",
     },
     "/about": {
-      element: LAZY_COMPONENT,
+      element: SomeComponent,
       children: {},
+      filepath: "about.tsx",
     },
     "/users": {
-      element: LAZY_COMPONENT,
+      element: SomeComponent,
+      filepath: "users.tsx",
       children: {
         "/:id": {
-          element: LAZY_COMPONENT,
+          element: SomeComponent,
+          filepath: "users/@id.tsx",
           children: {},
         },
       },
     },
     "/users/register": {
-      element: LAZY_COMPONENT,
+      element: SomeComponent,
       children: {},
+      filepath: "users.register.tsx",
     },
   });
 });
@@ -41,5 +41,3 @@ test("routes", () => {
 function SomeComponent() {
   return null;
 }
-
-const someComponent = async () => ({ default: SomeComponent });
