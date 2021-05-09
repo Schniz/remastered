@@ -11,7 +11,6 @@ const app = Fastify({
 app.register(createServer() as any);
 
 export default async (req: unknown, res: any) => {
-  res.send("Helllllllllllo mister");
-  // await app.ready();
-  // app.server.emit("request", req, res);
+  await app.ready();
+  app.server.emit("request", req, res);
 };
