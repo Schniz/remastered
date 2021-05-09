@@ -4,6 +4,8 @@ import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
+import { Request } from "node-fetch";
+import type { ServerResponse } from "./entry-server";
 
 function findDistRoot() {
   if (isProd) {
@@ -48,14 +50,16 @@ export async function createServer() {
   }
 
   app.all("*", async (req, reply) => {
-    const url = req.url;
-
-    const { data, status } = await renderRequest(
-      await getViteHandlers(vite, url),
-      url,
+    const request = new Request(req.url, {
+      method: req.method,
+      headers: [["Accept", String(req.headers.accept)]],
+    });
+    const { data, status, contentType } = await renderRequest(
+      await getViteHandlers(vite, request.url),
+      request,
       vite
     );
-    reply.status(status).header("Content-Type", "text/html").send(data);
+    reply.status(status).header("Content-Type", contentType).send(data);
   });
 
   return app;
@@ -63,24 +67,32 @@ export async function createServer() {
 
 export async function renderRequest(
   handlers: ViteHandlers,
-  url: string,
+  request: Request,
   vite?: ViteDevServer
-): Promise<{ data: string; status: number }> {
+): Promise<{ data: string; status: number; contentType: string }> {
   try {
     const { render } = handlers.serverEntry;
-    const { app, scripts, status } = await render(url, handlers.manifest);
+    const renderred: ServerResponse = await render(request, handlers.manifest);
 
-    // 5. Inject the app-rendered HTML into the template.
-    const html = handlers.template
-      .replace(`<!--ssr-outlet-->`, app)
-      .replace("<!--ssr-scripts-->", scripts);
-    return { status, data: html };
+    if (renderred.content.type === "html") {
+      // 5. Inject the app-rendered HTML into the template.
+      const html = handlers.template
+        .replace(`<!--ssr-outlet-->`, renderred.content.value)
+        .replace("<!--ssr-scripts-->", renderred.content.scripts);
+      return { status: renderred.status, data: html, contentType: "text/html" };
+    } else {
+      return {
+        status: renderred.status,
+        contentType: "application/json",
+        data: JSON.stringify(renderred.content.value),
+      };
+    }
   } catch (e) {
     // If an error is caught, let vite fix the stracktrace so it maps back to
     // your actual source code.
     vite?.ssrFixStacktrace(e);
     console.error(e);
-    return { status: 500, data: e.message };
+    return { status: 500, data: e.message, contentType: "text/plain" };
   }
 }
 

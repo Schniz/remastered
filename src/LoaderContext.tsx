@@ -11,5 +11,6 @@ export function useRouteData<P>(): P {
   const loaderContext = React.useContext(LoaderContext);
   const routeKey = React.useContext(RouteKeyContext);
   const value = loaderContext.get(routeKey ?? "nopenopenope");
+
   return value as P;
 }

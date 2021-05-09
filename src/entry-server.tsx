@@ -7,13 +7,29 @@ import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
 import { LoaderContext } from "./LoaderContext";
+import fetch from "node-fetch";
+
+global.fetch = fetch as any;
+
+export type ResponseType =
+  | {
+      type: "json";
+      value: unknown;
+    }
+  | {
+      type: "html";
+      value: string;
+      scripts: string;
+    };
+
+export type ServerResponse = { content: ResponseType; status: number };
 
 export async function render(
-  url: string,
+  request: Request,
   manifest?: Record<string, string[]>
-): Promise<{ app: string; scripts: string; status: number }> {
+): Promise<ServerResponse> {
   const routes = routeElementsObject;
-  const found = matchRoutes(routes, url) ?? [];
+  const found = matchRoutes(routes, request.url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
@@ -34,7 +50,17 @@ export async function render(
   }
 
   if (loaderNotFound) {
-    return { app: "Page not found", status: 404, scripts: "" };
+    return {
+      content: { type: "html", value: "Page not found", scripts: "" },
+      status: 404,
+    };
+  }
+
+  if (request.headers.get("accept")?.includes("application/json")) {
+    return {
+      status: 200,
+      content: { type: "json", value: { data: [...loaderContext] } },
+    };
   }
 
   const scripts =
@@ -46,13 +72,13 @@ export async function render(
   const string = ReactDOMServer.renderToString(
     <LoaderContext.Provider value={loaderContext}>
       <DynamicImportComponentContext.Provider value={loadedComponents}>
-        <MemoryRouter initialEntries={[url]} initialIndex={0}>
+        <MemoryRouter initialEntries={[request.url]} initialIndex={0}>
           <App />
         </MemoryRouter>
       </DynamicImportComponentContext.Provider>
     </LoaderContext.Provider>
   );
-  return { app: string, scripts, status: 200 };
+  return { content: { type: "html", value: string, scripts }, status: 200 };
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {

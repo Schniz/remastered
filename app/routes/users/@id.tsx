@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useRouteData } from "../../../src/LoaderContext";
+import { useFetcher } from "../../../src/fetcher";
 import { LoaderFn } from "../../../src/routeTypes";
 
 const database: Record<string, unknown> = {
@@ -15,12 +15,12 @@ export const loader: LoaderFn<unknown> = async ({ params }) => {
 
 export default function User() {
   const { id } = useParams();
-  const { name } = useRouteData<{ name: string }>();
+  const data = useFetcher<{ name: string }>();
 
   return (
     <>
       <div>User {id}!</div>
-      <div>Name: {name}</div>
+      <div>Name: {data?.name ?? "nope nope nope"}</div>
     </>
   );
 }
