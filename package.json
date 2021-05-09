@@ -8,7 +8,7 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",
     "serve": "node -r @swc-node/register src/server",
-    "vercel-build": "cp dist/server/template.js dist/server/entry-server.js dist/client/ssr-manifest.json ./api/"
+    "vercel-build": "yarn build && cp dist/server/template.js dist/server/entry-server.js dist/client/ssr-manifest.json ./api/"
   },
   "dependencies": {
     "@swc-node/register": "^1.2.1",
