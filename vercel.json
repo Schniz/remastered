@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/serverless.ts": {
+      "includeFiles": "dist/server/**"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/serverless.ts" }
   ]
