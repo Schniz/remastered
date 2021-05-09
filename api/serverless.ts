@@ -10,7 +10,8 @@ const app = Fastify({
 // Register your application as a normal plugin.
 app.register(createServer() as any);
 
-export default async (req: unknown, res: unknown) => {
-  await app.ready();
-  app.server.emit("request", req, res);
+export default async (req: unknown, res: any) => {
+  res.send("Helllllllllllo mister");
+  // await app.ready();
+  // app.server.emit("request", req, res);
 };
