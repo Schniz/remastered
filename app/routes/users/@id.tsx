@@ -20,7 +20,7 @@ export default function User() {
   return (
     <>
       <div>User {id}!</div>
-      <div>Name: {data?.name ?? "nope nope nope"}</div>
+      <div>Name: {data?.name}</div>
     </>
   );
 }
