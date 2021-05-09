@@ -1,5 +1,4 @@
 import React from "react";
-import { LoaderContext } from "./LoaderContext";
 
 type State =
   | {
