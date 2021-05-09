@@ -1,5 +1,5 @@
 import { renderRequest } from "../src/server";
-import manifest from "../dist/server/ssr-manifest.json";
+import manifest from "../dist/client/ssr-manifest.json";
 import serverEntry from "../dist/server/entry-server";
 import template from "../dist/server/template";
 
