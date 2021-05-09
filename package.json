@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "node -r @swc-node/register src/server",
-    "build": "tsc && yarn build:client && yarn build:server",
+    "build": "tsc && yarn build:client && yarn build:server && node ./scripts/generateNextHelpers.js",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",

@@ -50,30 +50,38 @@ export async function createServer() {
   app.all("*", async (req, reply) => {
     const url = req.url;
 
-    try {
-      const { template, serverEntry, manifest } = await getViteHandlers(
-        vite,
-        req.url
-      );
-      const { render } = serverEntry;
-      const { app, scripts } = await render(url, manifest);
-
-      // 5. Inject the app-rendered HTML into the template.
-      const html = template
-        .replace(`<!--ssr-outlet-->`, app)
-        .replace("<!--ssr-scripts-->", scripts);
-
-      reply.status(200).header("Content-Type", "text/html").send(html);
-    } catch (e) {
-      // If an error is caught, let vite fix the stracktrace so it maps back to
-      // your actual source code.
-      vite?.ssrFixStacktrace(e);
-      console.error(e);
-      reply.status(500).send(e.message);
-    }
+    const { data, status } = await renderRequest(
+      await getViteHandlers(vite, url),
+      url,
+      vite
+    );
+    reply.status(status).send(data);
   });
 
   return app;
+}
+
+export async function renderRequest(
+  handlers: ViteHandlers,
+  url: string,
+  vite?: ViteDevServer
+): Promise<{ data: string; status: number }> {
+  try {
+    const { render } = handlers.serverEntry;
+    const { app, scripts } = await render(url, handlers.manifest);
+
+    // 5. Inject the app-rendered HTML into the template.
+    const html = handlers.template
+      .replace(`<!--ssr-outlet-->`, app)
+      .replace("<!--ssr-scripts-->", scripts);
+    return { status: 200, data: html };
+  } catch (e) {
+    // If an error is caught, let vite fix the stracktrace so it maps back to
+    // your actual source code.
+    vite?.ssrFixStacktrace(e);
+    console.error(e);
+    return { status: 500, data: e.message };
+  }
 }
 
 async function main() {
@@ -85,22 +93,22 @@ if (require.main === module) {
   main();
 }
 
-async function getViteHandlers(
-  vite: ViteDevServer | undefined,
-  url: string
-): Promise<{
+type ViteHandlers = {
   template: string;
   serverEntry: any;
   manifest?: Record<string, string[]>;
-}> {
+};
+
+async function getViteHandlers(
+  vite: ViteDevServer | undefined,
+  url: string
+): Promise<ViteHandlers> {
   if (!vite) {
-    const distRoot = findDistRoot()!;
     return {
-      // @ts-expect-error
-      serverEntry: await import("../dist/server/entry-server.js"),
-      manifest: (await import("../dist/client/ssr-manifest.json")).default,
+      serverEntry: require("../dist/server/entry-server.js"),
+      manifest: require("../dist/client/ssr-manifest.json"),
       template: fs.readFileSync(
-        path.join(distRoot, "client/index.html"),
+        path.join(__dirname, "../dist/client/index.html"),
         "utf8"
       ),
     };

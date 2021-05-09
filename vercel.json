@@ -1,10 +1,5 @@
 {
-  "functions": {
-    "api/serverless.ts": {
-      "includeFiles": "dist/server/**"
-    }
-  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/serverless.ts" }
+    { "source": "/(.*)", "destination": "/api/serverless.js" }
   ]
 }
