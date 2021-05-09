@@ -7,17 +7,22 @@ import fastifyStatic from "fastify-static";
 
 function findDistRoot() {
   if (isProd) {
-    try {
-      require.resolve("../dist/server/entry-server.js");
-      return path.join(__dirname, "../dist");
-    } catch (e) {}
+    const places = [path.join(__dirname, ".."), process.cwd()];
 
-    try {
-      require.resolve("../server/entry-server.js");
-      return path.join(__dirname, "..");
-    } catch (e) {}
+    const newPlace = places
+      .map((place) => {
+        return path.join(place, "dist");
+      })
+      .find((place) => {
+        const filePath = path.join(place, "server/entry-server.js");
+        return fs.existsSync(filePath);
+      });
 
-    throw new Error(`Can't find stuff here!!!`);
+    if (!newPlace) {
+      throw new Error("Can't find place!");
+    }
+
+    return newPlace;
   }
 }
 
@@ -91,8 +96,9 @@ async function getViteHandlers(
   if (!vite) {
     const distRoot = findDistRoot()!;
     return {
-      serverEntry: require(path.join(distRoot, "server/entry-server.js")),
-      manifest: require(path.join(distRoot, "client/ssr-manifest.json")),
+      // @ts-expect-error
+      serverEntry: await import("../dist/server/entry-server.js"),
+      manifest: (await import("../dist/client/ssr-manifest.json")).default,
       template: fs.readFileSync(
         path.join(distRoot, "client/index.html"),
         "utf8"
