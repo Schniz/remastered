@@ -2,6 +2,7 @@ import { renderRequest } from "../src/server";
 import manifest from "./ssr-manifest.json";
 import * as serverEntry from "../dist/server/entry-server";
 import template from "../dist/server/template";
+import { Request } from "node-fetch";
 
 /**
  * @param {Request} req
