@@ -12,10 +12,13 @@ export function useFetcher<A>() {
   const fetcher = React.useMemo(() => createFetcher(cacheContext), [
     cacheContext,
   ]);
-  const swr = useSWR<A>([routeKey, `${location.pathname}${location.search}`], {
-    fetcher,
-    initialData,
-  });
+  const swr = useSWR<A>(
+    () => [routeKey, `${location.pathname}${location.search}`],
+    {
+      fetcher,
+      initialData,
+    }
+  );
   return swr.data;
 }
 
