@@ -44,6 +44,9 @@ function routeTransformer(): PluginOption {
       if (!id.startsWith(modulePrefix)) {
         return null;
       }
+      if (!/\.(t|j)sx?$/.test(id)) {
+        return null;
+      }
 
       const parsed = await parse(code, { syntax: "typescript", tsx: true });
       parsed.body = parsed.body.filter((x) => x.type !== "ExportDeclaration");

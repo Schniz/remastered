@@ -4,6 +4,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useRouteData } from "../../src/LoaderContext";
 import { LoaderFn } from "../../src/routeTypes";
 import { User, database } from "../database";
+import "./users.css";
 
 type Data = (User & { slug: string })[];
 
@@ -23,7 +24,9 @@ export default function Users() {
       <div>
         {routeData.map((project) => (
           <React.Fragment key={project.slug}>
-            <NavLink to={project.slug}>{project.name}</NavLink>{" "}
+            <NavLink className="nav-link" to={project.slug}>
+              {project.name}
+            </NavLink>
           </React.Fragment>
         ))}
       </div>
