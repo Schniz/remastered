@@ -31,9 +31,13 @@ const config = defineConfig({
 
 export default config;
 
+/**
+ * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
+ */
 function routeTransformer(): PluginOption {
   const modulePrefix = path.join(__dirname, "./app/routes/");
   return {
+    enforce: "pre",
     name: "remaster:route",
     async transform(code, id, ssr) {
       if (ssr) return null;

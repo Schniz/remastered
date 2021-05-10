@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useRouteData } from "../../../src/LoaderContext";
-import { LoaderFn } from "../../../src/routeTypes";
+import type { LoaderFn } from "../../../src/routeTypes";
 import { database, User } from "../../database";
 
 export const loader: LoaderFn<User> = async ({ params }) => {
