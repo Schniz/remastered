@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id   Int    @id @default(autoincrement())
+  slug String @unique
+  name String
+  Task Task[]
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  project     Project   @relation(fields: [projectId], references: [id])
+  projectId   Int
+  text        String
+  completedAt DateTime?
+}

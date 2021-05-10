@@ -6,32 +6,40 @@ import { LoaderContext } from "./LoaderContext";
 
 const routingContext = new Map(__REMASTERED_ROUTE_DEFS);
 
+type PendingState<T> = { value: T; tx: string };
 function usePendableState<T>(
   initialValue: T
 ): {
   currentValue: T;
-  pendingState?: T;
-  commit(): void;
-  rollback(): void;
+  pendingState: PendingState<T> | null;
+  commit(tx: string): void;
+  rollback(tx: string): void;
   begin(t: T): void;
 } {
-  const [pendingState, setPendingState] = React.useState<{ value: T } | null>(
-    null
-  );
+  const [
+    pendingState,
+    setPendingState,
+  ] = React.useState<PendingState<T> | null>(null);
   const [currentValue, setCurrentValue] = React.useState(initialValue);
 
-  const commit = React.useCallback(() => {
-    if (pendingState) {
-      setCurrentValue(pendingState.value);
-      setPendingState(null);
-    }
-  }, [pendingState]);
+  const commit = React.useCallback(
+    (tx: string) => {
+      if (pendingState && pendingState.tx === tx) {
+        setCurrentValue(pendingState.value);
+        setPendingState(null);
+      }
+    },
+    [pendingState]
+  );
   const rollback = React.useCallback(() => setPendingState(null), []);
-  const begin = React.useCallback((t: T) => setPendingState({ value: t }), []);
+  const begin = React.useCallback(
+    (t: T) => setPendingState({ value: t, tx: String(Math.random) }),
+    []
+  );
 
   return {
     currentValue,
-    pendingState: pendingState?.value,
+    pendingState,
     commit,
     rollback,
     begin,
@@ -49,8 +57,9 @@ export function HaltingRouter(props: {
     historyRef.current = createBrowserHistory({ window: props.window });
   }
   const history = historyRef.current;
+  const loaderContextRef = React.useRef(props.initialLoaderContext);
   const [loaderContext, setLoaderContext] = React.useState(
-    props.initialLoaderContext
+    loaderContextRef.current
   );
   const { currentValue: state, commit, pendingState, begin } = usePendableState(
     {
@@ -72,7 +81,11 @@ export function HaltingRouter(props: {
         pendingState,
         commit,
         abortController.signal,
-        setLoaderContext,
+        (newMap) => {
+          const mergedMap = new Map([...loaderContextRef.current, ...newMap]);
+          loaderContextRef.current = mergedMap;
+          setLoaderContext(mergedMap);
+        },
         props.loadedComponentContext
       );
     }
@@ -125,13 +138,13 @@ async function fetching(url: string, signal: AbortSignal): Promise<unknown> {
 }
 
 async function handlePendingState(
-  pendingState: { location: Location },
-  commit: () => void,
+  pendingState: PendingState<{ location: Location }>,
+  commit: (tx: string) => void,
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
   componentContext: Map<string, React.ComponentType>
 ) {
-  const matches = matchRoutes(routeElementsObject, pendingState.location);
+  const matches = matchRoutes(routeElementsObject, pendingState.value.location);
 
   const loaders = (matches ?? []).map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
@@ -146,7 +159,7 @@ async function handlePendingState(
     const routeInfo = routingContext.get(`../app/routes/${routeFile}`);
 
     if (routeInfo && routeInfo.hasLoader) {
-      const url = `${pendingState.location.pathname}.json${pendingState.location.search}`;
+      const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
 
       const result = await fetching(url, signal);
       const newMap = new Map<string, unknown>(result as any);
@@ -156,5 +169,5 @@ async function handlePendingState(
 
   await Promise.all(loaders);
 
-  commit();
+  commit(pendingState.tx);
 }
