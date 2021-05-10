@@ -22,5 +22,6 @@ export default async (req, res) => {
   );
 
   res.writeHead(response.status, { ...response.headers });
-  res.send(response.body);
+  res.write(response.body);
+  res.end();
 };
