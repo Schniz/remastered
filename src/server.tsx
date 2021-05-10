@@ -4,8 +4,9 @@ import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
-import { Request } from "node-fetch";
+import { Request, Response } from "node-fetch";
 import type { ServerResponse } from "./entry-server";
+import _ from "lodash";
 
 function findDistRoot() {
   if (isProd) {
@@ -52,14 +53,21 @@ export async function createServer() {
   app.all("*", async (req, reply) => {
     const request = new Request(req.url, {
       method: req.method,
-      headers: [["Accept", String(req.headers.accept)]],
+      headers: _(req.headers)
+        .entries()
+        .map(([key, value]) => value !== undefined && [key, String(value)])
+        .compact()
+        .value(),
     });
-    const { data, status, contentType } = await renderRequest(
+    const response = await renderRequest(
       await getViteHandlers(vite, request.url),
       request,
       vite
     );
-    reply.status(status).header("Content-Type", contentType).send(data);
+    reply
+      .status(response.status)
+      .headers({ ...response.headers })
+      .send(response.body);
   });
 
   return app;
@@ -69,7 +77,7 @@ export async function renderRequest(
   handlers: ViteHandlers,
   request: Request,
   vite?: ViteDevServer
-): Promise<{ data: string; status: number; contentType: string }> {
+): Promise<Response> {
   try {
     const { render } = handlers.serverEntry;
     const renderred: ServerResponse = await render(request, handlers.manifest);
@@ -79,13 +87,17 @@ export async function renderRequest(
       const html = handlers.template
         .replace(`<!--ssr-outlet-->`, renderred.content.value)
         .replace("<!--ssr-scripts-->", renderred.content.scripts);
-      return { status: renderred.status, data: html, contentType: "text/html" };
-    } else {
-      return {
+      return new Response(html, {
+        headers: { "Content-Type": "text/html" },
         status: renderred.status,
-        contentType: "application/json",
-        data: JSON.stringify(renderred.content.value),
-      };
+      });
+    } else {
+      return new Response(JSON.stringify(renderred.content.value), {
+        status: renderred.status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     }
   } catch (e) {
     // If an error is caught, let vite fix the stracktrace so it maps back to
@@ -93,7 +105,12 @@ export async function renderRequest(
     vite?.ssrFixStacktrace(e);
     console.error(e);
     const message = request.headers.has("x-debug") ? String(e) : e.message;
-    return { status: 500, data: message, contentType: "text/plain" };
+    return new Response(message, {
+      status: 500,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   }
 }
 
