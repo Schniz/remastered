@@ -1,6 +1,5 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useFetcher } from "../../../src/fetcher";
 import { useRouteData } from "../../../src/LoaderContext";
 import { LoaderFn } from "../../../src/routeTypes";
 
