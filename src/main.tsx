@@ -24,7 +24,10 @@ buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedComponents) => {
   ReactDOM.hydrate(
     <React.StrictMode>
       <DynamicImportComponentContext.Provider value={loadedComponents}>
-        <HaltingRouter initialLoaderContext={loadCtx}>
+        <HaltingRouter
+          initialLoaderContext={loadCtx}
+          loadedComponentContext={loadedComponents}
+        >
           <App />
         </HaltingRouter>
       </DynamicImportComponentContext.Provider>

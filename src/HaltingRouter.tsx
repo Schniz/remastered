@@ -1,7 +1,7 @@
 import { Navigator, Router, matchRoutes } from "react-router";
 import { BrowserHistory, createBrowserHistory, Location } from "history";
 import React from "react";
-import { routeElementsObject } from "./App";
+import { routeElementsObject, routesObject } from "./App";
 import { LoaderContext } from "./LoaderContext";
 
 const routingContext = new Map(__REMASTERED_ROUTE_DEFS);
@@ -42,6 +42,7 @@ export function HaltingRouter(props: {
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
   initialLoaderContext: Map<string, unknown>;
+  loadedComponentContext: Map<string, React.ComponentType>;
 }) {
   const historyRef = React.useRef<BrowserHistory>();
   if (!historyRef.current) {
@@ -71,7 +72,8 @@ export function HaltingRouter(props: {
         pendingState,
         commit,
         abortController.signal,
-        setLoaderContext
+        setLoaderContext,
+        props.loadedComponentContext
       );
     }
 
@@ -126,9 +128,18 @@ async function handlePendingState(
   pendingState: { location: Location },
   commit: () => void,
   signal: AbortSignal,
-  setLoaderContext: (map: Map<string, unknown>) => void
+  setLoaderContext: (map: Map<string, unknown>) => void,
+  componentContext: Map<string, React.ComponentType>
 ) {
   const matches = matchRoutes(routeElementsObject, pendingState.location);
+
+  const loaders = (matches ?? []).map(async (routeMatch) => {
+    const routeFile = (routeMatch.route as any).routeFile;
+    const key = `../app/routes/${routeFile}`;
+    const entry = await routesObject[key]?.();
+    componentContext.set(key, entry.default);
+  });
+
   const lastMatch = matches?.slice(-1)[0];
   if (lastMatch) {
     const routeFile = (lastMatch.route as any).routeFile;
@@ -142,6 +153,8 @@ async function handlePendingState(
       setLoaderContext(newMap);
     }
   }
+
+  await Promise.all(loaders);
 
   commit();
 }
