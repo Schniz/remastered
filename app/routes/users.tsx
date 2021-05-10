@@ -1,17 +1,20 @@
-import { Project } from ".prisma/client";
 import React from "react";
 import { Outlet } from "react-router";
 import { Link, NavLink } from "react-router-dom";
 import { useRouteData } from "../../src/LoaderContext";
 import { LoaderFn } from "../../src/routeTypes";
-import { prisma } from "../database";
+import { User, database } from "../database";
 
-export const loader: LoaderFn<Project[]> = async () => {
-  return prisma.project.findMany();
+type Data = (User & { slug: string })[];
+
+export const loader: LoaderFn<Data> = async () => {
+  return [...database].map(([slug, user]) => {
+    return { ...user, slug };
+  });
 };
 
 export default function Users() {
-  const routeData = useRouteData<Project[]>();
+  const routeData = useRouteData<Data>();
 
   return (
     <div>
