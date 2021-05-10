@@ -64,10 +64,10 @@ export async function createServer() {
       request,
       vite
     );
-    reply
-      .status(response.status)
-      .headers({ ...response.headers })
-      .send(response.body);
+    const headers = _([...response.headers.entries()])
+      .fromPairs()
+      .value();
+    reply.status(response.status).headers(headers).send(response.body);
   });
 
   return app;

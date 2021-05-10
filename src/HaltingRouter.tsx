@@ -146,7 +146,7 @@ async function handlePendingState(
     const routeInfo = routingContext.get(`../app/routes/${routeFile}`);
 
     if (routeInfo && routeInfo.hasLoader) {
-      const url = `${pendingState.location.pathname}${pendingState.location.search}`;
+      const url = `${pendingState.location.pathname}.json${pendingState.location.search}`;
 
       const result = await fetching(url, signal);
       const newMap = new Map<string, unknown>(result as any);

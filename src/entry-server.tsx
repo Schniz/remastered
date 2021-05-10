@@ -29,8 +29,9 @@ export async function render(
   request: Request,
   manifest?: Record<string, string[]>
 ): Promise<ServerResponse> {
+  const url = request.url.replace(/\.json$/, "");
   const routes = routeElementsObject;
-  const found = matchRoutes(routes, request.url) ?? [];
+  const found = matchRoutes(routes, url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
@@ -57,7 +58,10 @@ export async function render(
     };
   }
 
-  if (request.headers.get("accept")?.includes("application/json")) {
+  if (
+    request.url.endsWith(".json") ||
+    request.headers.get("accept")?.includes("application/json")
+  ) {
     return {
       status: 200,
       content: { type: "json", value: { data: [...loaderContext] } },
@@ -73,7 +77,7 @@ export async function render(
   const string = ReactDOMServer.renderToString(
     <LoaderContext.Provider value={loaderContext}>
       <DynamicImportComponentContext.Provider value={loadedComponents}>
-        <StaticRouter location={request.url}>
+        <StaticRouter location={url}>
           <App />
         </StaticRouter>
       </DynamicImportComponentContext.Provider>

@@ -2,15 +2,10 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useRouteData } from "../../../src/LoaderContext";
 import { LoaderFn } from "../../../src/routeTypes";
-
-const database: Record<string, unknown> = {
-  gal: { name: "Gal Schlezinger" },
-  dean: { name: "Dean Shub" },
-  amitush: { name: "Amit Shalev" },
-};
+import { database } from "../../database";
 
 export const loader: LoaderFn<unknown> = async ({ params }) => {
-  return database[params.id];
+  return database.get(params.id);
 };
 
 export default function User() {
