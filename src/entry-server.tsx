@@ -40,10 +40,12 @@ export async function render(
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
+      const params = relevantRoute.givenRoute.params;
+      const key = `${relevantRoute.key}@${JSON.stringify(params)}`;
       const loaderResult = await relevantRoute.loader({
-        params: relevantRoute.givenRoute.params,
+        params,
       });
-      loaderContext.set(relevantRoute.key, loaderResult);
+      loaderContext.set(key, loaderResult);
 
       if (loaderResult === null || loaderResult === undefined) {
         loaderNotFound = true;

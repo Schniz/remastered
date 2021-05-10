@@ -23,7 +23,7 @@ export default function App() {
 }
 
 export function loadFilesA() {
-  const files = import.meta.glob("../app/routes/**/*.tsx");
+  const files = import.meta.glob("../app/routes/**/*.{t,j}sx");
   return files;
 }
 

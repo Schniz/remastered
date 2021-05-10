@@ -1,4 +1,5 @@
 import React from "react";
+import { useParams } from "react-router";
 import { useRouteModule } from "./routeTreeIntoReactRouterRoute";
 
 export const LoaderContext = React.createContext<Map<string, unknown>>(
@@ -10,7 +11,8 @@ export const LoaderContext = React.createContext<Map<string, unknown>>(
 export function useRouteData<P>(routeKey?: string): P {
   const loaderContext = React.useContext(LoaderContext);
   routeKey = routeKey ?? useRouteModule();
-  const key = `../app/routes/${routeKey}`;
+  const params = useParams();
+  const key = `../app/routes/${routeKey}@${JSON.stringify(params)}`;
   const value = loaderContext.get(key);
 
   return value as P;

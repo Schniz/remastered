@@ -1,5 +1,10 @@
 import { Navigator, Router, matchRoutes } from "react-router";
-import { BrowserHistory, createBrowserHistory, Location } from "history";
+import {
+  Action,
+  BrowserHistory,
+  createBrowserHistory,
+  Location,
+} from "history";
 import React from "react";
 import { routeElementsObject, routesObject } from "./App";
 import { LoaderContext } from "./LoaderContext";
@@ -86,6 +91,7 @@ export function HaltingRouter(props: {
           loaderContextRef.current = mergedMap;
           setLoaderContext(mergedMap);
         },
+        loaderContextRef.current,
         props.loadedComponentContext
       );
     }
@@ -138,10 +144,11 @@ async function fetching(url: string, signal: AbortSignal): Promise<unknown> {
 }
 
 async function handlePendingState(
-  pendingState: PendingState<{ location: Location }>,
+  pendingState: PendingState<{ location: Location; action: Action }>,
   commit: (tx: string) => void,
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
+  loaderContext: Map<string, unknown>,
   componentContext: Map<string, React.ComponentType>
 ) {
   const matches = matchRoutes(routeElementsObject, pendingState.value.location);
@@ -156,14 +163,23 @@ async function handlePendingState(
   const lastMatch = matches?.slice(-1)[0];
   if (lastMatch) {
     const routeFile = (lastMatch.route as any).routeFile;
-    const routeInfo = routingContext.get(`../app/routes/${routeFile}`);
+    const routingKey = `../app/routes/${routeFile}`;
+    const routeInfo = routingContext.get(routingKey);
+    const storageKey = `${routingKey}@${JSON.stringify(lastMatch.params)}`;
 
     if (routeInfo && routeInfo.hasLoader) {
-      const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
+      if (
+        pendingState.value.action !== Action.Pop ||
+        !loaderContext.has(storageKey)
+      ) {
+        const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
 
-      const result = await fetching(url, signal);
-      const newMap = new Map<string, unknown>(result as any);
-      setLoaderContext(newMap);
+        const result = await fetching(url, signal);
+        const newMap = new Map<string, unknown>(result as any);
+        setLoaderContext(newMap);
+      } else {
+        console.log("cache hit");
+      }
     }
   }
 
