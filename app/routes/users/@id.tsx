@@ -2,20 +2,20 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useRouteData } from "../../../src/LoaderContext";
 import { LoaderFn } from "../../../src/routeTypes";
-import { database } from "../../database";
+import { database, User } from "../../database";
 
-export const loader: LoaderFn<unknown> = async ({ params }) => {
+export const loader: LoaderFn<User> = async ({ params }) => {
   return database.get(params.id);
 };
 
-export default function User() {
+export default function ViewUser() {
   const { id } = useParams();
-  const data = useRouteData<{ name: string }>();
+  const data = useRouteData<User>();
 
   return (
     <>
       <div>User {id}!</div>
-      <div>Name: {data?.name}</div>
+      <div>Name: {data.name}</div>
     </>
   );
 }

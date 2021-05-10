@@ -620,7 +620,7 @@
   resolved "https://registry.npmjs.org/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.2.56.tgz#6869931f6dc8c7f3ca8fac2326709dec581c2834"
   integrity sha512-eSqajMZ6fAfHAy1h9Bh8oN90faCy3zsj3VcgjhEbJQnjUIN32eOLlWb70pAb58ckP+c2pBejaRuRElVjaViVjw==
 
-"@swc/core@^1.2.54":
+"@swc/core@^1.2.54", "@swc/core@^1.2.55":
   version "1.2.55"
   resolved "https://registry.npmjs.org/@swc/core/-/core-1.2.55.tgz#41752178af694e5f2bbe10e5aac096d5d842df92"
   integrity sha512-ZtyxJ0IT0dv4jq0oPrlQytRN9HoSocT5Xig6y/Yx28uFRGJOlqaP1NrkNyZhB65c29gwXoedxN54uVqmXe+aFQ==

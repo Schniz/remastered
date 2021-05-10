@@ -1,10 +1,11 @@
-import { defineConfig } from "vite";
+import { defineConfig, PluginOption } from "vite";
+import { parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 
 // https://vitejs.dev/config/
 const config = defineConfig({
-  plugins: [reactRefresh()],
+  plugins: [routeTransformer(), reactRefresh()],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
   },
@@ -29,3 +30,21 @@ const config = defineConfig({
 });
 
 export default config;
+
+function routeTransformer(): PluginOption {
+  const modulePrefix = path.join(__dirname, "./app/routes/");
+  return {
+    name: "remaster:route",
+    async transform(code, id, ssr) {
+      if (ssr) return null;
+      if (!id.startsWith(modulePrefix)) {
+        return null;
+      }
+
+      const parsed = await parse(code, { syntax: "typescript", tsx: true });
+      parsed.body = parsed.body.filter((x) => x.type !== "ExportDeclaration");
+
+      return await print(parsed);
+    },
+  };
+}
