@@ -14,7 +14,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "react-router": ["./react-router-pkgs/react-router"],
+      "react-router-dom": ["./react-router-pkgs/react-router-dom"],
+      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"],
+    }
   },
   "include": ["./src", "./app"]
 }

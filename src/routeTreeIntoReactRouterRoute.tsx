@@ -1,10 +1,10 @@
 import { RouteTree } from "./createRouteTreeFromImportGlob";
 import React from "react";
-import { Outlet, RouteObject } from "react-router";
+import { Outlet, RouteObject, useClosestRoute } from "react-router";
 
-export const RouteKeyContext = React.createContext<string | undefined>(
-  undefined
-);
+export function useRouteModule(): string {
+  return (useClosestRoute()! as any).routeFile;
+}
 
 export function routeTreeIntoReactRouterRoute(
   routeTree: RouteTree
@@ -14,11 +14,7 @@ export function routeTreeIntoReactRouterRoute(
   for (const key in routeTree) {
     const branch = routeTree[key];
     const Element = branch.element ?? Outlet;
-    const element = (
-      <RouteKeyContext.Provider value={`../app/routes/${branch.filepath}`}>
-        <Element />
-      </RouteKeyContext.Provider>
-    );
+    const element = <Element />;
     routes.push({
       caseSensitive: true,
       path: key,

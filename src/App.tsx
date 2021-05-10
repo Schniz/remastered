@@ -1,9 +1,11 @@
 import React from "react";
-import { RouteObject } from "react-router";
 import { useRoutes } from "react-router-dom";
 import Layout from "../app/layout";
 import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
-import { routeTreeIntoReactRouterRoute } from "./routeTreeIntoReactRouterRoute";
+import {
+  CustomRouteObject,
+  routeTreeIntoReactRouterRoute,
+} from "./routeTreeIntoReactRouterRoute";
 import { dynamicImportComponent } from "./DynamicImportComponent";
 
 export const routesObject = loadFilesA();
@@ -40,7 +42,7 @@ function turnToComponentBag(files: Record<string, () => Promise<unknown>>) {
 
 export function convertRouteObjectsToRRDef(
   components: Record<string, React.ComponentType>
-): RouteObject[] {
+): CustomRouteObject[] {
   const routeTree = createRouteTreeFromImportGlob(components);
   const routes = routeTreeIntoReactRouterRoute(routeTree);
 

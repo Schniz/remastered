@@ -1,7 +1,8 @@
 import ReactDOMServer from "react-dom/server";
 import React from "react";
-import App, { routeElementsObject } from "./App";
-import { MemoryRouter, matchRoutes, RouteMatch } from "react-router";
+import App, { routeElementsObject, routesObject } from "./App";
+import { matchRoutes, RouteMatch } from "react-router";
+import { StaticRouter } from "react-router-dom/server";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
@@ -67,14 +68,14 @@ export async function render(
     buildScripts(
       foundRouteKeys.map((x) => x.routeKey),
       manifest
-    ) + buildWindowValues(found, loaderContext);
+    ) + (await buildWindowValues(found, loaderContext));
 
   const string = ReactDOMServer.renderToString(
     <LoaderContext.Provider value={loaderContext}>
       <DynamicImportComponentContext.Provider value={loadedComponents}>
-        <MemoryRouter initialEntries={[request.url]} initialIndex={0}>
+        <StaticRouter location={request.url}>
           <App />
-        </MemoryRouter>
+        </StaticRouter>
       </DynamicImportComponentContext.Provider>
     </LoaderContext.Provider>
   );
@@ -129,10 +130,15 @@ function buildScripts(
     .join("");
 }
 
-function buildWindowValues(
+async function buildWindowValues(
   routes: RouteMatch[],
   loaderContext: Map<string, unknown>
-): string {
+): Promise<string> {
+  const allRoutes = await buildRouteDefinitionBag(
+    Object.keys(routesObject).map((x) => ({
+      routeKey: x.replace("../app/routes/", ""),
+    }))
+  );
   const routeFiles = _(routes)
     .map((route) => {
       return (route.route as CustomRouteObject).routeFile;
@@ -142,6 +148,11 @@ function buildWindowValues(
   const data = {
     __REMASTERED_SSR_ROUTES: routeFiles,
     __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
+    __REMASTERED_ROUTE_DEFS: [
+      ...mapValues(allRoutes, (x) => ({
+        hasLoader: Boolean(x.loader),
+      })),
+    ],
   };
   const stringified = _(data)
     .map((value, key) => {
@@ -151,4 +162,12 @@ function buildWindowValues(
     })
     .join("");
   return `<script>${stringified}</script>`;
+}
+
+function mapToObject<K>(map: Map<string, K>): Record<string, K> {
+  const obj: Record<string, K> = {};
+  for (const [key, value] of map) {
+    obj[key] = value;
+  }
+  return obj;
 }
