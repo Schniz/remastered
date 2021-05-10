@@ -119,7 +119,8 @@ function buildScripts(
       .map(([, v]) => v)
       .flatten()
       .map((url) => {
-        return <link rel="modulepreload" href={url} key={url} />;
+        const rel = url.endsWith(".css") ? "stylesheet" : "modulepreload";
+        return <link rel={rel} href={url} key={url} />;
       })
       .value();
 
@@ -168,12 +169,4 @@ async function buildWindowValues(
     })
     .join("");
   return `<script>${stringified}</script>`;
-}
-
-function mapToObject<K>(map: Map<string, K>): Record<string, K> {
-  const obj: Record<string, K> = {};
-  for (const [key, value] of map) {
-    obj[key] = value;
-  }
-  return obj;
 }
