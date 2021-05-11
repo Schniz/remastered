@@ -8,6 +8,8 @@ import { Request, Response } from "node-fetch";
 import type { ServerResponse } from "./entry-server";
 import _ from "lodash";
 
+const isProd = process.env.NODE_ENV === "production";
+
 function findDistRoot() {
   if (isProd) {
     const places = [path.join(__dirname, ".."), process.cwd()];
@@ -30,7 +32,7 @@ function findDistRoot() {
 }
 
 export async function createServer() {
-  const app = fastify();
+  const app = fastify({ logger: isProd });
   await app.register(fastifyExpress);
 
   const vite = isProd
@@ -115,8 +117,12 @@ export async function renderRequest(
 }
 
 async function main() {
+  const port = process.env.PORT || 3000;
+  console.log(`Bootstrapping...`);
   const app = await createServer();
-  app.listen(3000);
+  console.log(`Server bootstrapped. Listening at ${port}`);
+
+  app.listen(port, "0.0.0.0");
 }
 
 if (require.main === module) {
@@ -154,5 +160,3 @@ async function getViteHandlers(
     };
   }
 }
-
-const isProd = process.env.NODE_ENV === "production";
