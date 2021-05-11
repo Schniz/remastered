@@ -10,6 +10,7 @@ import _ from "lodash";
  * @param {Response} res
  */
 export default async (req, res) => {
+  const method = req.method.toUpperCase();
   const response = await renderRequest(
     {
       template,
@@ -17,6 +18,8 @@ export default async (req, res) => {
       serverEntry,
     },
     new Request(req.url, {
+      method,
+      body: method !== "GET" && method !== "HEAD" ? req.body : undefined,
       headers: { ...req.headers },
     })
   );
