@@ -7,7 +7,7 @@ import _ from "lodash";
 
 /**
  * @param {Request} req
- * @param {Response} res
+ * @param {import('@vercel/node').VercelResponse} res
  */
 export default async (req, res) => {
   const method = req.method.toUpperCase();
@@ -24,7 +24,9 @@ export default async (req, res) => {
     })
   );
 
-  res.writeHead(response.status, { ...response.headers });
-  res.write(response.body);
-  res.end();
+  res.status(response.status);
+  for (const [header, value] of response.headers) {
+    res.setHeader(header, value);
+  }
+  res.end(response.body);
 };
