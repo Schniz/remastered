@@ -1,50 +1,24 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import Layout from "../app/layout";
-import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
-import {
-  CustomRouteObject,
-  routeTreeIntoReactRouterRoute,
-} from "./routeTreeIntoReactRouterRoute";
-import { dynamicImportComponent } from "./DynamicImportComponent";
-
-export const routesObject = loadFilesA();
-export const componentBag = turnToComponentBag(routesObject);
-export const routeElementsObject = convertRouteObjectsToRRDef(componentBag);
+import { ErrorTracker } from "./ErrorTracker";
+import { Error404 } from "./Error404";
+import { routeElementsObject } from "./fsRoutes";
 
 export default function App() {
   const element = useRoutes([
     {
       element: <Layout />,
-      children: routeElementsObject,
+      children: [
+        {
+          element: <ErrorTracker />,
+          children: [
+            ...routeElementsObject,
+            { path: "*", element: <Error404 /> },
+          ],
+        },
+      ],
     },
   ]);
   return element;
-}
-
-export function loadFilesA() {
-  const files = import.meta.glob("../app/routes/**/*.{t,j}sx");
-  return files;
-}
-
-function turnToComponentBag(files: Record<string, () => Promise<unknown>>) {
-  const components: Record<string, React.ComponentType> = {};
-
-  for (const key in files) {
-    const file = files[key] as { default: any } | (() => unknown);
-    components[key] =
-      typeof file === "function"
-        ? dynamicImportComponent(key, file as any)
-        : file.default;
-  }
-  return components;
-}
-
-export function convertRouteObjectsToRRDef(
-  components: Record<string, React.ComponentType>
-): CustomRouteObject[] {
-  const routeTree = createRouteTreeFromImportGlob(components);
-  const routes = routeTreeIntoReactRouterRoute(routeTree);
-
-  return routes;
 }

@@ -1,6 +1,7 @@
 import ReactDOMServer from "react-dom/server";
 import React from "react";
-import App, { routeElementsObject, routesObject } from "./App";
+import App from "./App";
+import { routeElementsObject, routesObject, user404 } from "./fsRoutes";
 import { matchRoutes, RouteMatch } from "react-router";
 import { StaticRouter } from "react-router-dom/server";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
@@ -9,6 +10,7 @@ import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
 import { LoaderContext } from "./LoaderContext";
 import fetch from "node-fetch";
+import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 
 global.fetch = fetch as any;
 
@@ -53,11 +55,11 @@ export async function render(
     }
   }
 
+  let status = 200;
+
   if (loaderNotFound) {
-    return {
-      content: { type: "html", value: "Page not found", scripts: "" },
-      status: 404,
-    };
+    loaderContext.clear();
+    status = 404;
   }
 
   if (
@@ -65,7 +67,7 @@ export async function render(
     request.headers.get("accept")?.includes("application/json")
   ) {
     return {
-      status: 200,
+      status,
       content: { type: "json", value: { data: [...loaderContext] } },
     };
   }
@@ -74,18 +76,24 @@ export async function render(
     buildScripts(
       foundRouteKeys.map((x) => x.routeKey),
       manifest
-    ) + (await buildWindowValues(found, loaderContext));
+    ) + (await buildWindowValues(found, loaderContext, status));
 
   const string = ReactDOMServer.renderToString(
-    <LoaderContext.Provider value={loaderContext}>
-      <DynamicImportComponentContext.Provider value={loadedComponents}>
-        <StaticRouter location={url}>
-          <App />
-        </StaticRouter>
-      </DynamicImportComponentContext.Provider>
-    </LoaderContext.Provider>
+    <NotFoundAndSkipRenderOnServerContext.Provider
+      value={{
+        state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
+      }}
+    >
+      <LoaderContext.Provider value={loaderContext}>
+        <DynamicImportComponentContext.Provider value={loadedComponents}>
+          <StaticRouter location={url}>
+            <App />
+          </StaticRouter>
+        </DynamicImportComponentContext.Provider>
+      </LoaderContext.Provider>
+    </NotFoundAndSkipRenderOnServerContext.Provider>
   );
-  return { content: { type: "html", value: string, scripts }, status: 200 };
+  return { content: { type: "html", value: string, scripts }, status };
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
@@ -139,7 +147,8 @@ function buildScripts(
 
 async function buildWindowValues(
   routes: RouteMatch[],
-  loaderContext: Map<string, unknown>
+  loaderContext: Map<string, unknown>,
+  splashState: number
 ): Promise<string> {
   const allRoutes = await buildRouteDefinitionBag(
     Object.keys(routesObject).map((x) => ({
@@ -153,6 +162,7 @@ async function buildWindowValues(
     .compact()
     .value();
   const data = {
+    __REMASTERED_SPLASH_STATE: splashState,
     __REMASTERED_SSR_ROUTES: routeFiles,
     __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
     __REMASTERED_ROUTE_DEFS: [

@@ -14,6 +14,7 @@ export function useRouteData<P>(routeKey?: string): P {
   const params = useParams();
   const key = `../app/routes/${routeKey}@${JSON.stringify(params)}`;
   const value = loaderContext.get(key);
+  console.log({ key, value, loaderContext });
 
   return value as P;
 }

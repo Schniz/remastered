@@ -6,8 +6,9 @@ import {
   Location,
 } from "history";
 import React from "react";
-import { routeElementsObject, routesObject } from "./App";
+import { routeElementsObject, routesObject } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
+import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 
 const routingContext = new Map(__REMASTERED_ROUTE_DEFS);
 
@@ -57,6 +58,9 @@ export function HaltingRouter(props: {
   initialLoaderContext: Map<string, unknown>;
   loadedComponentContext: Map<string, React.ComponentType>;
 }) {
+  const historyResponseState = React.useContext(
+    NotFoundAndSkipRenderOnServerContext
+  );
   const historyRef = React.useRef<BrowserHistory>();
   if (!historyRef.current) {
     historyRef.current = createBrowserHistory({ window: props.window });
@@ -92,7 +96,12 @@ export function HaltingRouter(props: {
           setLoaderContext(mergedMap);
         },
         loaderContextRef.current,
-        props.loadedComponentContext
+        props.loadedComponentContext,
+        () =>
+          historyResponseState.state?.set(
+            pendingState.value.location.key,
+            "not_found"
+          )
       );
     }
 
@@ -134,13 +143,16 @@ export function HaltingRouter(props: {
   );
 }
 
-async function fetching(url: string, signal: AbortSignal): Promise<unknown> {
+async function fetching(
+  url: string,
+  signal: AbortSignal
+): Promise<{ data: unknown; status: number }> {
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
     signal,
   });
   const json = await response.json();
-  return json.data;
+  return { data: json.data, status: response.status };
 }
 
 async function handlePendingState(
@@ -149,7 +161,8 @@ async function handlePendingState(
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
   loaderContext: Map<string, unknown>,
-  componentContext: Map<string, React.ComponentType>
+  componentContext: Map<string, React.ComponentType>,
+  onNotFound: () => void
 ) {
   const matches = matchRoutes(routeElementsObject, pendingState.value.location);
 
@@ -174,9 +187,13 @@ async function handlePendingState(
       ) {
         const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
 
-        const result = await fetching(url, signal);
-        const newMap = new Map<string, unknown>(result as any);
-        setLoaderContext(newMap);
+        const { data: result, status } = await fetching(url, signal);
+        if (status === 404) {
+          onNotFound();
+        } else {
+          const newMap = new Map<string, unknown>(result as any);
+          setLoaderContext(newMap);
+        }
       } else {
         console.log("cache hit");
       }

@@ -22,6 +22,9 @@ export default function Users() {
       Hello, this will not override, but won't be visible in{" "}
       <Link to="register">the registration page</Link>.
       <div>
+        <NavLink className="nav-link" to={"not-found"}>
+          Missing member
+        </NavLink>
         {routeData.map((project) => (
           <React.Fragment key={project.slug}>
             <NavLink className="nav-link" to={project.slug}>

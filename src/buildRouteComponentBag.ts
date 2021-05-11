@@ -1,4 +1,4 @@
-import { routesObject } from "./App";
+import { routesObject } from "./fsRoutes";
 import { LoaderFn } from "./routeTypes";
 
 type RouteDefinition<T> = {
