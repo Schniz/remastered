@@ -1,8 +1,9 @@
 import { routesObject } from "./fsRoutes";
-import { LoaderFn } from "./routeTypes";
+import { LoaderFn, ActionFn } from "./routeTypes";
 
 type RouteDefinition<T> = {
   loader?: LoaderFn<unknown>;
+  action?: ActionFn;
   component: React.ComponentType;
   key: string;
   givenRoute: T;
@@ -26,6 +27,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
       ctx.set(key, {
         component: routeDef.default,
         loader: routeDef.loader,
+        action: routeDef.action,
         key,
         givenRoute: route,
       });

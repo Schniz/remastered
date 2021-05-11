@@ -1,7 +1,7 @@
 import ReactDOMServer from "react-dom/server";
 import React from "react";
 import App from "./App";
-import { routeElementsObject, routesObject } from "./fsRoutes";
+import { routeElementsObject as routes, routesObject } from "./fsRoutes";
 import { matchRoutes, RouteMatch } from "react-router";
 import { StaticRouter } from "react-router-dom/server";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
@@ -9,30 +9,23 @@ import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
 import { LoaderContext } from "./LoaderContext";
-import fetch from "node-fetch";
+import fetch, { Response, Request } from "node-fetch";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 
 global.fetch = fetch as any;
 
-export type ResponseType =
-  | {
-      type: "json";
-      value: unknown;
-    }
-  | {
-      type: "html";
-      value: string;
-      scripts: string;
-    };
+type RequestContext = {
+  request: Request;
+  manifest?: Record<string, string[]>;
+  renderTemplate(opts: { preloadHtml: string; appHtml: string }): string;
+};
 
-export type ServerResponse = { content: ResponseType; status: number };
-
-export async function render(
-  request: Request,
-  manifest?: Record<string, string[]>
-): Promise<ServerResponse> {
+async function onGet({
+  request,
+  manifest,
+  renderTemplate,
+}: RequestContext): Promise<Response> {
   const url = request.url.replace(/\.json$/, "");
-  const routes = routeElementsObject;
   const found = matchRoutes(routes, url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
@@ -66,10 +59,12 @@ export async function render(
     request.url.endsWith(".json") ||
     request.headers.get("accept")?.includes("application/json")
   ) {
-    return {
+    return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
-      content: { type: "json", value: { data: [...loaderContext] } },
-    };
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   const scripts =
@@ -95,7 +90,46 @@ export async function render(
       </LoaderContext.Provider>
     </NotFoundAndSkipRenderOnServerContext.Provider>
   );
-  return { content: { type: "html", value: string, scripts }, status };
+
+  const html = renderTemplate({ preloadHtml: scripts, appHtml: string });
+  return new Response(html, {
+    status,
+    headers: {
+      "Content-Type": "text/html",
+    },
+  });
+}
+
+export async function render(ctx: RequestContext): Promise<Response> {
+  if (ctx.request.method === "GET") {
+    return await onGet(ctx);
+  }
+  const result = await onAction(ctx);
+  if (!result) {
+    return new Response("Not found", { status: 404 });
+  }
+  return result;
+}
+
+export type RenderFn = typeof render;
+
+async function onAction({
+  request,
+}: RequestContext): Promise<Response | undefined> {
+  const url = request.url.replace(/\.json$/, "");
+  const found = matchRoutes(routes, url) ?? [];
+  const foundRouteKey = getRouteKeys(found).slice(-1)[0];
+  if (!foundRouteKey) {
+    return;
+  }
+  const relevantRouteBag = await buildRouteDefinitionBag([foundRouteKey]);
+  const route = [...relevantRouteBag.values()][0];
+
+  if (!route.action) {
+    return;
+  }
+
+  return await route.action({ req: request });
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {

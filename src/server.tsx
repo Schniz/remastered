@@ -5,8 +5,9 @@ import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
 import { Request, Response } from "node-fetch";
-import type { ServerResponse } from "./entry-server";
+import type { RenderFn } from "./entry-server";
 import _ from "lodash";
+import fastifyFormBody from "fastify-formbody";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -34,6 +35,7 @@ function findDistRoot() {
 export async function createServer() {
   const app = fastify({ logger: isProd });
   await app.register(fastifyExpress);
+  app.addContentTypeParser("*", (_request, _payload, done) => done(null));
 
   const vite = isProd
     ? undefined
@@ -53,8 +55,10 @@ export async function createServer() {
   }
 
   app.all("*", async (req, reply) => {
+    const method = req.method.toUpperCase();
     const request = new Request(req.url, {
-      method: req.method,
+      method,
+      body: method !== "GET" && method !== "HEAD" ? req.raw : undefined,
       headers: _(req.headers)
         .entries()
         .map(([key, value]) => value !== undefined && [key, String(value)])
@@ -81,26 +85,16 @@ export async function renderRequest(
   vite?: ViteDevServer
 ): Promise<Response> {
   try {
-    const { render } = handlers.serverEntry;
-    const renderred: ServerResponse = await render(request, handlers.manifest);
-
-    if (renderred.content.type === "html") {
-      // 5. Inject the app-rendered HTML into the template.
-      const html = handlers.template
-        .replace(`<!--ssr-outlet-->`, renderred.content.value)
-        .replace("<!--ssr-scripts-->", renderred.content.scripts);
-      return new Response(html, {
-        headers: { "Content-Type": "text/html" },
-        status: renderred.status,
-      });
-    } else {
-      return new Response(JSON.stringify(renderred.content.value), {
-        status: renderred.status,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
+    const render: RenderFn = handlers.serverEntry.render;
+    return await render({
+      request,
+      manifest: handlers.manifest,
+      renderTemplate({ preloadHtml, appHtml }) {
+        return handlers.template
+          .replace(`<!--ssr-outlet-->`, appHtml)
+          .replace("<!--ssr-scripts-->", preloadHtml);
+      },
+    });
   } catch (e) {
     // If an error is caught, let vite fix the stracktrace so it maps back to
     // your actual source code.

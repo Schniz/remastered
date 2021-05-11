@@ -1,10 +1,11 @@
 import React from "react";
-import { Outlet } from "react-router";
+import { useOutlet } from "react-router";
 import { Link, NavLink } from "react-router-dom";
 import { useRouteData } from "../../src/LoaderContext";
-import { LoaderFn } from "../../src/routeTypes";
+import { ActionFn, LoaderFn } from "../../src/routeTypes";
 import { User, database } from "../database";
 import "./users.css";
+import { Response } from "node-fetch";
 
 type Data = (User & { slug: string })[];
 
@@ -14,8 +15,22 @@ export const loader: LoaderFn<Data> = async () => {
   });
 };
 
+export const action: ActionFn = async ({ req }) => {
+  const body = new URLSearchParams(await req.text());
+  const name = body.get("name")!;
+  const slug = name.replace(/[^A-z0-9]/g, "-");
+  database.set(slug, { name });
+  return new Response("", {
+    status: 302,
+    headers: {
+      Location: "/users",
+    },
+  });
+};
+
 export default function Users() {
   const routeData = useRouteData<Data>();
+  const outlet = useOutlet();
 
   return (
     <div>
@@ -33,7 +48,16 @@ export default function Users() {
           </React.Fragment>
         ))}
       </div>
-      <Outlet />
+      {outlet ?? <Form />}
     </div>
+  );
+}
+
+function Form() {
+  return (
+    <form method="post">
+      <input type="text" placeholder="name" name="name" />
+      <button type="submit">Submit</button>
+    </form>
   );
 }
