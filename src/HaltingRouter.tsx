@@ -166,7 +166,7 @@ async function handlePendingState(
 ) {
   const matches = matchRoutes(routeElementsObject, pendingState.value.location);
 
-  const loaders = (matches ?? []).map(async (routeMatch) => {
+  const components = (matches ?? []).map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
     const key = `../app/routes/${routeFile}`;
     const entry = await routesObject[key]?.();
@@ -206,7 +206,7 @@ async function handlePendingState(
     }
   }
 
-  await Promise.all(loaders);
+  await Promise.all(components);
 
   commit(pendingState.tx);
 }
