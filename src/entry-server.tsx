@@ -84,7 +84,9 @@ export async function render(
         state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
       }}
     >
-      <LoaderContext.Provider value={loaderContext}>
+      <LoaderContext.Provider
+        value={mapKeys(loaderContext, (a) => `default@${a}`)}
+      >
         <DynamicImportComponentContext.Provider value={loadedComponents}>
           <StaticRouter location={url}>
             <App />
@@ -179,4 +181,12 @@ async function buildWindowValues(
     })
     .join("");
   return `<script>${stringified}</script>`;
+}
+
+function mapKeys<K, V, R>(map: Map<K, V>, f: (k: K) => R): Map<R, V> {
+  const newMap = new Map<R, V>();
+  for (const [key, value] of map) {
+    newMap.set(f(key), value);
+  }
+  return newMap;
 }

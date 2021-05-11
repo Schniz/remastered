@@ -178,7 +178,9 @@ async function handlePendingState(
     const routeFile = (lastMatch.route as any).routeFile;
     const routingKey = `../app/routes/${routeFile}`;
     const routeInfo = routingContext.get(routingKey);
-    const storageKey = `${routingKey}@${JSON.stringify(lastMatch.params)}`;
+    const storageKey = `${
+      pendingState.value.location.key
+    }@${routingKey}@${JSON.stringify(lastMatch.params)}`;
 
     if (routeInfo && routeInfo.hasLoader) {
       if (
@@ -188,10 +190,14 @@ async function handlePendingState(
         const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
 
         const { data: result, status } = await fetching(url, signal);
+        const migrated = (result as [string, unknown][]).map(
+          ([key, value]) =>
+            [`${pendingState.value.location.key}@${key}`, value] as const
+        );
         if (status === 404) {
           onNotFound();
         } else {
-          const newMap = new Map<string, unknown>(result as any);
+          const newMap = new Map<string, unknown>(migrated);
           setLoaderContext(newMap);
         }
       } else {

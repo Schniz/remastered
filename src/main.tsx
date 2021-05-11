@@ -20,12 +20,12 @@ declare global {
   const __DEV__: boolean;
 }
 
-const loadCtx = new Map(__REMASTERED_LOAD_CTX);
+const historyKey = window.history.state?.key ?? "default";
+const loadCtx = new Map(
+  __REMASTERED_LOAD_CTX.map(([key, value]) => [`${historyKey}@${key}`, value])
+);
 const historyResponseState: HistoryResponseState = new Map([
-  [
-    window.history.state?.key ?? "default",
-    __REMASTERED_SPLASH_STATE === 404 ? "not_found" : "ok",
-  ],
+  [historyKey, __REMASTERED_SPLASH_STATE === 404 ? "not_found" : "ok"],
 ]);
 
 buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedComponents) => {
