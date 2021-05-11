@@ -19,7 +19,7 @@ export default async (req, res) => {
     },
     new Request(req.url, {
       method,
-      body: method !== "GET" && method !== "HEAD" ? req.body : undefined,
+      body: method !== "GET" && method !== "HEAD" ? req : undefined,
       headers: { ...req.headers },
     })
   );
