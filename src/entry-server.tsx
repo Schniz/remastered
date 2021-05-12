@@ -180,7 +180,7 @@ function buildScripts(
 
   const elms = _([...preloadLinks])
     .map(([url]) => {
-      return <link rel="modulepreload" href={url} />;
+      return <link rel="modulepreload" href={url} key={url} />;
       /* return <script type="module" src={url} />; */
     })
     .value();
