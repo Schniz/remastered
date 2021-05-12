@@ -31,7 +31,6 @@ export function convertRouteObjectsToRRDef(
   delete components["/app/routes/404.jsx"];
 
   const routeTree = createRouteTreeFromImportGlob(components);
-  console.log(routeTree);
   const routes = routeTreeIntoReactRouterRoute(routeTree);
 
   return routes;
