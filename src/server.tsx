@@ -89,6 +89,7 @@ export async function renderRequest(
     return await render({
       request,
       manifest: handlers.manifest,
+      viteDevServer: vite,
       renderTemplate({ preloadHtml, appHtml }) {
         return handlers.template
           .replace(`<!--ssr-outlet-->`, appHtml)

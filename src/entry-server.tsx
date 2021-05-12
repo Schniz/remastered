@@ -11,6 +11,7 @@ import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
 import { LoaderContext } from "./LoaderContext";
 import fetch, { Response, Request } from "node-fetch";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
+import type { ViteDevServer } from "vite";
 
 global.fetch = fetch as any;
 
@@ -18,11 +19,13 @@ type RequestContext = {
   request: Request;
   manifest?: Record<string, string[]>;
   renderTemplate(opts: { preloadHtml: string; appHtml: string }): string;
+  viteDevServer?: ViteDevServer;
 };
 
 async function onGet({
   request,
   manifest,
+  viteDevServer,
   renderTemplate,
 }: RequestContext): Promise<Response> {
   const url = request.url.replace(/\.json$/, "");
@@ -67,11 +70,10 @@ async function onGet({
     });
   }
 
+  const routeKeys = foundRouteKeys.map((x) => x.routeKey);
   const scripts =
-    buildScripts(
-      foundRouteKeys.map((x) => x.routeKey),
-      manifest
-    ) + (await buildWindowValues(found, loaderContext, status));
+    buildScripts(routeKeys, manifest, viteDevServer) +
+    (await buildWindowValues(found, loaderContext, status));
 
   const string = ReactDOMServer.renderToString(
     <NotFoundAndSkipRenderOnServerContext.Provider
@@ -150,7 +152,8 @@ type EnhancedRoute = RouteMatch & {
 
 function buildScripts(
   routeKeys: string[],
-  manifest?: Record<string, string[]>
+  manifest?: Record<string, string[]>,
+  vite?: ViteDevServer
 ): string {
   if (manifest) {
     const preload = _(manifest)
@@ -171,14 +174,15 @@ function buildScripts(
     return ReactDOMServer.renderToStaticMarkup(<>{preload}</>);
   }
 
-  return _(routeKeys)
-    .map((routeFile) => `/app/routes/${routeFile}`)
-    .map((url) => {
-      return ReactDOMServer.renderToStaticMarkup(
-        <link rel="modulepreload" href={url} />
-      );
+  const preloadLinks = getPreloadFromVite(vite, routeKeys);
+
+  const elms = _([...preloadLinks])
+    .map(([url]) => {
+      return <link rel="modulepreload" href={url} />;
+      /* return <script type="module" src={url} />; */
     })
-    .join("");
+    .value();
+  return ReactDOMServer.renderToStaticMarkup(<>{elms}</>);
 }
 
 async function buildWindowValues(
@@ -223,4 +227,36 @@ function mapKeys<K, V, R>(map: Map<K, V>, f: (k: K) => R): Map<R, V> {
     newMap.set(f(key), value);
   }
   return newMap;
+}
+
+function getPreloadFromVite(
+  vite: ViteDevServer | undefined,
+  routeKeys: string[]
+): Map<string, "js" | "css"> {
+  const resolvedModules = new Map<string, "js" | "css">();
+
+  if (!vite) {
+    return resolvedModules;
+  }
+
+  /* const result: Record<string, string[]> = {}; */
+  const moduleQueue = _(routeKeys)
+    .map((x) => `${process.cwd()}/app/routes/${x}`)
+    .concat([`${process.cwd()}/src/main.tsx`])
+    .map((x) => {
+      return vite.moduleGraph.fileToModulesMap.get(x);
+    })
+    .compact()
+    .flatMap((x) => [...x])
+    .compact()
+    .value();
+  /* console.log(vite.moduleGraph.fileToModulesMap); */
+
+  while (moduleQueue.length) {
+    const moduleNode = moduleQueue.shift()!;
+    resolvedModules.set(moduleNode.url, moduleNode.type);
+    moduleQueue.push(...moduleNode.importedModules);
+  }
+
+  return resolvedModules;
 }
