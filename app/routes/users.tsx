@@ -5,7 +5,7 @@ import { useRouteData } from "../../src/LoaderContext";
 import { ActionFn, LoaderFn } from "../../src/routeTypes";
 import { User, database } from "../database";
 import "./users.css";
-import { Response } from "node-fetch";
+import { redirectTo } from "../../src/httpHelpers";
 
 type Data = (User & { slug: string })[];
 
@@ -20,12 +20,7 @@ export const action: ActionFn = async ({ req }) => {
   const name = body.get("name")!;
   const slug = name.replace(/[^A-z0-9]/g, "-");
   database.set(slug, { name });
-  return new Response("", {
-    status: 302,
-    headers: {
-      Location: "/users",
-    },
-  });
+  return redirectTo("/users");
 };
 
 export default function Users() {

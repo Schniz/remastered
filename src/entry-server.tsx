@@ -36,7 +36,7 @@ async function onGet({
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
       const params = relevantRoute.givenRoute.params;
-      const key = `${relevantRoute.key}@${JSON.stringify(params)}`;
+      const key = `${relevantRoute.key}`;
       const loaderResult = await relevantRoute.loader({
         params,
       });

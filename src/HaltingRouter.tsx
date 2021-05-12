@@ -178,9 +178,7 @@ async function handlePendingState(
     const routeFile = (lastMatch.route as any).routeFile;
     const routingKey = `../app/routes/${routeFile}`;
     const routeInfo = routingContext.get(routingKey);
-    const storageKey = `${
-      pendingState.value.location.key
-    }@${routingKey}@${JSON.stringify(lastMatch.params)}`;
+    const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 
     if (routeInfo && routeInfo.hasLoader) {
       if (

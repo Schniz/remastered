@@ -3,7 +3,7 @@ import { useLocation, useParams } from "react-router";
 import { useRouteModule } from "./routeTreeIntoReactRouterRoute";
 
 /**
- * Keys are: `${location.key}@${fsRouteKey}@${JSON.stringify(location.params)}`
+ * Keys are: `${location.key}@${fsRouteKey}`
  */
 export const LoaderContext = React.createContext<Map<string, unknown>>(
   new Map()
@@ -15,10 +15,7 @@ export function useRouteData<P>(routeKey?: string): P {
   const location = useLocation();
   const loaderContext = React.useContext(LoaderContext);
   routeKey = routeKey ?? useRouteModule();
-  const params = useParams();
-  const key = `${location.key}@../app/routes/${routeKey}@${JSON.stringify(
-    params
-  )}`;
+  const key = `${location.key}@../app/routes/${routeKey}`;
   const value = loaderContext.get(key);
 
   return value as P;
