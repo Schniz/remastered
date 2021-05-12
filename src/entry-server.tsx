@@ -2,7 +2,7 @@ import ReactDOMServer from "react-dom/server";
 import React from "react";
 import App from "./App";
 import { routeElementsObject as routes, routesObject } from "./fsRoutes";
-import { matchRoutes, RouteMatch } from "react-router";
+import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { StaticRouter } from "react-router-dom/server";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
@@ -36,8 +36,7 @@ async function onGet({
 
   let found = matchRoutes(routes, url) ?? [];
   if (isJsonResponse) {
-    // Only provide the last route data
-    found = found.slice(-1);
+    found = found.filter((x) => matchPath(x.pathname, url));
   }
 
   const foundRouteKeys = getRouteKeys(found);
