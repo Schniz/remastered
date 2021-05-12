@@ -7,7 +7,6 @@ import fastifyStatic from "fastify-static";
 import { Request, Response } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
-import fastifyFormBody from "fastify-formbody";
 
 const isProd = process.env.NODE_ENV === "production";
 
