@@ -35,6 +35,11 @@ async function onGet({
     request.headers.get("accept")?.includes("application/json");
 
   let found = matchRoutes(routes, url) ?? [];
+  if (isJsonResponse) {
+    // Only provide the last route data
+    found = found.slice(-1);
+  }
+
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);

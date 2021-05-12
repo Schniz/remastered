@@ -1,4 +1,4 @@
-import { Navigator, Router, matchRoutes } from "react-router";
+import { Navigator, Router, matchRoutes, RouteMatch } from "react-router";
 import {
   Action,
   BrowserHistory,
@@ -87,6 +87,7 @@ export function HaltingRouter(props: {
     const abortController = new AbortController();
     if (pendingState) {
       handlePendingState(
+        state,
         pendingState,
         commit,
         abortController.signal,
@@ -156,6 +157,7 @@ async function fetching(
 }
 
 async function handlePendingState(
+  currentState: { location: Location; action: Action },
   pendingState: PendingState<{ location: Location; action: Action }>,
   commit: (tx: string) => void,
   signal: AbortSignal,
@@ -164,17 +166,38 @@ async function handlePendingState(
   componentContext: Map<string, React.ComponentType>,
   onNotFound: () => void
 ) {
-  const matches = matchRoutes(routeElementsObject, pendingState.value.location);
+  const allMatches = matchRoutes(
+    routeElementsObject,
+    pendingState.value.location
+  );
+  const { newRoutes, keepRoutes } = diffRoutes(currentState, allMatches ?? []);
 
-  const components = (matches ?? []).map(async (routeMatch) => {
+  const components = newRoutes.map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
     const key = `../app/routes/${routeFile}`;
     const entry = await routesObject[key]?.();
     componentContext.set(key, entry.default);
   });
 
-  const lastMatch = matches?.slice(-1)[0];
-  if (lastMatch) {
+  const newMap = new Map<string, unknown>();
+
+  keepRoutes.forEach((route) => {
+    const routeFile = (route.route as any).routeFile;
+    const routingKey = `../app/routes/${routeFile}`;
+    const routeInfo = routingContext.get(routingKey);
+    const pendingStorageKey = `${pendingState.value.location.key}@${routingKey}`;
+    const currentStorageKey = `${currentState.location.key}@${routingKey}`;
+
+    if (routeInfo && routeInfo.hasLoader) {
+      if (!loaderContext.has(currentStorageKey)) {
+        newRoutes.unshift(route);
+      } else {
+        newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
+      }
+    }
+  });
+
+  const loaders = newRoutes.map(async (lastMatch) => {
     const routeFile = (lastMatch.route as any).routeFile;
     const routingKey = `../app/routes/${routeFile}`;
     const routeInfo = routingContext.get(routingKey);
@@ -185,7 +208,7 @@ async function handlePendingState(
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
       ) {
-        const url = `${pendingState.value.location.pathname}.json${pendingState.value.location.search}`;
+        const url = `${lastMatch.pathname}.json`;
 
         const { data: result, status } = await fetching(url, signal);
         const migrated = (result as [string, unknown][]).map(
@@ -195,16 +218,43 @@ async function handlePendingState(
         if (status === 404) {
           onNotFound();
         } else {
-          const newMap = new Map<string, unknown>(migrated);
-          setLoaderContext(newMap);
+          for (const [key, value] of migrated) {
+            newMap.set(key, value);
+          }
         }
       } else {
         console.log("cache hit");
       }
     }
-  }
+  });
 
-  await Promise.all(components);
+  await Promise.all([Promise.all(components), Promise.all(loaders)]);
+  setLoaderContext(newMap);
 
   commit(pendingState.tx);
+}
+
+function diffRoutes(
+  currentState: { location: Location; action: Action },
+  pendingRoutes: RouteMatch[]
+) {
+  const currentMatches = (
+    matchRoutes(routeElementsObject, currentState.location) ?? []
+  ).map((route) => {
+    return `${route.pathname}/${JSON.stringify(route.params)}`;
+  });
+
+  const keepRoutes: RouteMatch[] = [];
+  const newRoutes: RouteMatch[] = [];
+
+  for (const route of pendingRoutes) {
+    const key = `${route.pathname}/${JSON.stringify(route.params)}`;
+    if (currentMatches.includes(key)) {
+      keepRoutes.push(route);
+    } else {
+      newRoutes.push(route);
+    }
+  }
+
+  return { keepRoutes, newRoutes };
 }
