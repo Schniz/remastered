@@ -16,8 +16,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
   const ctx = new Map<string, RouteDefinition<T>>();
   const loadedComponents = Object.entries(routesObject)
     .flatMap(([key, value]) => {
-      const shortKey = key.replace("/app/routes/", "");
-      const route = routeKeys.find(({ routeKey }) => shortKey === routeKey);
+      const route = routeKeys.find(({ routeKey }) => key === routeKey);
       if (route) {
         return [{ route, value, key }];
       }

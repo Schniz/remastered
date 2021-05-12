@@ -174,7 +174,7 @@ async function handlePendingState(
 
   const components = newRoutes.map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
-    const key = `/app/routes/${routeFile}`;
+    const key = `${routeFile}`;
     const entry = await routesObject[key]?.();
     componentContext.set(key, entry.default);
   });
@@ -183,7 +183,7 @@ async function handlePendingState(
 
   keepRoutes.forEach((route) => {
     const routeFile = (route.route as any).routeFile;
-    const routingKey = `/app/routes/${routeFile}`;
+    const routingKey = `${routeFile}`;
     const routeInfo = routingContext.get(routingKey);
     const pendingStorageKey = `${pendingState.value.location.key}@${routingKey}`;
     const currentStorageKey = `${currentState.location.key}@${routingKey}`;
@@ -199,7 +199,7 @@ async function handlePendingState(
 
   const loaders = newRoutes.map(async (lastMatch) => {
     const routeFile = (lastMatch.route as any).routeFile;
-    const routingKey = `/app/routes/${routeFile}`;
+    const routingKey = `${routeFile}`;
     const routeInfo = routingContext.get(routingKey);
     const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 

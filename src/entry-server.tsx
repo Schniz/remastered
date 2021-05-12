@@ -166,7 +166,7 @@ function buildScripts(
       .entries()
       .filter(([key]) => {
         return routeKeys.some((routeKey) => {
-          return key.endsWith(`/app/routes/${routeKey}`);
+          return key.endsWith(routeKey);
         });
       })
       .map(([, v]) => v)
@@ -198,7 +198,7 @@ async function buildWindowValues(
 ): Promise<string> {
   const allRoutes = await buildRouteDefinitionBag(
     Object.keys(routesObject).map((x) => ({
-      routeKey: x.replace("/app/routes/", ""),
+      routeKey: x,
     }))
   );
   const routeFiles = _(routes)
@@ -239,7 +239,7 @@ function getPreloadFromVite(
 
   /* const result: Record<string, string[]> = {}; */
   const moduleQueue = _(routeKeys)
-    .map((x) => `${process.cwd()}/app/routes/${x}`)
+    .map((x) => `${process.cwd()}${x}`)
     .concat([`${process.cwd()}/src/main.tsx`])
     .map((x) => {
       return vite.moduleGraph.fileToModulesMap.get(x);

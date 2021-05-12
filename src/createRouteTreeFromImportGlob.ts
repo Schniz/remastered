@@ -3,18 +3,20 @@ import React from "react";
 export function createRouteTreeFromImportGlob(
   record: Record<string, React.ComponentType>
 ): RouteTree {
-  const routes: Record<string, React.ComponentType> = {};
+  const routes: Record<
+    string,
+    { filename: string; component: React.ComponentType }
+  > = {};
 
   for (const filename in record) {
     const path = filename.replace(/^\/app\/routes\//, "");
-
-    routes[path] = record[filename];
+    routes[path] = { filename, component: record[filename] };
   }
 
   const routeTree: Leaf = { children: {}, filepath: "" };
 
   for (const path in routes) {
-    const element = routes[path];
+    const { component: element, filename } = routes[path];
     const parts = path.replace(/\.[tj]sx?$/, "").split("/");
     const relevant = parts.reduce((obj, part) => {
       const currentObject = obj.children[part] ?? {
@@ -23,7 +25,7 @@ export function createRouteTreeFromImportGlob(
       obj.children[part] = currentObject;
       return currentObject;
     }, routeTree);
-    relevant.filepath = path;
+    relevant.filepath = filename;
     relevant.element = element;
   }
 
