@@ -30,7 +30,11 @@ async function onGet({
   renderTemplate,
 }: RequestContext): Promise<Response> {
   const url = request.url.replace(/\.json$/, "");
-  const found = matchRoutes(routes, url) ?? [];
+  const isJsonResponse =
+    request.url.endsWith(".json") ||
+    request.headers.get("accept")?.includes("application/json");
+
+  let found = matchRoutes(routes, url) ?? [];
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
@@ -59,10 +63,7 @@ async function onGet({
     status = 404;
   }
 
-  if (
-    request.url.endsWith(".json") ||
-    request.headers.get("accept")?.includes("application/json")
-  ) {
+  if (isJsonResponse) {
     return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
       headers: {
