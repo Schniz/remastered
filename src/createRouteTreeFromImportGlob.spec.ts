@@ -2,11 +2,11 @@ import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
 
 test("routes", () => {
   const result = createRouteTreeFromImportGlob({
-    "../app/routes/users/@id.tsx": SomeComponent,
-    "../app/routes/users.tsx": SomeComponent,
-    "../app/routes/about.tsx": SomeComponent,
-    "../app/routes/index.tsx": SomeComponent,
-    "../app/routes/users.register.tsx": SomeComponent,
+    "/app/routes/users/@id.tsx": SomeComponent,
+    "/app/routes/users.tsx": SomeComponent,
+    "/app/routes/about.tsx": SomeComponent,
+    "/app/routes/index.tsx": SomeComponent,
+    "/app/routes/users.register.tsx": SomeComponent,
   });
   expect(result).toEqual({
     "/": {

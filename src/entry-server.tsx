@@ -198,7 +198,7 @@ async function buildWindowValues(
 ): Promise<string> {
   const allRoutes = await buildRouteDefinitionBag(
     Object.keys(routesObject).map((x) => ({
-      routeKey: x.replace("../app/routes/", ""),
+      routeKey: x.replace("/app/routes/", ""),
     }))
   );
   const routeFiles = _(routes)

@@ -6,7 +6,7 @@ import {
 import { dynamicImportComponent } from "./DynamicImportComponent";
 
 export function loadFilesA() {
-  const files = import.meta.glob("../app/routes/**/*.{t,j}sx");
+  const files = import.meta.glob(`/app/routes/**/*.{t,j}sx`);
   return files;
 }
 
@@ -27,10 +27,11 @@ export function convertRouteObjectsToRRDef(
   allComponents: Record<string, React.ComponentType>
 ): CustomRouteObject[] {
   const components = { ...allComponents };
-  delete components["../app/routes/404.tsx"];
-  delete components["../app/routes/404.jsx"];
+  delete components["/app/routes/404.tsx"];
+  delete components["/app/routes/404.jsx"];
 
   const routeTree = createRouteTreeFromImportGlob(components);
+  console.log(routeTree);
   const routes = routeTreeIntoReactRouterRoute(routeTree);
 
   return routes;

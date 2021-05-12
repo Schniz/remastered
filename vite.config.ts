@@ -8,6 +8,7 @@ const config = defineConfig({
   plugins: [routeTransformer(), reactRefresh()],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
+    __REMASTERED_ROOT__: JSON.stringify(process.cwd()),
   },
   resolve: {
     alias: {

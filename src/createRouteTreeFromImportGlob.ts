@@ -1,5 +1,4 @@
 import React from "react";
-// import lazy from "@loadable/component";
 
 export function createRouteTreeFromImportGlob(
   record: Record<string, React.ComponentType>
@@ -7,7 +6,7 @@ export function createRouteTreeFromImportGlob(
   const routes: Record<string, React.ComponentType> = {};
 
   for (const filename in record) {
-    const path = filename.replace(/^\.\.\/app\/routes\//, "");
+    const path = filename.replace(/^\/app\/routes\//, "");
 
     routes[path] = record[filename];
   }

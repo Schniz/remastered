@@ -11,7 +11,7 @@ function Default404() {
 }
 
 export function Error404() {
-  const userRoutes = import.meta.globEager("../app/routes/404.{t,j}sx");
+  const userRoutes = import.meta.globEager("/app/routes/404.{t,j}sx");
   const Route = Object.values(userRoutes)[0]?.default ?? Default404;
   return <Route />;
 }
