@@ -8,7 +8,7 @@ export const action: ActionFn = async ({ req }) => {
   const name = body.get("name")!;
   const slug = name.replace(/[^A-z0-9]/g, "-");
   database.set(slug, { name, slug });
-  return redirectTo("/users");
+  return redirectTo(`/users/${slug}`);
 };
 
 export default function UsersIndex() {
