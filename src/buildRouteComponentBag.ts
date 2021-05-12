@@ -1,5 +1,6 @@
 import { routesObject } from "./fsRoutes";
 import { LoaderFn, ActionFn } from "./routeTypes";
+import { mapValues } from "./Map";
 
 type RouteDefinition<T> = {
   loader?: LoaderFn<unknown>;
@@ -34,14 +35,6 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
     });
   await Promise.all(loadedComponents);
   return ctx;
-}
-
-export function mapValues<K, V, R>(map: Map<K, V>, f: (v: V) => R): Map<K, R> {
-  const newMap = new Map<K, R>();
-  for (const [key, value] of map.entries()) {
-    newMap.set(key, f(value));
-  }
-  return newMap;
 }
 
 export async function buildRouteComponentBag(

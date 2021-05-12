@@ -7,10 +7,11 @@ import { StaticRouter } from "react-router-dom/server";
 import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
-import { buildRouteDefinitionBag, mapValues } from "./buildRouteComponentBag";
+import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { LoaderContext } from "./LoaderContext";
 import fetch, { Response, Request } from "node-fetch";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
+import { mapValues, mapKeys } from "./Map";
 import type { ViteDevServer } from "vite";
 
 global.fetch = fetch as any;
@@ -219,14 +220,6 @@ async function buildWindowValues(
     })
     .join("");
   return `<script>${stringified}</script>`;
-}
-
-function mapKeys<K, V, R>(map: Map<K, V>, f: (k: K) => R): Map<R, V> {
-  const newMap = new Map<R, V>();
-  for (const [key, value] of map) {
-    newMap.set(f(key), value);
-  }
-  return newMap;
 }
 
 function getPreloadFromVite(
