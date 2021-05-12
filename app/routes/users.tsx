@@ -7,24 +7,20 @@ import { User, database } from "../database";
 import "./users.css";
 import { redirectTo } from "../../src/httpHelpers";
 
-type Data = (User & { slug: string })[];
-
-export const loader: LoaderFn<Data> = async () => {
-  return [...database].map(([slug, user]) => {
-    return { ...user, slug };
-  });
+export const loader: LoaderFn<User[]> = async () => {
+  return [...database.values()];
 };
 
 export const action: ActionFn = async ({ req }) => {
   const body = new URLSearchParams(await req.text());
   const name = body.get("name")!;
   const slug = name.replace(/[^A-z0-9]/g, "-");
-  database.set(slug, { name });
+  database.set(slug, { name, slug });
   return redirectTo("/users");
 };
 
 export default function Users() {
-  const routeData = useRouteData<Data>();
+  const users = useRouteData<User[]>();
   const outlet = useOutlet();
 
   return (
@@ -35,12 +31,10 @@ export default function Users() {
         <NavLink className="nav-link" to={"not-found"}>
           Missing member
         </NavLink>
-        {routeData.map((project) => (
-          <React.Fragment key={project.slug}>
-            <NavLink className="nav-link" to={project.slug}>
-              {project.name}
-            </NavLink>
-          </React.Fragment>
+        {users.map((user) => (
+          <NavLink className="nav-link" to={user.slug} key={user.slug}>
+            {user.name}
+          </NavLink>
         ))}
       </div>
       {outlet ?? <Form />}
