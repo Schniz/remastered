@@ -18,7 +18,7 @@
     "paths": {
       "react-router": ["./react-router-pkgs/react-router"],
       "react-router-dom": ["./react-router-pkgs/react-router-dom"],
-      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"],
+      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"]
     }
   },
   "include": ["./src", "./app"]

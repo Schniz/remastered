@@ -185,7 +185,6 @@ function buildScripts(
   const elms = _([...preloadLinks])
     .map(([url]) => {
       return <link rel="modulepreload" href={url} key={url} />;
-      /* return <script type="module" src={url} />; */
     })
     .value();
   return ReactDOMServer.renderToStaticMarkup(<>{elms}</>);
@@ -197,9 +196,7 @@ async function buildWindowValues(
   splashState: number
 ): Promise<string> {
   const allRoutes = await buildRouteDefinitionBag(
-    Object.keys(routesObject).map((x) => ({
-      routeKey: x,
-    }))
+    Object.keys(routesObject).map((routeKey) => ({ routeKey }))
   );
   const routeFiles = _(routes)
     .map((route) => {
