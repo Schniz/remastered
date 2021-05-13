@@ -22,16 +22,16 @@ Every `tsx` or `jsx` file in `./app/routes/` will become a route.
 All routes are chunked so you only download the routes you are visiting.
 SSR will make sure you preload the routes you are currently looking at and enforce downloading it before hydration.
 
-```
-app/routes/index.tsx => /
-app/routes/about.tsx => /about
-app/routes/users.tsx => /users
-app/routes/users/@id.tsx => /users/:id
-app/routes/users/index.tsx => /users/ (will be the outlet of `/users`, like an empty state)
-app/routes/users.register.tsx => /users/register
-```
+| file                          | url             | comments                                             |
+| ----------------------------- | --------------- | ---------------------------------------------------- |
+| app/routes/index.tsx          | /               |                                                      |
+| app/routes/about.tsx          | /about          |                                                      |
+| app/routes/users.tsx          | /users          |                                                      |
+| app/routes/users/@id.tsx      | /users/:id      |                                                      |
+| app/routes/users/index.tsx    | /users/         | will be the outlet of `/users`, like an empty state) |
+| app/routes/users.register.tsx | /users/register |                                                      |
 
-> 🔁 Note: Use `@` to declare a parameter.
+> 📝 Note: Use `@` to declare a parameter.
 >
 > Shells will interpret `$id` as the ENV var `id`. `@` is safer for this. We might support it both ways.
 >
