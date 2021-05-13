@@ -1,4 +1,10 @@
-import { Navigator, Router, matchRoutes, RouteMatch } from "react-router";
+import {
+  Navigator,
+  Router,
+  matchRoutes,
+  matchPath,
+  RouteMatch,
+} from "react-router";
 import {
   Action,
   BrowserHistory,
@@ -166,11 +172,10 @@ async function handlePendingState(
   componentContext: Map<string, React.ComponentType>,
   onNotFound: () => void
 ) {
-  const allMatches = matchRoutes(
-    routeElementsObject,
-    pendingState.value.location
+  const { newRoutes, keepRoutes } = diffRoutes(
+    currentState,
+    pendingState.value
   );
-  const { newRoutes, keepRoutes } = diffRoutes(currentState, allMatches ?? []);
 
   const components = newRoutes.map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
@@ -236,8 +241,10 @@ async function handlePendingState(
 
 function diffRoutes(
   currentState: { location: Location; action: Action },
-  pendingRoutes: RouteMatch[]
-) {
+  pendingState: { location: Location; action: Action }
+): { newRoutes: RouteMatch[]; keepRoutes: RouteMatch[] } {
+  const pendingRoutes =
+    matchRoutes(routeElementsObject, pendingState.location) ?? [];
   const currentMatches = (
     matchRoutes(routeElementsObject, currentState.location) ?? []
   ).map((route) => {
@@ -256,5 +263,13 @@ function diffRoutes(
     }
   }
 
-  return { keepRoutes, newRoutes };
+  if (newRoutes.length) {
+    return { keepRoutes, newRoutes };
+  } else {
+    const newRoutes = pendingRoutes.filter((route) => {
+      return matchPath(route.pathname, pendingState.location.pathname);
+    });
+    const keepRoutes = pendingRoutes.filter((x) => !newRoutes.includes(x));
+    return { newRoutes, keepRoutes };
+  }
 }
