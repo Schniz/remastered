@@ -22,14 +22,14 @@ Every `tsx` or `jsx` file in `./app/routes/` will become a route.
 All routes are chunked so you only download the routes you are visiting.
 SSR will make sure you preload the routes you are currently looking at and enforce downloading it before hydration.
 
-| file                          | url             | component hierarchy                                    |
-| ----------------------------- | --------------- | ------------------------------------------------------ |
-| app/routes/index.tsx          | /               | index.tsx                                              |
-| app/routes/about.tsx          | /about          | about.tsx                                              |
-| app/routes/users.tsx          | /users          | ⚠ will be used as a container, check `users/index.tsx` |
-| app/routes/users/@id.tsx      | /users/:id      | `users.tsx` > `users/@id.tsx`                          |
-| app/routes/users/index.tsx    | /users/         | `users.tsx` > `users/index.tsx`                        |
-| app/routes/users.register.tsx | /users/register | `users.register.tsx`                                   |
+| file                            | url               | component hierarchy                                      |
+| ------------------------------- | ----------------- | -------------------------------------------------------- |
+| `app/routes/index.tsx`          | `/`               | `index.tsx`                                              |
+| `app/routes/about.tsx`          | `/about`          | `about.tsx`                                              |
+| `app/routes/users.tsx`          | `/users`          | will be used as a nested layout, check `users/index.tsx` |
+| `app/routes/users/index.tsx`    | `/users/`         | `users.tsx` > `users/index.tsx`                          |
+| `app/routes/users/@id.tsx`      | `/users/:id`      | `users.tsx` > `users/@id.tsx`                            |
+| `app/routes/users.register.tsx` | `/users/register` | `users.register.tsx`                                     |
 
 > 📝 Note: Use `@` to declare a parameter.
 >
