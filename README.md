@@ -12,6 +12,13 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 
 ## What's implemented?
 
+- [x] SSR
+- [x] `loader` - still needs to support `Response`s
+- [x] `links`
+- [x] `action`
+- [ ] `headers`
+- [ ] `meta`
+
 ### SSR
 
 Every route is SSR'd completely, including the data.
