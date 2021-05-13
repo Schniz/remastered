@@ -1,8 +1,11 @@
+// @ts-check
+
 import { renderRequest } from "../src/server";
+// @ts-ignore
 import manifest from "./ssr-manifest.json";
+// @ts-ignore
 import clientManifest from "./manifest.json";
 import * as serverEntry from "../dist/server/entry-server";
-import template from "../dist/server/template";
 import { Request } from "node-fetch";
 import _ from "lodash";
 
@@ -14,13 +17,13 @@ export default async (req, res) => {
   const method = req.method.toUpperCase();
   const response = await renderRequest(
     {
-      template,
       manifest,
       serverEntry,
       clientManifest,
     },
     new Request(req.url, {
       method,
+      // @ts-ignore
       body: method !== "GET" && method !== "HEAD" ? req : undefined,
       headers: { ...req.headers },
     })

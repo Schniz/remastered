@@ -65,7 +65,7 @@ export async function createServer() {
         .value(),
     });
     const response = await renderRequest(
-      await getViteHandlers(vite, request.url),
+      await getViteHandlers(vite),
       request,
       vite
     );
@@ -90,11 +90,6 @@ export async function renderRequest(
       manifest: handlers.manifest,
       viteDevServer: vite,
       clientManifest: handlers.clientManifest,
-      renderTemplate({ preloadHtml, appHtml }) {
-        return handlers.template
-          .replace(`<!--ssr-outlet-->`, appHtml)
-          .replace("<!--ssr-scripts-->", preloadHtml);
-      },
     });
   } catch (e) {
     // If an error is caught, let vite fix the stracktrace so it maps back to
@@ -125,35 +120,23 @@ if (require.main === module) {
 }
 
 type ViteHandlers = {
-  template: string;
   serverEntry: any;
   manifest?: Record<string, string[]>;
   clientManifest?: import("vite").Manifest;
 };
 
 async function getViteHandlers(
-  vite: ViteDevServer | undefined,
-  url: string
+  vite: ViteDevServer | undefined
 ): Promise<ViteHandlers> {
   if (!vite) {
     return {
       serverEntry: require("../dist/server/entry-server.js"),
       manifest: require("../dist/client/ssr-manifest.json"),
       clientManifest: require("../dist/client/manifest.json"),
-      template: fs.readFileSync(
-        path.join(__dirname, "../dist/client/index.html"),
-        "utf8"
-      ),
     };
   } else {
-    const rawTemplate = fs.readFileSync(
-      path.join(__dirname, "../index.html"),
-      "utf8"
-    );
-    const template = await vite.transformIndexHtml(url, rawTemplate);
     return {
       serverEntry: await vite.ssrLoadModule("/src/entry-server.tsx"),
-      template,
     };
   }
 }

@@ -19,7 +19,6 @@ global.fetch = fetch as any;
 type RequestContext = {
   request: Request;
   manifest?: Record<string, string[]>;
-  renderTemplate(opts: { preloadHtml: string; appHtml: string }): string;
   viteDevServer?: ViteDevServer;
   clientManifest?: import("vite").Manifest;
 };
@@ -29,7 +28,6 @@ async function onGet({
   manifest,
   viteDevServer,
   clientManifest,
-  renderTemplate,
 }: RequestContext): Promise<Response> {
   const url = request.url.replace(/\.json$/, "");
   const isJsonResponse =
