@@ -1,18 +1,18 @@
 import ReactDOMServer from "react-dom/server";
 import React from "react";
-import App from "./App";
 import { routeElementsObject as routes, routesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
-import { StaticRouter } from "react-router-dom/server";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
-import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
-import { LoaderContext } from "./LoaderContext";
 import fetch, { Response, Request } from "node-fetch";
-import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { mapValues, mapKeys } from "./Map";
 import type { ViteDevServer } from "vite";
+import {
+  RemasteredAppServer,
+  RemasteredAppServerCtx,
+} from "./RemasteredAppServer";
+import { LinkTag, ScriptTag } from "./JsxForDocument";
 
 global.fetch = fetch as any;
 
@@ -21,12 +21,14 @@ type RequestContext = {
   manifest?: Record<string, string[]>;
   renderTemplate(opts: { preloadHtml: string; appHtml: string }): string;
   viteDevServer?: ViteDevServer;
+  clientManifest?: import("vite").Manifest;
 };
 
 async function onGet({
   request,
   manifest,
   viteDevServer,
+  clientManifest,
   renderTemplate,
 }: RequestContext): Promise<Response> {
   const url = request.url.replace(/\.json$/, "");
@@ -77,30 +79,34 @@ async function onGet({
   }
 
   const routeKeys = foundRouteKeys.map((x) => x.routeKey);
-  const scripts =
-    buildScripts(routeKeys, manifest, viteDevServer) +
-    (await buildWindowValues(found, loaderContext, status));
+  const links = buildScripts(routeKeys, manifest, viteDevServer);
+
+  const mainScripts = await mainScript(clientManifest, viteDevServer);
+  const inlineScript = await buildWindowValues(
+    found,
+    loaderContext,
+    status,
+    links,
+    mainScripts
+  );
+  const scripts = [inlineScript, ...mainScripts];
+
+  const remasteredAppContext: RemasteredAppServerCtx = {
+    loadingErrorContext: {
+      state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
+    },
+    links,
+    loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
+    loadedComponentsContext: loadedComponents,
+    requestedUrl: url,
+    scripts,
+  };
 
   const string = ReactDOMServer.renderToString(
-    <NotFoundAndSkipRenderOnServerContext.Provider
-      value={{
-        state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
-      }}
-    >
-      <LoaderContext.Provider
-        value={mapKeys(loaderContext, (a) => `default@${a}`)}
-      >
-        <DynamicImportComponentContext.Provider value={loadedComponents}>
-          <StaticRouter location={url}>
-            <App />
-          </StaticRouter>
-        </DynamicImportComponentContext.Provider>
-      </LoaderContext.Provider>
-    </NotFoundAndSkipRenderOnServerContext.Provider>
+    <RemasteredAppServer ctx={remasteredAppContext} />
   );
 
-  const html = renderTemplate({ preloadHtml: scripts, appHtml: string });
-  return new Response(html, {
+  return new Response(string, {
     status,
     headers: {
       "Content-Type": "text/html",
@@ -160,7 +166,7 @@ function buildScripts(
   routeKeys: string[],
   manifest?: Record<string, string[]>,
   vite?: ViteDevServer
-): string {
+): LinkTag[] {
   if (manifest) {
     const preload = _(manifest)
       .entries()
@@ -171,30 +177,34 @@ function buildScripts(
       })
       .map(([, v]) => v)
       .flatten()
-      .map((url) => {
-        const rel = url.endsWith(".css") ? "stylesheet" : "modulepreload";
-        return <link rel={rel} href={url} key={url} />;
-      })
+      .map(
+        (url): LinkTag => {
+          const rel = url.endsWith(".css") ? "stylesheet" : "modulepreload";
+          return { rel, href: url };
+        }
+      )
       .value();
 
-    return ReactDOMServer.renderToStaticMarkup(<>{preload}</>);
+    return preload;
   }
 
   const preloadLinks = getPreloadFromVite(vite, routeKeys);
 
   const elms = _([...preloadLinks])
     .map(([url]) => {
-      return <link rel="modulepreload" href={url} key={url} />;
+      return { rel: "modulepreload", href: url };
     })
     .value();
-  return ReactDOMServer.renderToStaticMarkup(<>{elms}</>);
+  return elms;
 }
 
 async function buildWindowValues(
   routes: RouteMatch[],
   loaderContext: Map<string, unknown>,
-  splashState: number
-): Promise<string> {
+  splashState: number,
+  links: LinkTag[],
+  scripts: ScriptTag[]
+): Promise<ScriptTag> {
   const allRoutes = await buildRouteDefinitionBag(
     Object.keys(routesObject).map((routeKey) => ({ routeKey }))
   );
@@ -205,6 +215,8 @@ async function buildWindowValues(
     .compact()
     .value();
   const data = {
+    __REMASTERED_LINK_TAGS: links,
+    __REMASTERED_SCRIPT_TAGS: scripts,
     __REMASTERED_SPLASH_STATE: splashState,
     __REMASTERED_SSR_ROUTES: routeFiles,
     __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
@@ -221,7 +233,11 @@ async function buildWindowValues(
       )});`;
     })
     .join("");
-  return `<script>${stringified}</script>`;
+  return {
+    id: "remastered--remove-me",
+    contents: stringified,
+    type: "text/javascript",
+  };
 }
 
 function getPreloadFromVite(
@@ -254,4 +270,23 @@ function getPreloadFromVite(
   }
 
   return resolvedModules;
+}
+
+async function mainScript(
+  regularManifest?: import("vite").Manifest,
+  vite?: ViteDevServer
+): Promise<ScriptTag[]> {
+  if (vite) {
+    const {
+      default: { preambleCode },
+    } = await import("@vitejs/plugin-react-refresh");
+    return [
+      { contents: preambleCode.replace("__BASE__", "/"), type: "module" },
+      { src: "/@vite/client", type: "module" },
+      { src: "/src/main.tsx", type: "module" },
+    ];
+  } else if (regularManifest) {
+    return [{ src: regularManifest["src/main.tsx"].file, type: "module" }];
+  }
+  return [];
 }

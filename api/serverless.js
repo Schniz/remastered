@@ -1,5 +1,6 @@
 import { renderRequest } from "../src/server";
 import manifest from "./ssr-manifest.json";
+import clientManifest from "./manifest.json";
 import * as serverEntry from "../dist/server/entry-server";
 import template from "../dist/server/template";
 import { Request } from "node-fetch";
@@ -16,6 +17,7 @@ export default async (req, res) => {
       template,
       manifest,
       serverEntry,
+      clientManifest,
     },
     new Request(req.url, {
       method,

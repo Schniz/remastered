@@ -89,6 +89,7 @@ export async function renderRequest(
       request,
       manifest: handlers.manifest,
       viteDevServer: vite,
+      clientManifest: handlers.clientManifest,
       renderTemplate({ preloadHtml, appHtml }) {
         return handlers.template
           .replace(`<!--ssr-outlet-->`, appHtml)
@@ -127,6 +128,7 @@ type ViteHandlers = {
   template: string;
   serverEntry: any;
   manifest?: Record<string, string[]>;
+  clientManifest?: import("vite").Manifest;
 };
 
 async function getViteHandlers(
@@ -137,6 +139,7 @@ async function getViteHandlers(
     return {
       serverEntry: require("../dist/server/entry-server.js"),
       manifest: require("../dist/client/ssr-manifest.json"),
+      clientManifest: require("../dist/client/manifest.json"),
       template: fs.readFileSync(
         path.join(__dirname, "../dist/client/index.html"),
         "utf8"

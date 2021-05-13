@@ -4,10 +4,10 @@
   "scripts": {
     "dev": "node -r @swc-node/register src/server",
     "build": "tsc && yarn build:client && yarn build:server",
-    "build:client": "vite build --outDir dist/client --ssrManifest",
+    "build:client": "vite build --outDir dist/client --ssrManifest --manifest",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",
-    "vercel-build": "yarn build && node ./scripts/generateNextHelpers.js && cp ./dist/client/ssr-manifest.json ./api/ssr-manifest.json && cp -r dist/client/assets public/assets"
+    "vercel-build": "yarn build && node ./scripts/generateNextHelpers.js && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@swc-node/register": "^1.2.1",

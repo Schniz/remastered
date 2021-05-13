@@ -10,6 +10,11 @@ const config = defineConfig({
     __DEV__: process.env.NODE_ENV !== "production",
     __REMASTERED_ROOT__: JSON.stringify(process.cwd()),
   },
+  build: {
+    rollupOptions: {
+      input: "./src/main.tsx",
+    },
+  },
   resolve: {
     alias: {
       "react-router": path.join(__dirname, "./react-router-pkgs/react-router"),
