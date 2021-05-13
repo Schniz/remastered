@@ -12,7 +12,10 @@ const config = defineConfig({
   },
   build: {
     rollupOptions: {
-      input: "./src/main.tsx",
+      input:
+        process.env.REMASTERED_BUILD_TARGET === "server"
+          ? "./src/entry-server.tsx"
+          : "./src/main.tsx",
     },
   },
   resolve: {
