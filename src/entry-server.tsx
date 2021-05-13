@@ -232,7 +232,6 @@ async function buildWindowValues(
     })
     .join("");
   return {
-    id: "remastered--remove-me",
     contents: stringified,
     type: "text/javascript",
   };
