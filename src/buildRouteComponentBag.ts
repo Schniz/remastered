@@ -1,10 +1,11 @@
 import { routesObject } from "./fsRoutes";
-import { LoaderFn, ActionFn } from "./routeTypes";
+import { LoaderFn, ActionFn, LinksFn } from "./routeTypes";
 import { mapValues } from "./Map";
 
 type RouteDefinition<T> = {
   loader?: LoaderFn<unknown>;
   action?: ActionFn;
+  links?: LinksFn;
   component: React.ComponentType;
   key: string;
   givenRoute: T;
@@ -28,6 +29,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
         component: routeDef.default,
         loader: routeDef.loader,
         action: routeDef.action,
+        links: routeDef.links,
         key,
         givenRoute: route,
       });

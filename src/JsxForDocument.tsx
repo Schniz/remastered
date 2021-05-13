@@ -1,11 +1,17 @@
 import React from "react";
 
-export type ScriptTag = {
+export type EagerScriptTag = {
   id?: string;
   type?: string;
   contents?: string;
   src?: string;
 };
+export type ScriptPreload = {
+  src: string;
+};
+export type ScriptTag =
+  | ({ _tag: "eager" } & EagerScriptTag)
+  | ({ _tag: "preload" } & ScriptPreload);
 export const ScriptTagsContext = React.createContext<ScriptTag[]>([]);
 
 export type LinkTag = { rel: string; href: string };
@@ -17,19 +23,29 @@ export function Scripts() {
   return (
     <>
       {scripts.map((script, i) => {
-        return (
-          <script
-            data-remastered
-            id={script.id}
-            type={script.type}
-            src={script.src}
-            key={script.src ?? i}
-            suppressHydrationWarning={true}
-            dangerouslySetInnerHTML={
-              script.contents ? { __html: script.contents } : undefined
-            }
-          />
-        );
+        if (script._tag === "eager") {
+          return (
+            <script
+              id={script.id}
+              type={script.type}
+              src={script.src}
+              key={script.src ?? i}
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={
+                script.contents ? { __html: script.contents } : undefined
+              }
+            />
+          );
+        } else {
+          return (
+            <link
+              suppressHydrationWarning
+              key={"preload@" + script.src}
+              rel="modulepreload"
+              href={script.src}
+            />
+          );
+        }
       })}
     </>
   );

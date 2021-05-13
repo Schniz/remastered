@@ -21,7 +21,9 @@ export function RemasteredApp(props: {
   scripts: ScriptTag[];
 }) {
   return (
-    <ScriptTagsContext.Provider value={props.scripts}>
+    <ScriptTagsContext.Provider
+      value={[{ _tag: "eager", contents: "" }, ...props.scripts]}
+    >
       <LinkTagsContext.Provider value={props.links}>
         <NotFoundAndSkipRenderOnServerContext.Provider
           value={{

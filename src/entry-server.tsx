@@ -44,6 +44,7 @@ async function onGet({
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
   const loaderContext = new Map<string, unknown>();
   let loaderNotFound = false;
+  const links: LinkTag[] = [];
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
@@ -57,6 +58,10 @@ async function onGet({
       if (loaderResult === null || loaderResult === undefined) {
         loaderNotFound = true;
       }
+    }
+
+    if (relevantRoute.links) {
+      links.push(...relevantRoute.links());
     }
   }
 
@@ -77,17 +82,28 @@ async function onGet({
   }
 
   const routeKeys = foundRouteKeys.map((x) => x.routeKey);
-  const links = buildScripts(routeKeys, manifest, viteDevServer);
+  const preloadLinks = buildScripts(routeKeys, manifest, viteDevServer);
+  const scripts: ScriptTag[] = [];
 
-  const mainScripts = await mainScript(clientManifest, viteDevServer);
+  for (const preloadLink of preloadLinks) {
+    if (preloadLink.rel === "modulepreload") {
+      scripts.push({ _tag: "preload", src: preloadLink.href });
+    } else {
+      links.push(preloadLink);
+    }
+  }
+
+  scripts.push(...(await mainScript(clientManifest, viteDevServer)));
+
   const inlineScript = await buildWindowValues(
     found,
     loaderContext,
     status,
     links,
-    mainScripts
+    scripts
   );
-  const scripts = [inlineScript, ...mainScripts];
+
+  scripts.unshift(inlineScript);
 
   const remasteredAppContext: RemasteredAppServerCtx = {
     loadingErrorContext: {
@@ -232,6 +248,7 @@ async function buildWindowValues(
     })
     .join("");
   return {
+    _tag: "eager",
     contents: stringified,
     type: "text/javascript",
   };
@@ -278,12 +295,22 @@ async function mainScript(
       default: { preambleCode },
     } = await import("@vitejs/plugin-react-refresh");
     return [
-      { contents: preambleCode.replace("__BASE__", "/"), type: "module" },
-      { src: "/@vite/client", type: "module" },
-      { src: "/src/main.tsx", type: "module" },
+      {
+        _tag: "eager",
+        contents: preambleCode.replace("__BASE__", "/"),
+        type: "module",
+      },
+      { _tag: "eager", src: "/@vite/client", type: "module" },
+      { _tag: "eager", src: "/src/main.tsx", type: "module" },
     ];
   } else if (regularManifest) {
-    return [{ src: regularManifest["src/main.tsx"].file, type: "module" }];
+    return [
+      {
+        _tag: "eager",
+        src: regularManifest["src/main.tsx"].file,
+        type: "module",
+      },
+    ];
   }
   return [];
 }
