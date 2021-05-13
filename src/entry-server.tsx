@@ -4,7 +4,7 @@ import App from "./App";
 import { routeElementsObject as routes, routesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { StaticRouter } from "react-router-dom/server";
-import { CustomRouteObject } from "./routeTreeIntoReactRouterRoute";
+import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
@@ -143,7 +143,7 @@ async function onAction({
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
   return _(routes)
     .map<EnhancedRoute | undefined>((a) => {
-      const routeKey = (a.route as CustomRouteObject).routeFile;
+      const routeKey = (a.route as RouteObjectWithFilename).routeFile;
       if (routeKey) {
         return { ...a, routeKey };
       }
@@ -203,7 +203,7 @@ async function buildWindowValues(
   );
   const routeFiles = _(routes)
     .map((route) => {
-      return (route.route as CustomRouteObject).routeFile;
+      return (route.route as RouteObjectWithFilename).routeFile;
     })
     .compact()
     .value();

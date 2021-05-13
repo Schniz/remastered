@@ -1,6 +1,6 @@
 import { createRouteTreeFromImportGlob } from "./createRouteTreeFromImportGlob";
 import {
-  CustomRouteObject,
+  RouteObjectWithFilename,
   routeTreeIntoReactRouterRoute,
 } from "./routeTreeIntoReactRouterRoute";
 import { dynamicImportComponent } from "./DynamicImportComponent";
@@ -25,10 +25,12 @@ function turnToComponentBag(files: Record<string, () => Promise<unknown>>) {
 
 export function convertRouteObjectsToRRDef(
   allComponents: Record<string, React.ComponentType>
-): CustomRouteObject[] {
+): RouteObjectWithFilename[] {
   const components = { ...allComponents };
   delete components["/app/routes/404.tsx"];
   delete components["/app/routes/404.jsx"];
+  delete components["/app/routes/404.ts"];
+  delete components["/app/routes/404.js"];
 
   const routeTree = createRouteTreeFromImportGlob(components);
   const routes = routeTreeIntoReactRouterRoute(routeTree);

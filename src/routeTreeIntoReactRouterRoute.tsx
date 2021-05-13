@@ -8,8 +8,8 @@ export function useRouteModule(): string {
 
 export function routeTreeIntoReactRouterRoute(
   routeTree: RouteTree
-): CustomRouteObject[] {
-  const routes: CustomRouteObject[] = [];
+): RouteObjectWithFilename[] {
+  const routes: RouteObjectWithFilename[] = [];
 
   for (const key in routeTree) {
     const branch = routeTree[key];
@@ -27,6 +27,6 @@ export function routeTreeIntoReactRouterRoute(
   return routes;
 }
 
-export type CustomRouteObject = RouteObject & {
+export type RouteObjectWithFilename = RouteObject & {
   routeFile?: string;
 };
