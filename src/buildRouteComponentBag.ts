@@ -1,10 +1,10 @@
 import { routesObject } from "./fsRoutes";
-import { LoaderFn, ActionFn, LinksFn, HeadersFn } from "./routeTypes";
-import { mapValues } from "./Map";
+import { LoaderFn, ActionFn, LinksFn, HeadersFn, MetaFn } from "./routeTypes";
 
 export type RouteDefinition<T = unknown> = {
   loader?: LoaderFn<unknown>;
   action?: ActionFn;
+  meta?: MetaFn;
   links?: LinksFn;
   handle?: unknown;
   component: React.ComponentType;
@@ -34,6 +34,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
         links: routeDef.links,
         handle: routeDef.handle,
         headers: routeDef.headers,
+        meta: routeDef.meta,
         key,
         givenRoute: route,
       });

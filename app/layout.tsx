@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import React from "react";
-import { Links, Scripts } from "../src/JsxForDocument";
+import { Links, Scripts, Meta } from "../src/JsxForDocument";
 import { Match, useMatches } from "../src/useMatches";
 import "./layout.css";
 
@@ -32,6 +32,7 @@ export default function Layout() {
   return (
     <html>
       <head>
+        <Meta />
         <Links />
       </head>
       <body>

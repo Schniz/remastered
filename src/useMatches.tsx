@@ -2,9 +2,10 @@ import React from "react";
 import { useLocation, matchRoutes, Params } from "react-router";
 import { routeElementsObject } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
+import { MetaFn } from "./routeTypes";
 /* import { RouteMatch } from "react-router"; */
 
-export type RouteDef = { hasLoader: boolean; handle?: unknown };
+export type RouteDef = { hasLoader: boolean; handle?: unknown; meta?: MetaFn };
 export const MatchesContext = React.createContext<Map<string, RouteDef>>(
   new Map()
 );
@@ -14,6 +15,7 @@ export type Match<Data = unknown> = {
   params: Params;
   pathname: string;
   data: Data;
+  meta?: MetaFn;
 };
 
 export function useMatches(): Match[] {
@@ -35,6 +37,7 @@ export function useMatches(): Match[] {
         pathname: route.pathname,
         params: route.params,
         data: loaderContext.get(`${location.key}@${routeFile}`),
+        meta: value.meta,
       },
     ];
   });

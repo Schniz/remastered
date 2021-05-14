@@ -113,7 +113,7 @@ async function onGet({
       Object.keys(routesObject).map((routeKey) => ({ routeKey }))
     ),
     (v): RouteDef => {
-      return { hasLoader: Boolean(v.loader), handle: v.handle };
+      return { hasLoader: Boolean(v.loader), handle: v.handle, meta: v.meta };
     }
   );
 

@@ -184,10 +184,12 @@ async function handlePendingState(
     const key = `${routeFile}`;
     const entry = await routesObject[key]?.();
     componentContext.set(key, entry.default);
+    console.log({ key, entry });
     matchesContext.set(key, {
       hasLoader: false,
       ...matchesContext.get(key),
       handle: entry.handle,
+      meta: entry.meta,
     });
     console.log(matchesContext);
   });

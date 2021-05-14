@@ -1,4 +1,5 @@
 import React from "react";
+import { useMatches } from "./useMatches";
 
 export type EagerScriptTag = {
   id?: string;
@@ -22,6 +23,8 @@ export type AllLinkTags =
   | { _tag: "script"; script: DevModeLinkTag };
 
 export const LinkTagsContext = React.createContext<AllLinkTags[]>([]);
+
+export type MetaTags = Record<string, string>;
 
 export function Scripts() {
   const scripts = React.useContext(ScriptTagsContext);
@@ -76,6 +79,30 @@ export function Links() {
             <script type="module" src={link.script.src} key={link.script.src} />
           );
         }
+      })}
+    </>
+  );
+}
+
+export function Meta() {
+  const matches = useMatches();
+  const metaTags = React.useMemo(() => {
+    const obj: MetaTags = {};
+    for (const match of matches) {
+      if (match.meta) {
+        Object.assign(obj, match.meta({ data: match.data }));
+      }
+    }
+    return obj;
+  }, matches);
+
+  return (
+    <>
+      {Object.entries(metaTags).map(([key, value]) => {
+        if (key === "title") {
+          return <title key={key}>{value}</title>;
+        }
+        return <meta key={key} name={key} content={value} />;
       })}
     </>
   );

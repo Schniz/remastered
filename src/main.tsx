@@ -57,12 +57,14 @@ function applyRouteHandlesToCtx(
     hasLoader: false,
     ...ctx.get(routeDefinition.key),
     handle: routeDefinition.handle,
+    meta: routeDefinition.meta,
   });
 }
 
 buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedRoutes) => {
   const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
   const matchesContext = new Map(__REMASTERED_ROUTE_DEFS);
+
   for (const route of loadedRoutes.values()) {
     applyRouteHandlesToCtx(matchesContext, route);
   }

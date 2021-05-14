@@ -69,7 +69,7 @@ function routeTransformer(): PluginOption {
             (declaration) => {
               return (
                 declaration.id.type === "Identifier" &&
-                declaration.id.value === "handle"
+                ["handle", "meta"].includes(declaration.id.value)
               );
             }
           );

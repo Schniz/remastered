@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouteData } from "../../src/LoaderContext";
-import { HeadersFn, LoaderFn } from "../../src/routeTypes";
+import { HeadersFn, LoaderFn, MetaFn } from "../../src/routeTypes";
 import s from "./noscript.module.css";
 
 type Data = { date: string };
@@ -8,6 +8,12 @@ type Data = { date: string };
 export const headers: HeadersFn = () => {
   return {
     "x-remastered-app": "oh yeaaaaaah baby",
+  };
+};
+
+export const meta: MetaFn = () => {
+  return {
+    title: "I have no script tags",
   };
 };
 
