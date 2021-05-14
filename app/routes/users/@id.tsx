@@ -2,6 +2,7 @@ import React from "react";
 import { redirectTo } from "../../../src/httpHelpers";
 import { useRouteData } from "../../../src/LoaderContext";
 import type { LoaderFn } from "../../../src/routeTypes";
+import { Match } from "../../../src/useMatches";
 import { User, database } from "../../database";
 
 export const loader: LoaderFn<User | Response> = async ({ params }) => {
@@ -17,3 +18,7 @@ export default function ViewUser() {
 
   return <h1>{data.name}</h1>;
 }
+
+export const handle = {
+  breadcrumbs: (match: Match<User>) => `${match.data.name}`,
+};

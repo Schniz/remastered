@@ -1,12 +1,33 @@
 import { Outlet, NavLink } from "react-router-dom";
 import React from "react";
 import { Links, Scripts } from "../src/JsxForDocument";
-import { useMatches } from "../src/useMatches";
+import { Match, useMatches } from "../src/useMatches";
 import "./layout.css";
+
+type HasBreadcrumbs = Match & {
+  handle: {
+    breadcrumbs(match: Match): React.ReactNode;
+  };
+};
 
 export default function Layout() {
   const routeMatches = useMatches();
   const withScripts = !routeMatches.every((x) => (x.handle as any)?.noScripts);
+  const breadcrumbs = routeMatches
+    .filter(
+      (x: any): x is HasBreadcrumbs =>
+        typeof x.handle?.breadcrumbs === "function"
+    )
+    .map((x, i) => {
+      const breadcrumb = x.handle.breadcrumbs(x);
+      if (i === 0) {
+        return breadcrumb;
+      } else {
+        return (
+          <React.Fragment key={x.pathname}> / {breadcrumb}</React.Fragment>
+        );
+      }
+    });
 
   return (
     <html>
@@ -14,6 +35,7 @@ export default function Layout() {
         <Links />
       </head>
       <body>
+        {breadcrumbs.length > 0 && <h1>Breadcrumbs: {breadcrumbs}</h1>}
         <nav>
           <NavLink to="/">Home</NavLink>
           {" / "}

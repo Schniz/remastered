@@ -294,7 +294,6 @@ function getPreloadFromVite(
     return resolvedModules;
   }
 
-  /* const result: Record<string, string[]> = {}; */
   const moduleQueue = _(routeKeys)
     .map((x) => `${process.cwd()}${x}`)
     .concat([`${process.cwd()}/src/main.tsx`])
@@ -305,7 +304,6 @@ function getPreloadFromVite(
     .flatMap((x) => [...x])
     .compact()
     .value();
-  /* console.log(vite.moduleGraph.fileToModulesMap); */
 
   while (moduleQueue.length) {
     const moduleNode = moduleQueue.shift()!;
@@ -337,7 +335,7 @@ async function mainScript(
     return [
       {
         _tag: "eager",
-        src: regularManifest["src/main.tsx"].file,
+        src: "/" + regularManifest["src/main.tsx"].file,
         type: "module",
       },
     ];

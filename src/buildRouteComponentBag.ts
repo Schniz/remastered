@@ -2,7 +2,7 @@ import { routesObject } from "./fsRoutes";
 import { LoaderFn, ActionFn, LinksFn, HeadersFn } from "./routeTypes";
 import { mapValues } from "./Map";
 
-type RouteDefinition<T> = {
+export type RouteDefinition<T = unknown> = {
   loader?: LoaderFn<unknown>;
   action?: ActionFn;
   links?: LinksFn;
@@ -44,9 +44,9 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
 
 export async function buildRouteComponentBag(
   routeKeys: readonly string[]
-): Promise<Map<string, React.ComponentType>> {
+): Promise<Map<string, RouteDefinition>> {
   const routeDefinitions = await buildRouteDefinitionBag(
     routeKeys.map((routeKey) => ({ routeKey }))
   );
-  return mapValues(routeDefinitions, (x) => x.component);
+  return routeDefinitions;
 }

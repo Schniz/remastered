@@ -1,11 +1,15 @@
 import "vite/dynamic-import-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
-import { buildRouteComponentBag } from "./buildRouteComponentBag";
+import {
+  buildRouteComponentBag,
+  RouteDefinition,
+} from "./buildRouteComponentBag";
 import type { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
 import { RemasteredApp } from "./RemasteredApp";
 import type { AllLinkTags, ScriptTag } from "./JsxForDocument";
-import type { RouteDef } from "./useMatches";
+import type { MatchesContext, RouteDef } from "./useMatches";
+import { mapValues } from "./Map";
 
 declare global {
   /** SSRd routes we need to preload before first render */
@@ -45,7 +49,24 @@ const historyResponseState: HistoryResponseState = new Map([
   [historyKey, __REMASTERED_SPLASH_STATE === 404 ? "not_found" : "ok"],
 ]);
 
-buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedComponents) => {
+function applyRouteHandlesToCtx(
+  ctx: React.ContextType<typeof MatchesContext>,
+  routeDefinition: RouteDefinition
+) {
+  ctx.set(routeDefinition.key, {
+    hasLoader: false,
+    ...ctx.get(routeDefinition.key),
+    handle: routeDefinition.handle,
+  });
+}
+
+buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedRoutes) => {
+  const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
+  const matchesContext = new Map(__REMASTERED_ROUTE_DEFS);
+  for (const route of loadedRoutes.values()) {
+    applyRouteHandlesToCtx(matchesContext, route);
+  }
+
   ReactDOM.hydrate(
     // @ts-expect-error
     <React.StrictMode>
@@ -55,7 +76,7 @@ buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedComponents) => {
         componentsContext={loadedComponents}
         historyResponseState={historyResponseState}
         loaderContext={loadCtx}
-        matchesContext={new Map(__REMASTERED_ROUTE_DEFS)}
+        matchesContext={matchesContext}
       />
     </React.StrictMode>,
     document

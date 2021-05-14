@@ -31,3 +31,7 @@ export default function Users() {
     </div>
   );
 }
+
+export const handle = {
+  breadcrumbs: () => "Users",
+};

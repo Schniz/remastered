@@ -15,8 +15,7 @@ import React from "react";
 import { routeElementsObject, routesObject } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
-
-const routingContext = new Map(__REMASTERED_ROUTE_DEFS);
+import { MatchesContext } from "./useMatches";
 
 type PendingState<T> = { value: T; tx: string };
 function usePendableState<T>(
@@ -67,6 +66,7 @@ export function HaltingRouter(props: {
   const historyResponseState = React.useContext(
     NotFoundAndSkipRenderOnServerContext
   );
+  const matchesContext = React.useContext(MatchesContext);
   const historyRef = React.useRef<BrowserHistory>();
   if (!historyRef.current) {
     historyRef.current = createBrowserHistory({ window: props.window });
@@ -104,6 +104,7 @@ export function HaltingRouter(props: {
         },
         loaderContextRef.current,
         props.loadedComponentContext,
+        matchesContext,
         () =>
           historyResponseState.state?.set(
             pendingState.value.location.key,
@@ -170,6 +171,7 @@ async function handlePendingState(
   setLoaderContext: (map: Map<string, unknown>) => void,
   loaderContext: Map<string, unknown>,
   componentContext: Map<string, React.ComponentType>,
+  matchesContext: React.ContextType<typeof MatchesContext>,
   onNotFound: () => void
 ) {
   const { newRoutes, keepRoutes } = diffRoutes(
@@ -182,6 +184,12 @@ async function handlePendingState(
     const key = `${routeFile}`;
     const entry = await routesObject[key]?.();
     componentContext.set(key, entry.default);
+    matchesContext.set(key, {
+      hasLoader: false,
+      ...matchesContext.get(key),
+      handle: entry.handle,
+    });
+    console.log(matchesContext);
   });
 
   const newMap = new Map<string, unknown>();
@@ -189,7 +197,7 @@ async function handlePendingState(
   keepRoutes.forEach((route) => {
     const routeFile = (route.route as any).routeFile;
     const routingKey = `${routeFile}`;
-    const routeInfo = routingContext.get(routingKey);
+    const routeInfo = matchesContext.get(routingKey);
     const pendingStorageKey = `${pendingState.value.location.key}@${routingKey}`;
     const currentStorageKey = `${currentState.location.key}@${routingKey}`;
 
@@ -205,7 +213,7 @@ async function handlePendingState(
   const loaders = newRoutes.map(async (lastMatch) => {
     const routeFile = (lastMatch.route as any).routeFile;
     const routingKey = `${routeFile}`;
-    const routeInfo = routingContext.get(routingKey);
+    const routeInfo = matchesContext.get(routingKey);
     const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 
     if (routeInfo && routeInfo.hasLoader) {

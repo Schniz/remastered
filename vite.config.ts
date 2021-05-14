@@ -1,5 +1,5 @@
 import { defineConfig, PluginOption } from "vite";
-import { parse, print } from "@swc/core";
+import { Module, parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 
@@ -57,10 +57,35 @@ function routeTransformer(): PluginOption {
         return null;
       }
 
-      const parsed = await parse(code, { syntax: "typescript", tsx: true });
-      parsed.body = parsed.body.filter((x) => x.type !== "ExportDeclaration");
+      const body: Module["body"] = [];
 
-      return await print(parsed);
+      const parsed = await parse(code, { syntax: "typescript", tsx: true });
+
+      for (const item of parsed.body) {
+        if (item.type !== "ExportDeclaration") {
+          body.push(item);
+        } else if (item.declaration.type === "VariableDeclaration") {
+          const declarations = item.declaration.declarations.filter(
+            (declaration) => {
+              return (
+                declaration.id.type === "Identifier" &&
+                declaration.id.value === "handle"
+              );
+            }
+          );
+          if (declarations.length) {
+            body.push({
+              ...item,
+              declaration: {
+                ...item.declaration,
+                declarations,
+              },
+            });
+          }
+        }
+      }
+
+      return await print({ ...parsed, body });
     },
   };
 }

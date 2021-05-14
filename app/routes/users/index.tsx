@@ -19,3 +19,7 @@ export default function UsersIndex() {
     </form>
   );
 }
+
+export const handle = {
+  breadcrumbs: () => "All Users",
+};
