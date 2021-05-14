@@ -101,7 +101,12 @@ async function onGet({
   }
 
   const routeKeys = foundRouteKeys.map((x) => x.routeKey);
-  const preloadLinks = buildScripts(routeKeys, manifest, viteDevServer);
+  const preloadLinks = buildScripts(
+    routeKeys,
+    manifest,
+    viteDevServer,
+    clientManifest
+  );
   const scripts: ScriptTag[] = [];
   const matchesContext = mapValues(
     await buildRouteDefinitionBag(
@@ -215,8 +220,10 @@ type EnhancedRoute = RouteMatch & {
 function buildScripts(
   routeKeys: string[],
   manifest?: Record<string, string[]>,
-  vite?: ViteDevServer
+  vite?: ViteDevServer,
+  clientManifest?: import("vite").Manifest
 ): LinkTag[] {
+  const links: LinkTag[] = [];
   if (manifest) {
     const preload = _(manifest)
       .entries()
@@ -235,17 +242,33 @@ function buildScripts(
       )
       .value();
 
-    return preload;
+    links.push(...preload);
   }
 
-  const preloadLinks = getPreloadFromVite(vite, routeKeys);
+  if (clientManifest) {
+    const manifested = (clientManifest["src/main.tsx"].css ?? []).map(
+      (url): LinkTag => {
+        return {
+          rel: "stylesheet",
+          href: `/${url}`,
+        };
+      }
+    );
+    links.push(...manifested);
+  }
 
-  const elms = _([...preloadLinks])
-    .map(([url]) => {
-      return { rel: "modulepreload", href: url };
-    })
-    .value();
-  return elms;
+  if (vite) {
+    const preloadLinks = getPreloadFromVite(vite, routeKeys);
+
+    const elms = _([...preloadLinks])
+      .map(([url]) => {
+        return { rel: "modulepreload", href: url };
+      })
+      .value();
+    links.push(...elms);
+  }
+
+  return links;
 }
 
 async function buildWindowValues(
