@@ -2,6 +2,7 @@ import { Outlet, NavLink } from "react-router-dom";
 import React from "react";
 import { Links, Scripts } from "../src/JsxForDocument";
 import { useMatches } from "../src/useMatches";
+import "./layout.css";
 
 export default function Layout() {
   const routeMatches = useMatches();
