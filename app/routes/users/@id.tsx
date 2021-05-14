@@ -16,7 +16,7 @@ export const loader: LoaderFn<User | Response> = async ({ params }) => {
 export default function ViewUser() {
   const data = useRouteData<User>();
 
-  return <h1>{data.name}!</h1>;
+  return <h1>{data.name}</h1>;
 }
 
 export const meta: MetaFn<User> = ({ data }) => ({

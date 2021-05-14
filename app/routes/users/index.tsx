@@ -1,6 +1,6 @@
 import React from "react";
 import { redirectTo } from "../../../src/httpHelpers";
-import { ActionFn } from "../../../src/routeTypes";
+import { ActionFn, MetaFn } from "../../../src/routeTypes";
 import { database } from "../../database";
 
 export const action: ActionFn = async ({ req }) => {
@@ -22,4 +22,10 @@ export default function UsersIndex() {
 
 export const handle = {
   breadcrumbs: () => "All Users",
+};
+
+export const meta: MetaFn = () => {
+  return {
+    title: "List of all users",
+  };
 };

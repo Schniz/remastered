@@ -94,7 +94,7 @@ export function Meta() {
       }
     }
     return obj;
-  }, matches);
+  }, [matches]);
 
   return (
     <>
