@@ -15,18 +15,20 @@ import _ from "lodash";
  */
 export default async (req, res) => {
   const method = req.method.toUpperCase();
+  const request = new Request(req.url, {
+    method,
+    // @ts-ignore
+    body: method !== "GET" && method !== "HEAD" ? req : undefined,
+    headers: { ...req.headers },
+  });
   const response = await renderRequest(
     {
       manifest,
       serverEntry,
       clientManifest,
     },
-    new Request(req.url, {
-      method,
-      // @ts-ignore
-      body: method !== "GET" && method !== "HEAD" ? req : undefined,
-      headers: { ...req.headers },
-    })
+    // @ts-ignore
+    request
   );
 
   res.status(response.status);
