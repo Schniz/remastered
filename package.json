@@ -1,0 +1,11 @@
+{
+  "name": "@remaster/monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "repository": "git@github.com:Schniz/remastered.git",
+  "author": "Gal Schlezinger <gal@spitfire.co.il>",
+  "license": "MIT",
+  "workspaces": [
+    "./packages/*"
+  ]
+}
