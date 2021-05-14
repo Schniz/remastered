@@ -16,7 +16,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 - [x] `loader` - still needs to support `Response`s
 - [x] `links`
 - [x] `action`
-- [ ] `headers`
+- [x] `headers`
 - [ ] `meta`
 
 ### SSR
