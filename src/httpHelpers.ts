@@ -6,3 +6,7 @@ export function redirectTo(url: string): Response {
     },
   });
 }
+
+export function json<T = unknown>(value: T, opts?: ResponseInit): Response {
+  return new Response(JSON.stringify(value), opts);
+}

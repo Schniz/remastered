@@ -1,9 +1,3 @@
-export const loader = () =>
-  new Response(
-    JSON.stringify({
-      randomNumber: Math.random(),
-    }),
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+import { json } from "../../../src/httpHelpers";
+
+export const loader = () => json({ randomNumber: Math.random() });
