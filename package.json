@@ -6,6 +6,6 @@
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "license": "MIT",
   "workspaces": [
-    "./packages/*"
+    "packages/*"
   ]
 }
