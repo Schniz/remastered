@@ -6,6 +6,7 @@ type RouteDefinition<T> = {
   loader?: LoaderFn<unknown>;
   action?: ActionFn;
   links?: LinksFn;
+  handle?: unknown;
   component: React.ComponentType;
   key: string;
   givenRoute: T;
@@ -30,6 +31,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
         loader: routeDef.loader,
         action: routeDef.action,
         links: routeDef.links,
+        handle: routeDef.handle,
         key,
         givenRoute: route,
       });

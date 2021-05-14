@@ -7,6 +7,7 @@ import {
   HistoryResponseState,
   NotFoundAndSkipRenderOnServerContext,
 } from "./NotFoundAndSkipRenderOnServerContext";
+import { MatchesContext } from "./useMatches";
 
 export function RemasteredApp(props: {
   loaderContext: Map<string, unknown>;
@@ -14,29 +15,32 @@ export function RemasteredApp(props: {
   historyResponseState: HistoryResponseState;
   links: React.ContextType<typeof LinkTagsContext>;
   scripts: React.ContextType<typeof ScriptTagsContext>;
+  matchesContext: React.ContextType<typeof MatchesContext>;
 }) {
   return (
-    <ScriptTagsContext.Provider
-      value={[{ _tag: "eager", contents: "" }, ...props.scripts]}
-    >
-      <LinkTagsContext.Provider value={props.links}>
-        <NotFoundAndSkipRenderOnServerContext.Provider
-          value={{
-            state: props.historyResponseState,
-          }}
-        >
-          <DynamicImportComponentContext.Provider
-            value={props.componentsContext}
+    <MatchesContext.Provider value={props.matchesContext}>
+      <ScriptTagsContext.Provider
+        value={[{ _tag: "eager", contents: "" }, ...props.scripts]}
+      >
+        <LinkTagsContext.Provider value={props.links}>
+          <NotFoundAndSkipRenderOnServerContext.Provider
+            value={{
+              state: props.historyResponseState,
+            }}
           >
-            <HaltingRouter
-              initialLoaderContext={props.loaderContext}
-              loadedComponentContext={props.componentsContext}
+            <DynamicImportComponentContext.Provider
+              value={props.componentsContext}
             >
-              <App />
-            </HaltingRouter>
-          </DynamicImportComponentContext.Provider>
-        </NotFoundAndSkipRenderOnServerContext.Provider>
-      </LinkTagsContext.Provider>
-    </ScriptTagsContext.Provider>
+              <HaltingRouter
+                initialLoaderContext={props.loaderContext}
+                loadedComponentContext={props.componentsContext}
+              >
+                <App />
+              </HaltingRouter>
+            </DynamicImportComponentContext.Provider>
+          </NotFoundAndSkipRenderOnServerContext.Provider>
+        </LinkTagsContext.Provider>
+      </ScriptTagsContext.Provider>
+    </MatchesContext.Provider>
   );
 }

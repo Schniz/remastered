@@ -22,3 +22,7 @@ export default function NoScript() {
     </>
   );
 }
+
+export const handle = {
+  noScripts: true,
+};

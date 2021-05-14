@@ -13,6 +13,7 @@ import {
   RemasteredAppServerCtx,
 } from "./RemasteredAppServer";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
+import { MatchesContext, RouteDef } from "./useMatches";
 
 global.fetch = fetch as any;
 
@@ -87,6 +88,14 @@ async function onGet({
   const routeKeys = foundRouteKeys.map((x) => x.routeKey);
   const preloadLinks = buildScripts(routeKeys, manifest, viteDevServer);
   const scripts: ScriptTag[] = [];
+  const matchesContext = mapValues(
+    await buildRouteDefinitionBag(
+      Object.keys(routesObject).map((routeKey) => ({ routeKey }))
+    ),
+    (v): RouteDef => {
+      return { hasLoader: Boolean(v.loader), handle: v.handle };
+    }
+  );
 
   for (const preloadLink of preloadLinks) {
     if (
@@ -109,7 +118,8 @@ async function onGet({
     loaderContext,
     status,
     links,
-    scripts
+    scripts,
+    matchesContext
   );
 
   scripts.unshift(inlineScript);
@@ -123,6 +133,7 @@ async function onGet({
     loadedComponentsContext: loadedComponents,
     requestedUrl: url,
     scripts,
+    matchesContext,
   };
 
   const string = ReactDOMServer.renderToString(
@@ -226,11 +237,9 @@ async function buildWindowValues(
   loaderContext: Map<string, unknown>,
   splashState: number,
   links: AllLinkTags[],
-  scripts: ScriptTag[]
+  scripts: ScriptTag[],
+  matchesContext: React.ContextType<typeof MatchesContext>
 ): Promise<ScriptTag> {
-  const allRoutes = await buildRouteDefinitionBag(
-    Object.keys(routesObject).map((routeKey) => ({ routeKey }))
-  );
   const routeFiles = _(routes)
     .map((route) => {
       return (route.route as RouteObjectWithFilename).routeFile;
@@ -243,11 +252,7 @@ async function buildWindowValues(
     __REMASTERED_SPLASH_STATE: splashState,
     __REMASTERED_SSR_ROUTES: routeFiles,
     __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
-    __REMASTERED_ROUTE_DEFS: [
-      ...mapValues(allRoutes, (x) => ({
-        hasLoader: Boolean(x.loader),
-      })),
-    ],
+    __REMASTERED_ROUTE_DEFS: [...matchesContext],
   };
   const stringified = _(data)
     .map((value, key) => {

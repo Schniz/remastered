@@ -1,9 +1,11 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink } from "react-router-dom";
 import React from "react";
 import { Links, Scripts } from "../src/JsxForDocument";
+import { useMatches } from "../src/useMatches";
 
 export default function Layout() {
-  const location = useLocation();
+  const routeMatches = useMatches();
+  const withScripts = !routeMatches.every((x) => (x.handle as any)?.noScripts);
 
   return (
     <html>
@@ -23,7 +25,7 @@ export default function Layout() {
           <NavLink to="users/gal">Gal</NavLink>
         </nav>
         <Outlet />
-        {location.pathname.includes("/noscript") ? null : <Scripts />}
+        {withScripts && <Scripts />}
       </body>
     </html>
   );

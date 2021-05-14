@@ -2,9 +2,10 @@ import "vite/dynamic-import-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
 import { buildRouteComponentBag } from "./buildRouteComponentBag";
-import { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
+import type { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
 import { RemasteredApp } from "./RemasteredApp";
-import { AllLinkTags, ScriptTag } from "./JsxForDocument";
+import type { AllLinkTags, ScriptTag } from "./JsxForDocument";
+import type { RouteDef } from "./useMatches";
 
 declare global {
   /** SSRd routes we need to preload before first render */
@@ -14,7 +15,7 @@ declare global {
   const __REMASTERED_LOAD_CTX: readonly [string, unknown][];
 
   /** Information about routes */
-  const __REMASTERED_ROUTE_DEFS: readonly [string, { hasLoader: boolean }][];
+  const __REMASTERED_ROUTE_DEFS: readonly [string, RouteDef][];
 
   /** Should be the status number... crappy name though... */
   const __REMASTERED_SPLASH_STATE: number;
@@ -54,6 +55,7 @@ buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedComponents) => {
         componentsContext={loadedComponents}
         historyResponseState={historyResponseState}
         loaderContext={loadCtx}
+        matchesContext={new Map(__REMASTERED_ROUTE_DEFS)}
       />
     </React.StrictMode>,
     document
