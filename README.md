@@ -18,7 +18,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 - [x] `action`
 - [x] `headers`
 - [x] `handle` (bundled to the client)
-- [ ] `meta`
+- [x] `meta` (runs on client)
 
 ### SSR
 
@@ -60,6 +60,11 @@ export default function MyComponent() {
 }
 ```
 
+By returning a `Response` object from `loader`, you can bypass the server-side rendering of the app:
+
+- You can `redirectTo("/another-url")` if some page has moved
+- You can return JSON or any other request... if this is what you want!
+
 ### Actions
 
 Every route can export an async function `action`, which will catch the HTTP requests that are not `GET`.
@@ -75,4 +80,15 @@ export const action: ActionFn = async ({ req }) => {
   await database.createUser(username);
   return redirectTo(`/users/${username}`);
 };
+```
+
+### Meta tags
+
+Generating meta tags is _synchronous_:
+
+```ts
+export const meta: MetaFn = () => ({
+  title: "This is the document title",
+  description: "My very own app!",
+});
 ```
