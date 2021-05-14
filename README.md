@@ -17,6 +17,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 - [x] `links`
 - [x] `action`
 - [x] `headers`
+- [x] `handle` (bundled to the client)
 - [ ] `meta`
 
 ### SSR
