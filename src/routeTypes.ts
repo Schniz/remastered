@@ -1,4 +1,3 @@
-import type { Request, Response, HeadersInit } from "node-fetch";
 import { LinkTag } from "./JsxForDocument";
 
 export type LoaderFnOpts = {

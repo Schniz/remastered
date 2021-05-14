@@ -5,7 +5,6 @@ import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
-import fetch, { Response, Request, Headers } from "node-fetch";
 import { mapValues, mapKeys } from "./Map";
 import type { ViteDevServer } from "vite";
 import {
@@ -14,11 +13,9 @@ import {
 } from "./RemasteredAppServer";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
+import { globalPatch } from "./globalPatch";
 
-global.fetch = fetch as any;
-global.Response = Response as any;
-global.Request = Request as any;
-global.Headers = Headers as any;
+globalPatch();
 
 type RequestContext = {
   request: Request;
@@ -98,7 +95,7 @@ async function onGet({
       status,
       headers: {
         "Content-Type": "application/json",
-        ...headers.raw(),
+        ...Object.fromEntries(headers.entries()),
       },
     });
   }
@@ -162,7 +159,7 @@ async function onGet({
     status,
     headers: {
       "Content-Type": "text/html",
-      ...headers.raw(),
+      ...Object.fromEntries(headers.entries()),
     },
   });
 }

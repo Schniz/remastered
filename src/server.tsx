@@ -4,7 +4,7 @@ import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
-import { Request, Response } from "node-fetch";
+import { Request as NFRequest, Response as NFResponse } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
 
@@ -55,7 +55,7 @@ export async function createServer() {
 
   app.all("*", async (req, reply) => {
     const method = req.method.toUpperCase();
-    const request = new Request(req.url, {
+    const request = new NFRequest(req.url, {
       method,
       body: method !== "GET" && method !== "HEAD" ? req.raw : undefined,
       headers: _(req.headers)
@@ -66,7 +66,7 @@ export async function createServer() {
     });
     const response = await renderRequest(
       await getViteHandlers(vite),
-      request,
+      (request as unknown) as Request,
       vite
     );
     const headers = _([...response.headers.entries()])
