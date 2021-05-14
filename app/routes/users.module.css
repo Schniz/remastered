@@ -1,8 +1,8 @@
-.nav-link {
+.navLink {
   display: inline-block;
   margin: 0 0.2em;
 }
 
-.nav-link:first-child {
+.navLink:first-child {
   margin-left: 0;
 }

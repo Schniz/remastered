@@ -12,7 +12,7 @@ import {
   RemasteredAppServer,
   RemasteredAppServerCtx,
 } from "./RemasteredAppServer";
-import { LinkTag, ScriptTag } from "./JsxForDocument";
+import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 
 global.fetch = fetch as any;
 
@@ -44,7 +44,7 @@ async function onGet({
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
   const loaderContext = new Map<string, unknown>();
   let loaderNotFound = false;
-  const links: LinkTag[] = [];
+  const links: AllLinkTags[] = [];
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
@@ -61,7 +61,10 @@ async function onGet({
     }
 
     if (relevantRoute.links) {
-      links.push(...relevantRoute.links());
+      const routeLinks = (await relevantRoute.links()).map(
+        (link): AllLinkTags => ({ _tag: "link", link })
+      );
+      links.push(...routeLinks);
     }
   }
 
@@ -86,10 +89,16 @@ async function onGet({
   const scripts: ScriptTag[] = [];
 
   for (const preloadLink of preloadLinks) {
-    if (preloadLink.rel === "modulepreload") {
+    if (
+      preloadLink.rel === "modulepreload" &&
+      !preloadLink.href.endsWith(".css")
+    ) {
       scripts.push({ _tag: "preload", src: preloadLink.href });
+    } else if (preloadLink.rel === "modulepreload") {
+      // force load css
+      links.push({ _tag: "script", script: { src: preloadLink.href } });
     } else {
-      links.push(preloadLink);
+      links.push({ _tag: "link", link: preloadLink });
     }
   }
 
@@ -216,7 +225,7 @@ async function buildWindowValues(
   routes: RouteMatch[],
   loaderContext: Map<string, unknown>,
   splashState: number,
-  links: LinkTag[],
+  links: AllLinkTags[],
   scripts: ScriptTag[]
 ): Promise<ScriptTag> {
   const allRoutes = await buildRouteDefinitionBag(

@@ -2,12 +2,7 @@ import React from "react";
 import App from "./App";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { HaltingRouter } from "./HaltingRouter";
-import {
-  LinkTag,
-  LinkTagsContext,
-  ScriptTag,
-  ScriptTagsContext,
-} from "./JsxForDocument";
+import { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
 import {
   HistoryResponseState,
   NotFoundAndSkipRenderOnServerContext,
@@ -17,8 +12,8 @@ export function RemasteredApp(props: {
   loaderContext: Map<string, unknown>;
   componentsContext: Map<string, React.ComponentType>;
   historyResponseState: HistoryResponseState;
-  links: LinkTag[];
-  scripts: ScriptTag[];
+  links: React.ContextType<typeof LinkTagsContext>;
+  scripts: React.ContextType<typeof ScriptTagsContext>;
 }) {
   return (
     <ScriptTagsContext.Provider

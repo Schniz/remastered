@@ -2,12 +2,7 @@ import React from "react";
 import { StaticRouter } from "react-router-dom/server";
 import App from "./App";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
-import {
-  LinkTag,
-  LinkTagsContext,
-  ScriptTag,
-  ScriptTagsContext,
-} from "./JsxForDocument";
+import { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
 import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 
@@ -15,8 +10,8 @@ export type RemasteredAppServerCtx = {
   loadingErrorContext: React.ContextType<
     typeof NotFoundAndSkipRenderOnServerContext
   >;
-  links: LinkTag[];
-  scripts: ScriptTag[];
+  links: React.ContextType<typeof LinkTagsContext>;
+  scripts: React.ContextType<typeof ScriptTagsContext>;
   loaderContext: React.ContextType<typeof LoaderContext>;
   requestedUrl: string;
   loadedComponentsContext: React.ContextType<

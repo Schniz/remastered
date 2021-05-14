@@ -14,8 +14,14 @@ export type ScriptTag =
   | ({ _tag: "preload" } & ScriptPreload);
 export const ScriptTagsContext = React.createContext<ScriptTag[]>([]);
 
+/** A <script> tag... */
+export type DevModeLinkTag = { src: string };
 export type LinkTag = { rel: string; href: string };
-export const LinkTagsContext = React.createContext<LinkTag[]>([]);
+export type AllLinkTags =
+  | { _tag: "link"; link: LinkTag }
+  | { _tag: "script"; script: DevModeLinkTag };
+
+export const LinkTagsContext = React.createContext<AllLinkTags[]>([]);
 
 export function Scripts() {
   const scripts = React.useContext(ScriptTagsContext);
@@ -57,7 +63,19 @@ export function Links() {
   return (
     <>
       {links.map((link) => {
-        return <link rel={link.rel} href={link.href} key={link.href} />;
+        if (link._tag === "link") {
+          return (
+            <link
+              rel={link.link.rel}
+              href={link.link.href}
+              key={link.link.href}
+            />
+          );
+        } else {
+          return (
+            <script type="module" src={link.script.src} key={link.script.src} />
+          );
+        }
       })}
     </>
   );

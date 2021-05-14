@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { buildRouteComponentBag } from "./buildRouteComponentBag";
 import { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
 import { RemasteredApp } from "./RemasteredApp";
-import { LinkTag, ScriptTag } from "./JsxForDocument";
+import { AllLinkTags, ScriptTag } from "./JsxForDocument";
 
 declare global {
   /** SSRd routes we need to preload before first render */
@@ -20,7 +20,7 @@ declare global {
   const __REMASTERED_SPLASH_STATE: number;
 
   /** Link tags */
-  const __REMASTERED_LINK_TAGS: LinkTag[];
+  const __REMASTERED_LINK_TAGS: AllLinkTags[];
 
   /** Link tags */
   const __REMASTERED_SCRIPT_TAGS: ScriptTag[];

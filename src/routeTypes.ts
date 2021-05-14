@@ -9,4 +9,4 @@ export type LoaderFn<Props> = (
 ) => Promise<Props | null | undefined>;
 export type ActionFn = (opts: { req: Request }) => Promise<Response>;
 
-export type LinksFn = () => LinkTag[];
+export type LinksFn = () => LinkTag[] | Promise<LinkTag[]>;
