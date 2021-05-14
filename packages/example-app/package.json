@@ -1,5 +1,5 @@
 {
-  "name": "remastered",
+  "name": "@remaster/example-app-1",
   "version": "0.0.0",
   "scripts": {
     "dev": "node -r @swc-node/register src/server",
