@@ -70,7 +70,6 @@ buildRouteComponentBag(__REMASTERED_SSR_ROUTES).then((loadedRoutes) => {
   }
 
   ReactDOM.hydrate(
-    // @ts-expect-error
     <React.StrictMode>
       <RemasteredApp
         links={__REMASTERED_LINK_TAGS}
