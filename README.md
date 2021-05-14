@@ -12,13 +12,13 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 
 ## What's implemented?
 
-- [x] SSR
-- [x] `loader` - still needs to support `Response`s
+- [x] SSR all pages
+- [x] `loader`
 - [x] `links`
 - [x] `action`
 - [x] `headers`
-- [x] `handle` (bundled to the client)
-- [x] `meta` (runs on client)
+- [x] `handle`
+- [x] `meta`
 
 ### SSR
 
