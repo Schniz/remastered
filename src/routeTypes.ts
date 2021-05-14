@@ -1,4 +1,4 @@
-import type { Request, Response } from "node-fetch";
+import type { Request, Response, HeadersInit } from "node-fetch";
 import { LinkTag } from "./JsxForDocument";
 
 export type LoaderFnOpts = {
@@ -10,3 +10,5 @@ export type LoaderFn<Props> = (
 export type ActionFn = (opts: { req: Request }) => Promise<Response>;
 
 export type LinksFn = () => LinkTag[] | Promise<LinkTag[]>;
+
+export type HeadersFn = () => HeadersInit | Promise<HeadersInit>;

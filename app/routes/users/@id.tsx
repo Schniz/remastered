@@ -1,9 +1,14 @@
 import React from "react";
+import { redirectTo } from "../../../src/httpHelpers";
 import { useRouteData } from "../../../src/LoaderContext";
 import type { LoaderFn } from "../../../src/routeTypes";
 import { User, database } from "../../database";
 
-export const loader: LoaderFn<User> = async ({ params }) => {
+export const loader: LoaderFn<User | Response> = async ({ params }) => {
+  if (params.id === "redirect_to_gal") {
+    return redirectTo(`/users/gal`);
+  }
+
   return database.get(params.id);
 };
 

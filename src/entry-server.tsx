@@ -5,7 +5,7 @@ import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
-import fetch, { Response, Request } from "node-fetch";
+import fetch, { Response, Request, Headers } from "node-fetch";
 import { mapValues, mapKeys } from "./Map";
 import type { ViteDevServer } from "vite";
 import {
@@ -16,6 +16,9 @@ import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 
 global.fetch = fetch as any;
+global.Response = Response as any;
+global.Request = Request as any;
+global.Headers = Headers as any;
 
 type RequestContext = {
   request: Request;
@@ -46,6 +49,7 @@ async function onGet({
   const loaderContext = new Map<string, unknown>();
   let loaderNotFound = false;
   const links: AllLinkTags[] = [];
+  const headers = new Headers();
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
@@ -59,6 +63,10 @@ async function onGet({
       if (loaderResult === null || loaderResult === undefined) {
         loaderNotFound = true;
       }
+
+      if (loaderResult instanceof Response) {
+        return loaderResult;
+      }
     }
 
     if (relevantRoute.links) {
@@ -66,6 +74,15 @@ async function onGet({
         (link): AllLinkTags => ({ _tag: "link", link })
       );
       links.push(...routeLinks);
+    }
+
+    if (relevantRoute.headers) {
+      const routeHeadersInit = await relevantRoute.headers();
+      const routeHeaders = new Headers(routeHeadersInit);
+
+      for (const [key, value] of routeHeaders.entries()) {
+        headers.append(key, value);
+      }
     }
   }
 
@@ -81,6 +98,7 @@ async function onGet({
       status,
       headers: {
         "Content-Type": "application/json",
+        ...headers.raw(),
       },
     });
   }
@@ -144,6 +162,7 @@ async function onGet({
     status,
     headers: {
       "Content-Type": "text/html",
+      ...headers.raw(),
     },
   });
 }
