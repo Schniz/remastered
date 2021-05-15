@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/serverless.js": {
-      "includeFiles": "dist/client/*.json"
+      "includeFiles": "dist/*/*"
     }
   },
   "rewrites": [
