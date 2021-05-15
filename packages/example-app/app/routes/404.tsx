@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router";
+import { useLocation } from "@remaster/core";
 
 export default function Error404() {
   const { pathname } = useLocation();

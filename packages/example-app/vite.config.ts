@@ -2,17 +2,22 @@ import { defineConfig, PluginOption } from "vite";
 import { Module, parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
-import fs from "fs";
+import fs from "fs-extra";
 
 function fileInCore(name: string): string {
   return path.join(__dirname, "node_modules/.remaster", name);
 }
 
-const coreDir = path.dirname(require.resolve("@remaster/core/package.json"));
-
-try {
-  fs.symlinkSync(coreDir, fileInCore(""));
-} catch (e) {}
+const symlinkDir = fileInCore("");
+fs.removeSync(symlinkDir);
+fs.outputFileSync(
+  path.join(symlinkDir, "entry.client.js"),
+  `import '@remaster/core/dist/src/main';`
+);
+fs.outputFileSync(
+  path.join(symlinkDir, "entry.server.js"),
+  `export * from '@remaster/core/dist/src/entry-server';`
+);
 
 // https://vitejs.dev/config/
 const config = defineConfig({
@@ -24,15 +29,15 @@ const config = defineConfig({
     rollupOptions: {
       input:
         process.env.REMASTERED_BUILD_TARGET === "server"
-          ? fileInCore("dist/src/entry-server.js")
-          : fileInCore("dist/src/main.js"),
+          ? path.join(__dirname, "node_modules/.remaster/entry.server.js")
+          : path.join(__dirname, "node_modules/.remaster/entry.client.js"),
     },
   },
   resolve: {
     alias: {
-      "react-router": fileInCore("dist/react-router-pkgs/react-router"),
-      "react-router-dom": fileInCore("dist/react-router-pkgs/react-router-dom"),
-      "@remaster/core": path.join(__dirname, "node_modules", ".remaster"),
+      "react-router": "@remaster/core/dist/react-router-pkgs/react-router",
+      "react-router-dom":
+        "@remaster/core/dist/react-router-pkgs/react-router-dom",
     },
   },
   ...({

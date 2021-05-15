@@ -6,7 +6,7 @@ import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
-import type { ViteDevServer } from "vite";
+import { ModuleNode, ViteDevServer } from "vite";
 import {
   RemasteredAppServer,
   RemasteredAppServerCtx,
@@ -15,7 +15,7 @@ import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
 
-const mainFile = `node_modules/.remaster/dist/src/main.js`;
+const mainFile = `node_modules/.remaster/entry.client.js`;
 
 globalPatch();
 
@@ -91,7 +91,6 @@ async function onGet({
     loaderContext.clear();
     status = 404;
   }
-
   if (isJsonResponse) {
     return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
@@ -328,8 +327,12 @@ function getPreloadFromVite(
     .compact()
     .value();
 
+  const visited = new Set<ModuleNode>();
+
   while (moduleQueue.length) {
     const moduleNode = moduleQueue.shift()!;
+    if (visited.has(moduleNode)) continue;
+    visited.add(moduleNode);
     resolvedModules.set(moduleNode.url, moduleNode.type);
     moduleQueue.push(...moduleNode.importedModules);
   }

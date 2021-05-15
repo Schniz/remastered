@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2019",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "@types/jest"],
     "allowJs": false,
@@ -23,5 +23,6 @@
       "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"]
     }
   },
-  "include": ["./src", "./app"]
+  "include": ["./src", "./app"],
+  "exclude": ["./dist"]
 }

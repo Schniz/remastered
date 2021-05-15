@@ -1,3 +1,3 @@
-import { json } from "@remaster/core/dist/src/httpHelpers";
+import { json } from "@remaster/core";
 
 export const loader = () => json({ randomNumber: Math.random() });
