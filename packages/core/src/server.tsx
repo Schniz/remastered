@@ -42,7 +42,7 @@ export async function createServer(root: string) {
     ? undefined
     : await createViteServer({
         root,
-        configFile: getViteConfigPath(),
+        configFile: getViteConfigPath({ ssr: false }),
         server: { middlewareMode: true },
       });
 
