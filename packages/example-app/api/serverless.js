@@ -12,7 +12,11 @@ import path from "path";
  * @param {import('@vercel/node').VercelResponse} res
  */
 export default async (req, res) => {
-  console.log({ cwd: process.cwd(), dirname: __dirname, ...process.env });
+  console.log({
+    cwd: process.cwd(),
+    dirname: __dirname,
+    keys: Object.keys(process.env),
+  });
   const manifest = fs.readJsonSync(
     path.join(process.cwd(), "../dist/client/ssr-manifest.json")
   );
