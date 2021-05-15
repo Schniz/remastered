@@ -1,6 +1,9 @@
 // @ts-check
 
 import createVercelFunction from "@remastered/vercel/dist/function";
+import serverEntry from "../dist/server/entry.server";
 import path from "path";
 
-export default createVercelFunction(path.join(__dirname, ".."));
+const rootDir = path.join(__dirname, "..");
+
+export default createVercelFunction({ rootDir, serverEntry });

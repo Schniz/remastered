@@ -5,22 +5,24 @@ import fs from "fs-extra";
 import path from "path";
 import _ from "lodash";
 
-export default function createVercelFunction(
-  rootDir: string
-): VercelApiHandler {
+export default function createVercelFunction({
+  serverEntry,
+  rootDir,
+}: {
+  serverEntry: typeof import("@remastered/core/dist/src/entry-server");
+  rootDir: string;
+}): VercelApiHandler {
   const manifest$ = fs.readJson(
     path.join(rootDir, "dist/client/ssr-manifest.json")
   );
   const clientManifest$ = fs.readJson(
     path.join(rootDir, "dist/client/manifest.json")
   );
-  const serverEntry$ = import(`${rootDir}/dist/server/entry.server.js`);
 
   return async (req, res) => {
-    const [manifest, clientManifest, serverEntry] = await Promise.all([
+    const [manifest, clientManifest] = await Promise.all([
       manifest$,
       clientManifest$,
-      serverEntry$,
     ]);
 
     const method = req.method?.toUpperCase() ?? "GET";
