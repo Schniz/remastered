@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import path from "path";
 import _ from "lodash";
 
-export default function createVercelFunction({
+export function createVercelFunction({
   rootDir,
 }: {
   rootDir: string;

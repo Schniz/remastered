@@ -1,8 +1,8 @@
 {
   "name": "@remastered/vercel",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "Gal Schlezinger",
+  "main": "./dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc"
