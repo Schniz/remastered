@@ -1,7 +1,9 @@
 // @ts-check
 
 import { renderRequest } from "@remastered/core/dist/src/server";
+// @ts-ignore
 import manifest from "../dist/client/ssr-manifest.json";
+// @ts-ignore
 import clientManifest from "../dist/client/manifest.json";
 import * as serverEntry from "../dist/server/entry.server";
 import { Request } from "node-fetch";

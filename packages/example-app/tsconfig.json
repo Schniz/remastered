@@ -23,5 +23,5 @@
       "@remastered/core/*": [".remastered/*"]
     }
   },
-  "include": ["./src", "./app", "./api"]
+  "include": ["./src", "./app"]
 }
