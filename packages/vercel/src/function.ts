@@ -14,7 +14,7 @@ export default function createVercelFunction(
   const clientManifest$ = fs.readJson(
     path.join(rootDir, "dist/client/manifest.json")
   );
-  const serverEntry$ = import(`${rootDir}/dist/server/server.entry.js`);
+  const serverEntry$ = import(`${rootDir}/dist/server/entry.server.js`);
 
   return async (req, res) => {
     const [manifest, clientManifest, serverEntry] = await Promise.all([
