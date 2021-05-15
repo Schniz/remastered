@@ -7,7 +7,7 @@
     "build:client": "vite build --outDir dist/client --ssrManifest --manifest",
     "build:server": "env REMASTERED_BUILD_TARGET=server vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",
-    "vercel-build": "yarn build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@swc-node/register": "^1.2.1",
