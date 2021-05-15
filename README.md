@@ -19,6 +19,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 - [x] `headers`
 - [x] `handle`
 - [x] `meta`
+- [ ] Session helpers
 
 ### SSR
 
