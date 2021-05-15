@@ -1,14 +1,16 @@
 {
   "name": "@remastered/example-app-1",
+  "private": true,
   "version": "0.0.0",
   "scripts": {
     "dev": "remastered dev",
     "build": "tsc && remastered build",
     "start": "remastered serve",
-    "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "vercel-build": "yarn workspaces run build && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@remastered/core": "1.0.0",
+    "@remastered/vercel": "1.0.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
     "esm": "^3.2.25",

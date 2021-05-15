@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vite/client", "@types/jest"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "jsx": "react",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "react-router": ["./react-router-pkgs/react-router"],
+      "react-router-dom": ["./react-router-pkgs/react-router-dom"],
+      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"]
+    }
+  },
+  "include": ["./src", "./app"],
+  "exclude": ["./dist"]
+}
