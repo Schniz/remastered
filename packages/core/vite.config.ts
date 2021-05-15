@@ -4,8 +4,8 @@ import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 import fs from "fs-extra";
 
-function fileInCore(name: string): string {
-  return path.join(__dirname, "node_modules/.remaster", name);
+export function fileInCore(name: string): string {
+  return path.join(process.cwd(), "node_modules/.remaster", name);
 }
 
 const symlinkDir = fileInCore("");
@@ -27,10 +27,7 @@ const config = defineConfig({
   },
   build: {
     rollupOptions: {
-      input:
-        process.env.REMASTERED_BUILD_TARGET === "server"
-          ? path.join(__dirname, "node_modules/.remaster/entry.server.js")
-          : path.join(__dirname, "node_modules/.remaster/entry.client.js"),
+      input: fileInCore("entry.client.js"),
     },
   },
   resolve: {
@@ -57,7 +54,7 @@ export default config;
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
  */
 function routeTransformer(): PluginOption {
-  const modulePrefix = path.join(__dirname, "./app/routes/");
+  const modulePrefix = path.join(process.cwd(), "./app/routes/");
   return {
     enforce: "pre",
     name: "remaster:route",

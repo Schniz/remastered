@@ -1252,6 +1252,16 @@ cliui@^6.0.0:
     strip-ansi "^6.0.0"
     wrap-ansi "^6.2.0"
 
+cmd-ts@^0.6.9:
+  version "0.6.9"
+  resolved "https://registry.npmjs.org/cmd-ts/-/cmd-ts-0.6.9.tgz#dcc2c4a19b51c91eb62fb565a49f05aca5505186"
+  integrity sha512-pWMhILm1enypPvEb29XSLUW58oFtqu97XMM7L+Pw0ynugkALGfi/O86Tawt8L3uMRlNMW7pzzjwBG/Zxzj4d8Q==
+  dependencies:
+    chalk "^4.0.0"
+    debug "^4.1.1"
+    didyoumean "^1.2.1"
+    strip-ansi "^6.0.0"
+
 co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.npmjs.org/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -1498,6 +1508,11 @@ detect-newline@^3.0.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
+
+didyoumean@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/didyoumean/-/didyoumean-1.2.1.tgz#e92edfdada6537d484d73c0172fd1eba0c4976ff"
+  integrity sha1-6S7f2tplN9SE1zwBcv0eugxJdv8=
 
 diff-sequences@^26.6.2:
   version "26.6.2"

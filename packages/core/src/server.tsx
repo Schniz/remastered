@@ -7,6 +7,7 @@ import fastifyStatic from "fastify-static";
 import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
+import { getViteConfigPath } from "./getViteConfig";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -20,7 +21,6 @@ function findDistRoot() {
       })
       .find((place) => {
         const filePath = path.join(place, "server/entry.server.js");
-        console.log(filePath);
         return fs.existsSync(filePath);
       });
 
@@ -30,12 +30,6 @@ function findDistRoot() {
 
     return newPlace;
   }
-}
-
-function getViteConfig(): string {
-  return [path.join(process.cwd(), "vite.config.ts")].filter((v) =>
-    fs.existsSync(v)
-  )[0];
 }
 
 export async function createServer(root: string) {
@@ -48,7 +42,7 @@ export async function createServer(root: string) {
     ? undefined
     : await createViteServer({
         root,
-        configFile: getViteConfig(),
+        configFile: getViteConfigPath(),
         server: { middlewareMode: true },
       });
 
