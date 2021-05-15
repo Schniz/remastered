@@ -8,10 +8,10 @@ import fs from "fs-extra";
 import path from "path";
 
 const manifest = fs.readJsonSync(
-  path.join(__dirname, "../dist/client/ssr-manifest.json")
+  path.join(process.cwd(), "../dist/client/ssr-manifest.json")
 );
 const clientManifest = fs.readJsonSync(
-  path.join(__dirname, "../dist/client/manifest.json")
+  path.join(process.cwd(), "../dist/client/manifest.json")
 );
 
 /**
