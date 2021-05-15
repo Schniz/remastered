@@ -7,7 +7,7 @@ import {
   Meta,
   Links,
   Scripts,
-} from "@remaster/core";
+} from "@remastered/core";
 import "./layout.css";
 
 type HasBreadcrumbs = Match & {

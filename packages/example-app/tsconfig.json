@@ -17,10 +17,10 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "react-router": [".remaster/dist/react-router-pkgs/react-router"],
-      "react-router-dom": [".remaster/dist/react-router-pkgs/react-router-dom"],
-      "react-router-dom/server": [".remaster/dist/react-router-pkgs/react-router-dom/server"],
-      "@remaster/core/*": [".remaster/*"]
+      "react-router": [".remastered/dist/react-router-pkgs/react-router"],
+      "react-router-dom": [".remastered/dist/react-router-pkgs/react-router-dom"],
+      "react-router-dom/server": [".remastered/dist/react-router-pkgs/react-router-dom/server"],
+      "@remastered/core/*": [".remastered/*"]
     }
   },
   "include": ["./src", "./app"]

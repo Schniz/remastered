@@ -1,6 +1,6 @@
 // @ts-check
 
-import { renderRequest } from "@remaster/core/dist/src/server";
+import { renderRequest } from "@remastered/core/dist/src/server";
 // @ts-ignore
 import manifest from "./ssr-manifest.json";
 // @ts-ignore

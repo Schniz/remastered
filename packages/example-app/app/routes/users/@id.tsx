@@ -5,7 +5,7 @@ import {
   LoaderFn,
   MetaFn,
   Match,
-} from "@remaster/core";
+} from "@remastered/core";
 import { User, database } from "../../database";
 
 export const loader: LoaderFn<User | Response> = async ({ params }) => {

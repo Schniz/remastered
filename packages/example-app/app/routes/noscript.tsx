@@ -1,5 +1,5 @@
 import React from "react";
-import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "@remaster/core";
+import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "@remastered/core";
 import s from "./noscript.module.css";
 
 type Data = { date: string };

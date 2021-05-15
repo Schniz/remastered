@@ -15,7 +15,7 @@ import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
 
-const mainFile = `node_modules/.remaster/entry.client.js`;
+const mainFile = `node_modules/.remastered/entry.client.js`;
 
 globalPatch();
 

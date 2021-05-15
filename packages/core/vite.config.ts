@@ -5,18 +5,18 @@ import path from "path";
 import fs from "fs-extra";
 
 export function fileInCore(name: string): string {
-  return path.join(process.cwd(), "node_modules/.remaster", name);
+  return path.join(process.cwd(), "node_modules/.remastered", name);
 }
 
 const symlinkDir = fileInCore("");
 fs.removeSync(symlinkDir);
 fs.outputFileSync(
   path.join(symlinkDir, "entry.client.js"),
-  `import '@remaster/core/dist/src/main';`
+  `import '@remastered/core/dist/src/main';`
 );
 fs.outputFileSync(
   path.join(symlinkDir, "entry.server.js"),
-  `export * from '@remaster/core/dist/src/entry-server';`
+  `export * from '@remastered/core/dist/src/entry-server';`
 );
 
 // https://vitejs.dev/config/
@@ -32,9 +32,9 @@ const config = defineConfig({
   },
   resolve: {
     alias: {
-      "react-router": "@remaster/core/dist/react-router-pkgs/react-router",
+      "react-router": "@remastered/core/dist/react-router-pkgs/react-router",
       "react-router-dom":
-        "@remaster/core/dist/react-router-pkgs/react-router-dom",
+        "@remastered/core/dist/react-router-pkgs/react-router-dom",
     },
   },
   ...({

@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "@remaster/core";
+import { useLocation } from "@remastered/core";
 
 export default function Error404() {
   const { pathname } = useLocation();

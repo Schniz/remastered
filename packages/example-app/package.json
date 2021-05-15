@@ -1,5 +1,5 @@
 {
-  "name": "@remaster/example-app-1",
+  "name": "@remastered/example-app-1",
   "version": "0.0.0",
   "scripts": {
     "dev": "remastered dev",
@@ -8,7 +8,7 @@
     "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
-    "@remaster/core": "1.0.0",
+    "@remastered/core": "1.0.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
     "esm": "^3.2.25",
