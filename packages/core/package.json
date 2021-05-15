@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "bin": {
-    "remaster": "./bin/remaster.js"
+    "remastered": "./bin/remastered.js"
   },
   "devDependencies": {
     "@swc-node/jest": "^1.2.1",

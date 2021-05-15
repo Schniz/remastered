@@ -2,9 +2,9 @@
   "name": "@remaster/example-app-1",
   "version": "0.0.0",
   "scripts": {
-    "dev": "remaster dev",
-    "build": "tsc && remaster build",
-    "start": "remaster serve",
+    "dev": "remastered dev",
+    "build": "tsc && remastered build",
+    "start": "remastered serve",
     "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
