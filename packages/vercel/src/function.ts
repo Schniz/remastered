@@ -6,7 +6,6 @@ import path from "path";
 import _ from "lodash";
 
 export default function createVercelFunction({
-  serverEntry,
   rootDir,
 }: {
   serverEntry: typeof import("@remastered/core/dist/src/entry-server");
@@ -18,11 +17,13 @@ export default function createVercelFunction({
   const clientManifest$ = fs.readJson(
     path.join(rootDir, "dist/client/manifest.json")
   );
+  const serverEntry$ = import(path.join(rootDir, "dist/server/entry.server"));
 
   return async (req, res) => {
-    const [manifest, clientManifest] = await Promise.all([
+    const [manifest, clientManifest, serverEntry] = await Promise.all([
       manifest$,
       clientManifest$,
+      serverEntry$,
     ]);
 
     const method = req.method?.toUpperCase() ?? "GET";
