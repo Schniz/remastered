@@ -4,8 +4,6 @@
   "private": true,
   "repository": "git@github.com:Schniz/remastered.git",
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ]
+  "workspaces": ["packages/*"],
+  "license": "MIT"
 }

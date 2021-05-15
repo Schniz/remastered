@@ -4,9 +4,10 @@ import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
-import { Request as NFRequest, Response as NFResponse } from "node-fetch";
+import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
+import { getViteConfigPath } from "./getViteConfig";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -19,7 +20,7 @@ function findDistRoot() {
         return path.join(place, "dist");
       })
       .find((place) => {
-        const filePath = path.join(place, "server/entry-server.js");
+        const filePath = path.join(place, "server/entry.server.js");
         return fs.existsSync(filePath);
       });
 
@@ -31,7 +32,8 @@ function findDistRoot() {
   }
 }
 
-export async function createServer() {
+export async function createServer(root: string) {
+  process.env.REMASTER_PROJECT_DIR = root;
   const app = fastify({ logger: isProd });
   await app.register(fastifyExpress);
   app.addContentTypeParser("*", (_request, _payload, done) => done(null));
@@ -39,6 +41,8 @@ export async function createServer() {
   const vite = isProd
     ? undefined
     : await createViteServer({
+        root,
+        configFile: getViteConfigPath({ ssr: false }),
         server: { middlewareMode: true },
       });
 
@@ -66,7 +70,7 @@ export async function createServer() {
     });
     const response = await renderRequest(
       await getViteHandlers(vite),
-      (request as unknown) as Request,
+      request as unknown as Request,
       vite
     );
     const headers = _([...response.headers.entries()])
@@ -106,17 +110,17 @@ export async function renderRequest(
   }
 }
 
-async function main() {
+export async function main(root: string) {
   const port = process.env.PORT || 3000;
   console.log(`Bootstrapping...`);
-  const app = await createServer();
+  const app = await createServer(root);
   console.log(`Server bootstrapped. Listening at ${port}`);
 
   app.listen(port, "0.0.0.0");
 }
 
 if (require.main === module) {
-  main();
+  main(path.dirname(__dirname));
 }
 
 type ViteHandlers = {
@@ -129,14 +133,16 @@ async function getViteHandlers(
   vite: ViteDevServer | undefined
 ): Promise<ViteHandlers> {
   if (!vite) {
+    const distRoot = findDistRoot();
     return {
-      serverEntry: require("../dist/server/entry-server.js"),
-      manifest: require("../dist/client/ssr-manifest.json"),
-      clientManifest: require("../dist/client/manifest.json"),
+      serverEntry: require(`${distRoot}/server/entry.server.js`),
+      manifest: require(`${distRoot}/client/ssr-manifest.json`),
+      clientManifest: require(`${distRoot}/client/manifest.json`),
     };
   } else {
+    const entry = require.resolve("./entry-server.js");
     return {
-      serverEntry: await vite.ssrLoadModule("/src/entry-server.tsx"),
+      serverEntry: await vite.ssrLoadModule(entry),
     };
   }
 }

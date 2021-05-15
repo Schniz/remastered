@@ -1,11 +1,11 @@
 // @ts-check
 
-import { renderRequest } from "../src/server";
+import { renderRequest } from "@remaster/core/dist/src/server";
 // @ts-ignore
 import manifest from "./ssr-manifest.json";
 // @ts-ignore
 import clientManifest from "./manifest.json";
-import * as serverEntry from "../dist/server/entry-server";
+import * as serverEntry from "../dist/server/entry.server";
 import { Request } from "node-fetch";
 import _ from "lodash";
 

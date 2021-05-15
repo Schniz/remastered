@@ -2,29 +2,39 @@ import { defineConfig, PluginOption } from "vite";
 import { Module, parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
+import fs from "fs-extra";
+
+export function fileInCore(name: string): string {
+  return path.join(process.cwd(), "node_modules/.remaster", name);
+}
+
+const symlinkDir = fileInCore("");
+fs.removeSync(symlinkDir);
+fs.outputFileSync(
+  path.join(symlinkDir, "entry.client.js"),
+  `import '@remaster/core/dist/src/main';`
+);
+fs.outputFileSync(
+  path.join(symlinkDir, "entry.server.js"),
+  `export * from '@remaster/core/dist/src/entry-server';`
+);
 
 // https://vitejs.dev/config/
 const config = defineConfig({
   plugins: [routeTransformer(), reactRefresh()],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
-    __REMASTERED_ROOT__: JSON.stringify(process.cwd()),
   },
   build: {
     rollupOptions: {
-      input:
-        process.env.REMASTERED_BUILD_TARGET === "server"
-          ? "./src/entry-server.tsx"
-          : "./src/main.tsx",
+      input: fileInCore("entry.client.js"),
     },
   },
   resolve: {
     alias: {
-      "react-router": path.join(__dirname, "./react-router-pkgs/react-router"),
-      "react-router-dom": path.join(
-        __dirname,
-        "./react-router-pkgs/react-router-dom"
-      ),
+      "react-router": "@remaster/core/dist/react-router-pkgs/react-router",
+      "react-router-dom":
+        "@remaster/core/dist/react-router-pkgs/react-router-dom",
     },
   },
   ...({
@@ -44,7 +54,7 @@ export default config;
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
  */
 function routeTransformer(): PluginOption {
-  const modulePrefix = path.join(__dirname, "./app/routes/");
+  const modulePrefix = path.join(process.cwd(), "./app/routes/");
   return {
     enforce: "pre",
     name: "remaster:route",

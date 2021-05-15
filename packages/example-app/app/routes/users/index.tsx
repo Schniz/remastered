@@ -1,6 +1,5 @@
 import React from "react";
-import { redirectTo } from "../../../src/httpHelpers";
-import { ActionFn, MetaFn } from "../../../src/routeTypes";
+import { redirectTo, ActionFn, MetaFn } from "@remaster/core";
 import { database } from "../../database";
 
 export const action: ActionFn = async ({ req }) => {

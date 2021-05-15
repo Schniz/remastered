@@ -6,7 +6,7 @@ import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import _ from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
-import type { ViteDevServer } from "vite";
+import { ModuleNode, ViteDevServer } from "vite";
 import {
   RemasteredAppServer,
   RemasteredAppServerCtx,
@@ -14,6 +14,8 @@ import {
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
+
+const mainFile = `node_modules/.remaster/entry.client.js`;
 
 globalPatch();
 
@@ -89,7 +91,6 @@ async function onGet({
     loaderContext.clear();
     status = 404;
   }
-
   if (isJsonResponse) {
     return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
@@ -234,19 +235,17 @@ function buildScripts(
       })
       .map(([, v]) => v)
       .flatten()
-      .map(
-        (url): LinkTag => {
-          const rel = url.endsWith(".css") ? "stylesheet" : "modulepreload";
-          return { rel, href: url };
-        }
-      )
+      .map((url): LinkTag => {
+        const rel = url.endsWith(".css") ? "stylesheet" : "modulepreload";
+        return { rel, href: url };
+      })
       .value();
 
     links.push(...preload);
   }
 
   if (clientManifest) {
-    const manifested = (clientManifest["src/main.tsx"].css ?? []).map(
+    const manifested = (clientManifest[mainFile].css ?? []).map(
       (url): LinkTag => {
         return {
           rel: "stylesheet",
@@ -319,7 +318,7 @@ function getPreloadFromVite(
 
   const moduleQueue = _(routeKeys)
     .map((x) => `${process.cwd()}${x}`)
-    .concat([`${process.cwd()}/src/main.tsx`])
+    .concat([`${process.cwd()}/${mainFile}`])
     .map((x) => {
       return vite.moduleGraph.fileToModulesMap.get(x);
     })
@@ -328,8 +327,12 @@ function getPreloadFromVite(
     .compact()
     .value();
 
+  const visited = new Set<ModuleNode>();
+
   while (moduleQueue.length) {
     const moduleNode = moduleQueue.shift()!;
+    if (visited.has(moduleNode)) continue;
+    visited.add(moduleNode);
     resolvedModules.set(moduleNode.url, moduleNode.type);
     moduleQueue.push(...moduleNode.importedModules);
   }
@@ -352,13 +355,13 @@ async function mainScript(
         type: "module",
       },
       { _tag: "eager", src: "/@vite/client", type: "module" },
-      { _tag: "eager", src: "/src/main.tsx", type: "module" },
+      { _tag: "eager", src: `/${mainFile}`, type: "module" },
     ];
   } else if (regularManifest) {
     return [
       {
         _tag: "eager",
-        src: "/" + regularManifest["src/main.tsx"].file,
+        src: "/" + regularManifest[mainFile].file,
         type: "module",
       },
     ];

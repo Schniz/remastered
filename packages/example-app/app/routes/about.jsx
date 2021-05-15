@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouteData } from "../../src/LoaderContext";
+import { useRouteData } from "@remaster/core";
 
 export async function loader() {
   return {

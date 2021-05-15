@@ -2,16 +2,16 @@
   "name": "@remaster/example-app-1",
   "version": "0.0.0",
   "scripts": {
-    "dev": "node -r @swc-node/register src/server",
-    "build": "tsc && yarn build:client && yarn build:server",
-    "build:client": "vite build --outDir dist/client --ssrManifest --manifest",
-    "build:server": "env REMASTERED_BUILD_TARGET=server vite build --outDir dist/server --ssr src/entry-server.tsx",
-    "start": "node -r @swc-node/register src/server",
-    "vercel-build": "yarn build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "dev": "remastered dev",
+    "build": "tsc && remastered build",
+    "start": "remastered serve",
+    "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
+    "@remaster/core": "1.0.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
+    "esm": "^3.2.25",
     "fastify": "^3.15.1",
     "fastify-express": "^0.3.2",
     "fastify-static": "^4.0.1",
@@ -21,8 +21,7 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router": "^6.0.0-beta.0",
-    "react-router-dom": "^6.0.0-beta.0",
-    "swr": "^0.5.6"
+    "react-router-dom": "^6.0.0-beta.0"
   },
   "devDependencies": {
     "@swc-node/jest": "^1.2.1",
