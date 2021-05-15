@@ -1,6 +1,10 @@
 import React from "react";
-import { useRouteData } from "../../src/LoaderContext";
-import { HeadersFn, LoaderFn, MetaFn } from "../../src/routeTypes";
+import { useRouteData } from "@remaster/core/dist/src/LoaderContext";
+import {
+  HeadersFn,
+  LoaderFn,
+  MetaFn,
+} from "@remaster/core/dist/src/routeTypes";
 import s from "./noscript.module.css";
 
 type Data = { date: string };

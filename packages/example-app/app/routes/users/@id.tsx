@@ -1,8 +1,8 @@
 import React from "react";
-import { redirectTo } from "../../../src/httpHelpers";
-import { useRouteData } from "../../../src/LoaderContext";
-import type { LoaderFn, MetaFn } from "../../../src/routeTypes";
-import { Match } from "../../../src/useMatches";
+import { redirectTo } from "@remaster/core/dist/src/httpHelpers";
+import { useRouteData } from "@remaster/core/dist/src/LoaderContext";
+import type { LoaderFn, MetaFn } from "@remaster/core/dist/src/routeTypes";
+import { Match } from "@remaster/core/dist/src/useMatches";
 import { User, database } from "../../database";
 
 export const loader: LoaderFn<User | Response> = async ({ params }) => {

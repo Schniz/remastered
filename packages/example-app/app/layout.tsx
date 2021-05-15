@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from "react-router-dom";
 import React from "react";
-import { Links, Scripts, Meta } from "../src/JsxForDocument";
-import { Match, useMatches } from "../src/useMatches";
+import { Links, Scripts, Meta } from "@remaster/core/dist/src/JsxForDocument";
+import { Match, useMatches } from "@remaster/core/dist/src/useMatches";
 import "./layout.css";
 
 type HasBreadcrumbs = Match & {

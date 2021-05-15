@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet } from "react-router";
 import { Link, NavLink } from "react-router-dom";
-import { useRouteData } from "../../src/LoaderContext";
-import { LoaderFn } from "../../src/routeTypes";
+import { useRouteData } from "@remaster/core/dist/src/LoaderContext";
+import { LoaderFn } from "@remaster/core/dist/src/routeTypes";
 import { User, database } from "../database";
 import s from "./users.module.css";
 

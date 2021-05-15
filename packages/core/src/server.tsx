@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import fastifyStatic from "fastify-static";
 import { Request as NFRequest, Response as NFResponse } from "node-fetch";
-import type { RenderFn } from "@remaster/core/dist/src/entry-server";
+import type { RenderFn } from "./entry-server";
 import _ from "lodash";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -66,7 +66,7 @@ export async function createServer() {
     });
     const response = await renderRequest(
       await getViteHandlers(vite),
-      request as unknown as Request,
+      (request as unknown) as Request,
       vite
     );
     const headers = _([...response.headers.entries()])
@@ -136,9 +136,7 @@ async function getViteHandlers(
     };
   } else {
     return {
-      serverEntry: await vite.ssrLoadModule(
-        "/.remaster/dist/src/entry-server.js"
-      ),
+      serverEntry: await vite.ssrLoadModule("/src/entry-server.tsx"),
     };
   }
 }

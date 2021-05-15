@@ -13,14 +13,14 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "declaration": true,
     "jsx": "react",
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "react-router": [".remaster/dist/react-router-pkgs/react-router"],
-      "react-router-dom": [".remaster/dist/react-router-pkgs/react-router-dom"],
-      "react-router-dom/server": [".remaster/dist/react-router-pkgs/react-router-dom/server"],
-      "@remaster/core/*": [".remaster/*"]
+      "react-router": ["./react-router-pkgs/react-router"],
+      "react-router-dom": ["./react-router-pkgs/react-router-dom"],
+      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"]
     }
   },
   "include": ["./src", "./app"]

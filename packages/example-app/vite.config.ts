@@ -2,29 +2,37 @@ import { defineConfig, PluginOption } from "vite";
 import { Module, parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
+import fs from "fs";
+
+function fileInCore(name: string): string {
+  return path.join(__dirname, ".remaster", name);
+}
+
+// const coreDir = path.dirname(require.resolve("@remaster/core/package.json"));
+
+// try {
+//   fs.symlinkSync(coreDir, fileInCore(""));
+// } catch (e) {}
 
 // https://vitejs.dev/config/
 const config = defineConfig({
   plugins: [routeTransformer(), reactRefresh()],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
-    __REMASTERED_ROOT__: JSON.stringify(process.cwd()),
   },
   build: {
     rollupOptions: {
       input:
         process.env.REMASTERED_BUILD_TARGET === "server"
-          ? "./src/entry-server.tsx"
-          : "./src/main.tsx",
+          ? fileInCore("dist/src/entry-server.js")
+          : fileInCore("dist/src/main.js"),
     },
   },
   resolve: {
     alias: {
-      "react-router": path.join(__dirname, "./react-router-pkgs/react-router"),
-      "react-router-dom": path.join(
-        __dirname,
-        "./react-router-pkgs/react-router-dom"
-      ),
+      "react-router": "@remaster/core/react-router-pkgs/react-router",
+      "react-router-dom": "@remaster/core/react-router-pkgs/react-router-dom",
+      "@remaster/core": path.join(__dirname, ".remaster"),
     },
   },
   ...({
