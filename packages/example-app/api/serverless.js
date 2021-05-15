@@ -7,18 +7,19 @@ import _ from "lodash";
 import fs from "fs-extra";
 import path from "path";
 
-const manifest = fs.readJsonSync(
-  path.join(process.cwd(), "../dist/client/ssr-manifest.json")
-);
-const clientManifest = fs.readJsonSync(
-  path.join(process.cwd(), "../dist/client/manifest.json")
-);
-
 /**
  * @param {Request} req
  * @param {import('@vercel/node').VercelResponse} res
  */
 export default async (req, res) => {
+  console.log({ cwd: process.cwd(), dirname: __dirname });
+  const manifest = fs.readJsonSync(
+    path.join(process.cwd(), "../dist/client/ssr-manifest.json")
+  );
+  const clientManifest = fs.readJsonSync(
+    path.join(process.cwd(), "../dist/client/manifest.json")
+  );
+
   const method = req.method.toUpperCase();
   const request = new Request(req.url, {
     method,
