@@ -8,7 +8,6 @@ import _ from "lodash";
 export default function createVercelFunction({
   rootDir,
 }: {
-  serverEntry: typeof import("@remastered/core/dist/src/entry-server");
   rootDir: string;
 }): VercelApiHandler {
   const manifest$ = fs.readJson(
@@ -20,6 +19,7 @@ export default function createVercelFunction({
   const serverEntry$ = import(
     path.join(rootDir, "dist/server/entry.server.js")
   );
+
   return async (req, res) => {
     const [manifest, clientManifest, serverEntry] = await Promise.all([
       manifest$,
