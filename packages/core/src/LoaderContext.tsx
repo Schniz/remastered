@@ -17,6 +17,7 @@ export function useRouteData<P>(routeKey?: string): P {
   routeKey = routeKey ?? useRouteModule();
   const key = `${location.key}@${routeKey}`;
   const value = loaderContext.get(key);
+  console.log({ loaderContext });
 
   return value as P;
 }

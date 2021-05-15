@@ -135,10 +135,10 @@ async function getViteHandlers(
       clientManifest: require("../dist/client/manifest.json"),
     };
   } else {
+    const entry = require.resolve("@remaster/core/dist/src/entry-server");
+    process.env.REMASTER_ROOT_DIR = path.dirname(entry);
     return {
-      serverEntry: await vite.ssrLoadModule(
-        "/.remaster/dist/src/entry-server.js"
-      ),
+      serverEntry: await vite.ssrLoadModule(entry),
     };
   }
 }

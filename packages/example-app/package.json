@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "node -r @swc-node/register src/server",
+    "vercel-build-prepare": "cd ../.. && npm install && rush update && rush build",
     "build": "tsc && yarn build:client && yarn build:server",
     "build:client": "vite build --outDir dist/client --ssrManifest --manifest",
     "build:server": "env REMASTERED_BUILD_TARGET=server vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",
-    "vercel-build": "yarn build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "vercel-build": "npm run vercel-build-prepare && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@swc-node/register": "^1.2.1",
@@ -22,7 +23,6 @@
     "react-dom": "^17.0.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
-    "swr": "^0.5.6",
     "@remaster/core": "1.0.0"
   },
   "devDependencies": {

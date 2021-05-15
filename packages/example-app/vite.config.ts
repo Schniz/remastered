@@ -5,14 +5,14 @@ import path from "path";
 import fs from "fs";
 
 function fileInCore(name: string): string {
-  return path.join(__dirname, ".remaster", name);
+  return path.join(__dirname, "node_modules/.remaster", name);
 }
 
-// const coreDir = path.dirname(require.resolve("@remaster/core/package.json"));
+const coreDir = path.dirname(require.resolve("@remaster/core/package.json"));
 
-// try {
-//   fs.symlinkSync(coreDir, fileInCore(""));
-// } catch (e) {}
+try {
+  fs.symlinkSync(coreDir, fileInCore(""));
+} catch (e) {}
 
 // https://vitejs.dev/config/
 const config = defineConfig({
@@ -30,9 +30,9 @@ const config = defineConfig({
   },
   resolve: {
     alias: {
-      "react-router": "@remaster/core/react-router-pkgs/react-router",
-      "react-router-dom": "@remaster/core/react-router-pkgs/react-router-dom",
-      "@remaster/core": path.join(__dirname, ".remaster"),
+      "react-router": fileInCore("dist/react-router-pkgs/react-router"),
+      "react-router-dom": fileInCore("dist/react-router-pkgs/react-router-dom"),
+      "@remaster/core": path.join(__dirname, "node_modules", ".remaster"),
     },
   },
   ...({

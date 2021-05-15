@@ -5,7 +5,7 @@
   "repository": "git@github.com:Schniz/remastered.git",
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ]
+  "devDependencies": {
+    "@microsoft/rush": "^5.47.0"
+  }
 }
