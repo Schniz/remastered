@@ -6,7 +6,7 @@
     "dev": "remastered dev",
     "build": "tsc && remastered build",
     "start": "remastered serve",
-    "vercel-build": "yarn workspaces run build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "vercel-build": "yarn workspaces run build && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@remastered/core": "1.0.0",

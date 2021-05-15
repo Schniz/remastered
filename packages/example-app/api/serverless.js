@@ -1,13 +1,13 @@
 // @ts-check
 
 import { renderRequest } from "@remastered/core/dist/src/server";
-// @ts-ignore
-import manifest from "./ssr-manifest.json";
-// @ts-ignore
-import clientManifest from "./manifest.json";
 import * as serverEntry from "../dist/server/entry.server";
 import { Request } from "node-fetch";
 import _ from "lodash";
+import fs from "fs-extra";
+
+const manifest = fs.readJSONSync(`../dist/client/ssr-manifest.json`);
+const clientManifest = fs.readJSONSync(`../dist/client/manifest.json`);
 
 /**
  * @param {Request} req

@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/serverless.js": {
+      "includeFiles": "../dist/client/*.json"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/serverless.js" }
   ]
