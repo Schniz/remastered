@@ -11,15 +11,17 @@ export default function createVercelFunction({
   serverEntry: typeof import("@remastered/core/dist/src/entry-server");
   rootDir: string;
 }): VercelApiHandler {
-  const manifest$ = fs.readJson(
-    path.join(rootDir, "dist/client/ssr-manifest.json")
-  );
-  const clientManifest$ = fs.readJson(
-    path.join(rootDir, "dist/client/manifest.json")
-  );
-  const serverEntry$ = import(path.join(rootDir, "dist/server/entry.server"));
-
   return async (req, res) => {
+    console.log({ rootDir, files: fs.readdirSync(path.join(rootDir, "dist")) });
+    const manifest$ = fs.readJson(
+      path.join(rootDir, "dist/client/ssr-manifest.json")
+    );
+    const clientManifest$ = fs.readJson(
+      path.join(rootDir, "dist/client/manifest.json")
+    );
+    const serverEntry$ = import(
+      path.join(rootDir, "dist/server/entry.server.js")
+    );
     const [manifest, clientManifest, serverEntry] = await Promise.all([
       manifest$,
       clientManifest$,
