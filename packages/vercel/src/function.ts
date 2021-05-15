@@ -13,7 +13,7 @@ export default function createVercelFunction({
   rootDir: string;
 }): VercelApiHandler {
   return async (req, res) => {
-    console.log({ rootDir, files: fs.readdirSync(rootDir) });
+    console.log({ rootDir, files: fs.readdirSync(path.join(rootDir, "dist")) });
     const manifest$ = fs.readJson(
       path.join(rootDir, "dist/client/ssr-manifest.json")
     );
