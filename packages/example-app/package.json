@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "node -r @swc-node/register src/server",
-    "vercel-build-prepare": "npm install -g @microsoft/rush && rush update && rush build",
     "build": "tsc && yarn build:client && yarn build:server",
     "build:client": "vite build --outDir dist/client --ssrManifest --manifest",
     "build:server": "env REMASTERED_BUILD_TARGET=server vite build --outDir dist/server --ssr src/entry-server.tsx",
     "start": "node -r @swc-node/register src/server",
-    "vercel-build": "cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
+    "vercel-build": "yarn build && cp ./dist/client/ssr-manifest.json ./dist/client/manifest.json ./api/ && cp -r dist/client/assets public/assets"
   },
   "dependencies": {
     "@swc-node/register": "^1.2.1",
