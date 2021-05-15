@@ -20,6 +20,7 @@ export default function createVercelFunction({
   );
 
   return async (req, res) => {
+    console.log({ rootDir, files: fs.readdirSync(rootDir) });
     const [manifest, clientManifest] = await Promise.all([
       manifest$,
       clientManifest$,
