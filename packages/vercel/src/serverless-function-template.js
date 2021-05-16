@@ -1,5 +1,3 @@
-// @ts-check
-
 import { createVercelFunction } from "@remastered/vercel";
 import path from "path";
 

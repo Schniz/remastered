@@ -3,7 +3,7 @@
     "target": "ES2019",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "@types/jest"],
-    "allowJs": false,
+    "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
