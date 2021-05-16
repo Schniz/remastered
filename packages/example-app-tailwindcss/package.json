@@ -1,0 +1,25 @@
+{
+  "name": "@remastered/example-app-tailwindcss",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Gal Schlezinger",
+  "license": "MIT",
+  "scripts": {
+    "dev": "remastered dev",
+    "build": "remastered build",
+    "start": "remastered serve",
+    "vercel-build": "yarn workspaces run build && cp -r dist/client/assets public/assets"
+  },
+  "dependencies": {
+    "@remastered/core": "^1.0.0",
+    "@remastered/vercel": "^1.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.15",
+    "prettier": "^2.3.0",
+    "tailwindcss": "^2.1.2",
+    "typescript": "^4.2.4"
+  }
+}
