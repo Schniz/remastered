@@ -319,9 +319,9 @@ function getPreloadFromVite(
   const moduleQueue = _(routeKeys)
     .map((x) => `${process.cwd()}${x}`)
     .concat([`${process.cwd()}/${mainFile}`])
-    .map((x) => {
-      return vite.moduleGraph.fileToModulesMap.get(x);
-    })
+    .concat([`${process.cwd()}/app/layout.tsx`])
+    .concat([`${process.cwd()}/app/layout.jsx`])
+    .map((x) => vite.moduleGraph.fileToModulesMap.get(x))
     .compact()
     .flatMap((x) => [...x])
     .compact()
