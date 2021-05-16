@@ -12,20 +12,20 @@ test("routes", () => {
     "/": {
       element: SomeComponent,
       children: {},
-      filepath: "index.tsx",
+      filepath: "/app/routes/index.tsx",
     },
     "/about": {
       element: SomeComponent,
       children: {},
-      filepath: "about.tsx",
+      filepath: "/app/routes/about.tsx",
     },
     "/users": {
       element: SomeComponent,
-      filepath: "users.tsx",
+      filepath: "/app/routes/users.tsx",
       children: {
         "/:id": {
           element: SomeComponent,
-          filepath: "users/@id.tsx",
+          filepath: "/app/routes/users/@id.tsx",
           children: {},
         },
       },
@@ -33,7 +33,7 @@ test("routes", () => {
     "/users/register": {
       element: SomeComponent,
       children: {},
-      filepath: "users.register.tsx",
+      filepath: "/app/routes/users.register.tsx",
     },
   });
 });
