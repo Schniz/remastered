@@ -15,13 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "baseUrl": ".",
-    "paths": {
-      "react-router": [".remastered/dist/react-router-pkgs/react-router"],
-      "react-router-dom": [".remastered/dist/react-router-pkgs/react-router-dom"],
-      "react-router-dom/server": [".remastered/dist/react-router-pkgs/react-router-dom/server"],
-      "@remastered/core/*": [".remastered/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["./src", "./app"]
 }

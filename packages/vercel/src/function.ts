@@ -1,4 +1,4 @@
-import { renderRequest } from "@remastered/core/dist/src/server";
+import { renderRequest } from "@remastered/core/dist/server";
 import { Request } from "node-fetch";
 import type { VercelApiHandler } from "@vercel/node";
 import fs from "fs-extra";
