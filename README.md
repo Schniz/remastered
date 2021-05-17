@@ -20,6 +20,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 - [x] `handle`
 - [x] `meta`
 - [ ] Session helpers
+- [ ] custom entries (`app/entry.client.js`/`app/entry.server.js`)
 
 ### SSR
 
