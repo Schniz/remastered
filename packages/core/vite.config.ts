@@ -39,6 +39,12 @@ export default config;
  */
 function routeTransformer(): PluginOption {
   const modulePrefix = path.join(process.cwd(), "./app/routes/");
+  const acceptSelfCode = `
+    ;if (import.meta.hot) {
+      import.meta.hot.accept();
+    }
+  `;
+
   return {
     enforce: "pre",
     name: "remaster:route",
@@ -80,6 +86,7 @@ function routeTransformer(): PluginOption {
       }
 
       const result = await print({ ...parsed, body });
+      result.code = result.code + acceptSelfCode;
       return result;
     },
   };

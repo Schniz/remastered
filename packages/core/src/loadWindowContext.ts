@@ -18,7 +18,16 @@ export type Context = {
   matchesContext: React.ContextType<typeof MatchesContext>;
 };
 
-export let readyContext: { value?: Context } = {};
+declare global {
+  interface Window {
+    $$remasteredCtx?: { value?: Context };
+  }
+}
+
+export let readyContext: { value?: Context } =
+  import.meta.env.SSR || import.meta.env.PROD
+    ? {}
+    : window.$$remasteredCtx ?? {};
 
 export async function loadWindowContext(): Promise<Context> {
   const ctx = __REMASTERED_CTX;
@@ -44,6 +53,10 @@ export async function loadWindowContext(): Promise<Context> {
     loaderContext: loadCtx,
     matchesContext: matchesContext,
   };
+
+  if (!(import.meta.env.SSR || import.meta.env.PROD)) {
+    window.$$remasteredCtx = readyContext;
+  }
 
   return readyContext.value;
 }
