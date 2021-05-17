@@ -38,10 +38,17 @@ document
   .forEach((x) => x.remove());
 
 loadWindowContext().then(() => {
-  ReactDOM.hydrate(
-    <React.StrictMode>
-      <RemasteredApp />
-    </React.StrictMode>,
-    document
-  );
+  const customEntry = Object.values(
+    import.meta.globEager(`/app/entry.client.{j,t}s{,x}`)
+  )[0];
+  if (!customEntry) {
+    ReactDOM.hydrate(
+      <React.StrictMode>
+        <RemasteredApp />
+      </React.StrictMode>,
+      document
+    );
+  } else {
+    customEntry.entry();
+  }
 });
