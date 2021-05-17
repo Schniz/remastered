@@ -53,11 +53,10 @@ async function onGet({
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
       const params = relevantRoute.givenRoute.params;
-      const key = `${relevantRoute.key}`;
       const loaderResult = await relevantRoute.loader({
         params,
       });
-      loaderContext.set(key, loaderResult);
+      loaderContext.set(relevantRoute.key, loaderResult);
 
       if (loaderResult === null || loaderResult === undefined) {
         loaderNotFound = true;
@@ -91,6 +90,7 @@ async function onGet({
     loaderContext.clear();
     status = 404;
   }
+
   if (isJsonResponse) {
     return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
@@ -145,10 +145,12 @@ async function onGet({
 
   scripts.unshift(inlineScript);
 
+  const loadingErrorContext: RemasteredAppServerCtx["loadingErrorContext"] = {
+    state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
+  };
+
   const remasteredAppContext: RemasteredAppServerCtx = {
-    loadingErrorContext: {
-      state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
-    },
+    loadingErrorContext,
     links,
     loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
     loadedComponentsContext: loadedComponents,

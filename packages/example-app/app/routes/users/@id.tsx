@@ -23,9 +23,9 @@ export default function ViewUser() {
 }
 
 export const meta: MetaFn<User> = ({ data }) => ({
-  title: `${data.name}'s profile`,
+  title: `${data?.name}'s profile`,
 });
 
 export const handle = {
-  breadcrumbs: (match: Match<User>) => `${match.data.name}`,
+  breadcrumbs: (match: Match<User>) => `${match.data?.name ?? "Not found"}`,
 };
