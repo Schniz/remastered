@@ -5,5 +5,4 @@ export { Links, Scripts, Meta } from "./JsxForDocument";
 export { useMatches } from "./useMatches";
 export type { Match } from "./useMatches";
 export { useRouteData } from "./LoaderContext";
-export { RemasteredApp as Remastered } from "./RemasteredApp";
 export * from "./routeTypes";
