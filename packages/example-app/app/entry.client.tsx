@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 
 export async function entry() {
-  console.log(`current html is`, document.documentElement.outerHTML);
+  /* console.log(`current html is`, document.documentElement.outerHTML); */
   console.log("hydrating...");
   ReactDOM.hydrate(
     <React.StrictMode>
@@ -11,5 +11,5 @@ export async function entry() {
     </React.StrictMode>,
     document
   );
-  console.log(`hydrated html is`, document.documentElement.outerHTML);
+  /* console.log(`hydrated html is`, document.documentElement.outerHTML); */
 }

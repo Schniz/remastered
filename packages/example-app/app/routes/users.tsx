@@ -18,7 +18,7 @@ export default function Users() {
 
   return (
     <div>
-      Hello, this will not override, but won't be visible in{" "}
+      Hello! this will not override, but won't be visible in{" "}
       <Link to="register">the registration page</Link>.
       <div>
         <NavLink className={s.navLink} to={"not-found"}>

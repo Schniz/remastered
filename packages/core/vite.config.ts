@@ -79,7 +79,8 @@ function routeTransformer(): PluginOption {
         }
       }
 
-      return await print({ ...parsed, body });
+      const result = await print({ ...parsed, body });
+      return result;
     },
   };
 }
