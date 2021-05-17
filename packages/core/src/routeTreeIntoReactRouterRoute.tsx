@@ -1,10 +1,17 @@
 import { RouteTree } from "./createRouteTreeFromImportGlob";
 import React from "react";
-import { Outlet, RouteObject, useClosestRoute } from "react-router";
+import { Outlet, RouteObject } from "react-router";
 
 export function useRouteModule(): string {
-  return (useClosestRoute()! as any).routeFile;
+  return useClosestRoute()?.routeFile!;
 }
+
+export function useClosestRoute(): RouteObjectWithFilename | null {
+  return React.useContext(ClosestRouteContext);
+}
+
+export const ClosestRouteContext =
+  React.createContext<RouteObjectWithFilename | null>(null);
 
 export function routeTreeIntoReactRouterRoute(
   routeTree: RouteTree
@@ -14,14 +21,19 @@ export function routeTreeIntoReactRouterRoute(
   for (const key in routeTree) {
     const branch = routeTree[key];
     const Element = branch.element ?? Outlet;
-    const element = <Element />;
-    routes.push({
+    const route: RouteObjectWithFilename = {
+      element: <Element />,
       caseSensitive: true,
       path: key,
-      element,
       children: routeTreeIntoReactRouterRoute(branch.children),
       routeFile: branch.filepath,
-    });
+    };
+    route.element = (
+      <ClosestRouteContext.Provider value={route}>
+        <Element />
+      </ClosestRouteContext.Provider>
+    );
+    routes.push(route);
   }
 
   return routes;

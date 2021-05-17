@@ -12,11 +12,11 @@ const symlinkDir = fileInCore("");
 fs.removeSync(symlinkDir);
 fs.outputFileSync(
   path.join(symlinkDir, "entry.client.js"),
-  `import '@remastered/core/dist/src/main';`
+  `import '@remastered/core/dist/main';`
 );
 fs.outputFileSync(
   path.join(symlinkDir, "entry.server.js"),
-  `export * from '@remastered/core/dist/src/entry-server';`
+  `export * from '@remastered/core/dist/entry-server';`
 );
 
 // https://vitejs.dev/config/
@@ -30,22 +30,6 @@ const config = defineConfig({
       input: fileInCore("entry.client.js"),
     },
   },
-  resolve: {
-    alias: {
-      "react-router": "@remastered/core/dist/react-router-pkgs/react-router",
-      "react-router-dom":
-        "@remastered/core/dist/react-router-pkgs/react-router-dom",
-    },
-  },
-  ...({
-    ssr: {
-      noExternal: [
-        "react-router",
-        "react-router-dom",
-        "react-router-dom/server",
-      ],
-    },
-  } as {}),
 });
 
 export default config;

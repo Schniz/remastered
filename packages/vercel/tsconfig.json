@@ -3,7 +3,7 @@
     "target": "ES2019",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "@types/jest"],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -15,14 +15,7 @@
     "isolatedModules": true,
     "declaration": true,
     "jsx": "react",
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "react-router": ["./react-router-pkgs/react-router"],
-      "react-router-dom": ["./react-router-pkgs/react-router-dom"],
-      "react-router-dom/server": ["./react-router-pkgs/react-router-dom/server"]
-    }
+    "outDir": "dist"
   },
-  "include": ["./src", "./app"],
-  "exclude": ["./dist"]
+  "include": ["./src", "./app"]
 }

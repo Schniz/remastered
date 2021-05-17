@@ -56,7 +56,7 @@ const setup = command({
 
     await Promise.all([
       fs.copy(
-        path.join(__dirname, "./serverless-function-template.js"),
+        require.resolve("@remastered/vercel/serverless-function-template.js"),
         path.resolve(functionName)
       ),
       fs.outputJson(packageJsonPath, newPackageJson, { spaces: 2 }),

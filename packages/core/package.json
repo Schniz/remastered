@@ -1,7 +1,7 @@
 {
   "name": "@remastered/core",
   "version": "1.0.0",
-  "main": "./dist/src/index.js",
+  "main": "./dist/index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {
