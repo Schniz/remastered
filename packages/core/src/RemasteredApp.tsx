@@ -3,20 +3,16 @@ import App from "./App";
 import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { HaltingRouter } from "./HaltingRouter";
 import { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
-import {
-  HistoryResponseState,
-  NotFoundAndSkipRenderOnServerContext,
-} from "./NotFoundAndSkipRenderOnServerContext";
+import { readyContext } from "./loadWindowContext";
+import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 
-export function RemasteredApp(props: {
-  loaderContext: Map<string, unknown>;
-  componentsContext: Map<string, React.ComponentType>;
-  historyResponseState: HistoryResponseState;
-  links: React.ContextType<typeof LinkTagsContext>;
-  scripts: React.ContextType<typeof ScriptTagsContext>;
-  matchesContext: React.ContextType<typeof MatchesContext>;
-}) {
+export function RemasteredApp() {
+  const props = readyContext.value;
+  if (!props) {
+    throw new Error("Context was not loaded!!!");
+  }
+
   return (
     <MatchesContext.Provider value={props.matchesContext}>
       <ScriptTagsContext.Provider

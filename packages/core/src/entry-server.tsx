@@ -286,25 +286,20 @@ async function buildWindowValues(
     })
     .compact()
     .value();
-  const data = {
-    __REMASTERED_LINK_TAGS: links,
-    __REMASTERED_SCRIPT_TAGS: scripts,
-    __REMASTERED_SPLASH_STATE: splashState,
-    __REMASTERED_SSR_ROUTES: routeFiles,
-    __REMASTERED_LOAD_CTX: [...loaderContext.entries()],
-    __REMASTERED_ROUTE_DEFS: [...matchesContext],
+  const data: typeof __REMASTERED_CTX = {
+    linkTags: links,
+    scriptTags: scripts,
+    splashState: splashState,
+    ssrRoutes: routeFiles,
+    loadCtx: [...loaderContext.entries()],
+    routeDefs: [...matchesContext],
   };
-  const stringified = _(data)
-    .map((value, key) => {
-      return `window.${key}=JSON.parse(${JSON.stringify(
-        JSON.stringify(value)
-      )});`;
-    })
-    .join("");
   return {
     _tag: "eager",
-    contents: stringified,
     type: "text/javascript",
+    contents: `window.__REMASTERED_CTX=JSON.parse(${JSON.stringify(
+      JSON.stringify(data)
+    )});`,
   };
 }
 
