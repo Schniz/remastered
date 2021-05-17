@@ -1,6 +1,6 @@
 {
   "name": "@remastered/monorepo",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "repository": "git@github.com:Schniz/remastered.git",
   "author": "Gal Schlezinger <gal@spitfire.co.il>",

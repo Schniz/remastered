@@ -1,7 +1,7 @@
 {
   "name": "@remastered/example-app-tailwindcss",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",

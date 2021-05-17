@@ -1,7 +1,7 @@
 {
   "name": "@remastered/example-app-1",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "remastered dev",
     "build": "tsc && remastered build",

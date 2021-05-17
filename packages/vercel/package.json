@@ -1,6 +1,6 @@
 {
   "name": "@remastered/vercel",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "Gal Schlezinger",
   "main": "./dist/index.js",
   "license": "MIT",
