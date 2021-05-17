@@ -4,6 +4,14 @@
   "private": true,
   "repository": "git@github.com:Schniz/remastered.git",
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
-  "workspaces": ["packages/*"],
-  "license": "MIT"
+  "scripts": {
+    "postinstall": "lerna bootstrap"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  }
 }
