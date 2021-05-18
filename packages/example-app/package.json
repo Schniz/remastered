@@ -1,7 +1,7 @@
 {
   "name": "@remastered/example-app-1",
   "private": true,
-  "version": "0.1.9",
+  "version": "0.1.10",
   "scripts": {
     "dev": "remastered dev",
     "build": "tsc && remastered build",
@@ -9,7 +9,7 @@
     "vercel-build": "lerna run build && remastered-vercel postbuild"
   },
   "dependencies": {
-    "@remastered/vercel": "^0.1.9",
+    "@remastered/vercel": "^0.1.10",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
     "esm": "^3.2.25",
@@ -23,7 +23,7 @@
     "react-dom": "^17.0.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
-    "remastered": "^0.1.9"
+    "remastered": "^0.1.10"
   },
   "devDependencies": {
     "@swc-node/jest": "^1.2.1",
