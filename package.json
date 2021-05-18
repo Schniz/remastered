@@ -5,7 +5,8 @@
   "repository": "git@github.com:Schniz/remastered.git",
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "scripts": {
-    "postinstall": "lerna bootstrap"
+    "postinstall": "lerna bootstrap",
+    "preversion": "lerna run build"
   },
   "workspaces": [
     "packages/*"
