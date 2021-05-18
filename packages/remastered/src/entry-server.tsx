@@ -3,7 +3,7 @@ import React from "react";
 import { routeElementsObject as routes, routesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
-import _ from "lodash";
+import { chain } from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
@@ -205,7 +205,7 @@ async function onAction({
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
-  return _(routes)
+  return chain(routes)
     .map<EnhancedRoute | undefined>((a) => {
       const routeKey = (a.route as RouteObjectWithFilename).routeFile;
       if (routeKey) {
@@ -228,7 +228,7 @@ function buildScripts(
 ): LinkTag[] {
   const links: LinkTag[] = [];
   if (manifest) {
-    const preload = _(manifest)
+    const preload = chain(manifest)
       .entries()
       .filter(([key]) => {
         return routeKeys.some((routeKey) => {
@@ -261,7 +261,7 @@ function buildScripts(
   if (vite) {
     const preloadLinks = getPreloadFromVite(vite, routeKeys);
 
-    const elms = _([...preloadLinks])
+    const elms = chain([...preloadLinks])
       .map(([url]) => {
         return { rel: "modulepreload", href: url };
       })
@@ -280,7 +280,7 @@ async function buildWindowValues(
   scripts: ScriptTag[],
   matchesContext: React.ContextType<typeof MatchesContext>
 ): Promise<ScriptTag> {
-  const routeFiles = _(routes)
+  const routeFiles = chain(routes)
     .map((route) => {
       return (route.route as RouteObjectWithFilename).routeFile;
     })
@@ -313,7 +313,7 @@ function getPreloadFromVite(
     return resolvedModules;
   }
 
-  const moduleQueue = _(routeKeys)
+  const moduleQueue = chain(routeKeys)
     .map((x) => `${process.cwd()}${x}`)
     .concat([`${process.cwd()}/${mainFile}`])
     .concat([`${process.cwd()}/app/layout.tsx`])

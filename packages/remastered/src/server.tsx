@@ -6,7 +6,7 @@ import path from "path";
 import fastifyStatic from "fastify-static";
 import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
-import _ from "lodash";
+import { chain } from "lodash";
 import { getViteConfigPath } from "./getViteConfig";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -62,7 +62,7 @@ export async function createServer(root: string) {
     const request = new NFRequest(req.url, {
       method,
       body: method !== "GET" && method !== "HEAD" ? req.raw : undefined,
-      headers: _(req.headers)
+      headers: chain(req.headers)
         .entries()
         .map(([key, value]) => value !== undefined && [key, String(value)])
         .compact()
@@ -73,7 +73,7 @@ export async function createServer(root: string) {
       request as unknown as Request,
       vite
     );
-    const headers = _([...response.headers.entries()])
+    const headers = chain([...response.headers.entries()])
       .fromPairs()
       .value();
     reply.status(response.status).headers(headers).send(response.body);

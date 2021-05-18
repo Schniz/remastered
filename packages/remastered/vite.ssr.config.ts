@@ -1,8 +1,8 @@
 import config, { fileInCore } from "./vite.config";
-import _ from "lodash";
+import { merge } from "lodash";
 import { UserConfigExport } from "vite";
 
-export default _.merge<{}, UserConfigExport, UserConfigExport>({}, config, {
+export default merge<{}, UserConfigExport, UserConfigExport>({}, config, {
   build: {
     rollupOptions: {
       input: fileInCore("entry.server.js"),
