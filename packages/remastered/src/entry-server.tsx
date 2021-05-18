@@ -3,7 +3,7 @@ import React from "react";
 import { routeElementsObject as routes, routesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
-import { chain } from "lodash";
+import { chain } from "lodash-es";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";

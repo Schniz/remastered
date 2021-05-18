@@ -1,5 +1,5 @@
 import config, { fileInCore } from "./vite.config";
-import { merge } from "lodash";
+import { merge } from "lodash-es";
 import { UserConfigExport } from "vite";
 
 export default merge<{}, UserConfigExport, UserConfigExport>({}, config, {

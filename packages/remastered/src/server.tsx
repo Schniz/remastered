@@ -6,7 +6,7 @@ import path from "path";
 import fastifyStatic from "fastify-static";
 import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
-import { chain } from "lodash";
+import { chain } from "lodash-es";
 import { getViteConfigPath } from "./getViteConfig";
 
 const isProd = process.env.NODE_ENV === "production";

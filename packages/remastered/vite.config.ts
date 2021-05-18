@@ -31,7 +31,13 @@ const config = defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["react-router", "react-router-dom", "react", "react-dom"],
+    include: [
+      "react-router",
+      "react-router-dom",
+      "react",
+      "react-dom",
+      "@vitejs/plugin-react-refresh",
+    ],
     exclude: ["remastered"],
   },
   ...({
