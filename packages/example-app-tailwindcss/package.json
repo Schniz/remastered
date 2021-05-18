@@ -1,7 +1,7 @@
 {
   "name": "@remastered/example-app-tailwindcss",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
@@ -12,8 +12,8 @@
     "vercel-build": "lerna run build && remastered-vercel postbuild"
   },
   "dependencies": {
-    "@remastered/vercel": "^0.1.0",
-    "remastered": "^0.1.0"
+    "@remastered/vercel": "^0.1.1",
+    "remastered": "^0.1.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
