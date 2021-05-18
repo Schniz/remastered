@@ -9,7 +9,7 @@
     "vercel-build": "yarn workspaces run build && remastered-vercel postbuild"
   },
   "dependencies": {
-    "@remastered/core": "^0.1.0",
+    "remastered": "^0.1.0",
     "@remastered/vercel": "^0.1.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",

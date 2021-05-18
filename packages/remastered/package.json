@@ -1,5 +1,5 @@
 {
-  "name": "@remastered/core",
+  "name": "remastered",
   "version": "0.1.0",
   "main": "./dist/index.js",
   "author": "Gal Schlezinger",

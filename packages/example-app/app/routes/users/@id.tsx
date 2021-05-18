@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  redirectTo,
-  useRouteData,
-  LoaderFn,
-  MetaFn,
-  Match,
-} from "@remastered/core";
+import { redirectTo, useRouteData, LoaderFn, MetaFn, Match } from "remastered";
 import { User, database } from "../../database";
 
 export const loader: LoaderFn<User | Response> = async ({ params }) => {
