@@ -30,6 +30,10 @@ const config = defineConfig({
       input: fileInCore("entry.client.js"),
     },
   },
+  optimizeDeps: {
+    include: ["react-router", "react-router-dom", "react", "react-dom"],
+    exclude: ["remastered"],
+  },
   ...({
     ssr: {
       noExternal: ["remastered"],
