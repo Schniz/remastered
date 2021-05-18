@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useLocation } from "react-router";
-import { Error404 } from "./Error404";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
+import { Error404 } from "./UserOverridableComponents";
 
 export function ErrorTracker() {
   const key = useLocation().key;
