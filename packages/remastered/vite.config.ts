@@ -1,8 +1,11 @@
-import { defineConfig, PluginOption } from "vite";
+import { defineConfig, PluginOption, ResolvedConfig } from "vite";
 import { Module, parse, print } from "@swc/core";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 import fs from "fs-extra";
+import globby from "globby";
+import walk from "acorn-walk";
+import MagicString from "magic-string";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -21,7 +24,7 @@ fs.outputFileSync(
 
 // https://vitejs.dev/config/
 const config = defineConfig({
-  plugins: [routeTransformer(), reactRefresh()],
+  plugins: [globFirst(), routeTransformer(), reactRefresh()],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
   },
@@ -104,6 +107,83 @@ function routeTransformer(): PluginOption {
       const result = await print({ ...parsed, body });
       result.code = result.code + acceptSelfCode;
       return result;
+    },
+  };
+}
+
+/**
+ * Adds the `__glob_matches__` function
+ * and `import A from 'glob-first:/app/*.ts'`
+ */
+function globFirst(): PluginOption {
+  let config: ResolvedConfig | undefined;
+
+  function matchGlob(opts: {
+    pattern: string;
+    config: ResolvedConfig;
+    baseDir: string;
+  }): string[] {
+    let pattern = opts.pattern;
+    if (path.isAbsolute(pattern)) {
+      pattern = path.join(config.root, pattern.slice(1));
+    }
+    const files = globby.sync(pattern, { cwd: opts.baseDir });
+    return files;
+  }
+
+  return {
+    name: "remastered:glob-first",
+    enforce: "pre",
+    configResolved(given) {
+      config = given;
+    },
+    async transform(code, importer) {
+      if (!code.includes("glob-first:")) {
+        return;
+      }
+
+      const magicString = new MagicString(code);
+      const baseDir = path.dirname(importer);
+
+      const node = this.parse(code);
+      walk.simple(node, {
+        ImportDeclaration(n: any) {
+          const matches = n.source.value.match(/^glob-first:(.+)$/);
+          if (!matches) {
+            return;
+          }
+          let [, pattern] = matches;
+          const [file] = matchGlob({ pattern, baseDir, config });
+          if (file) {
+            magicString.overwrite(
+              n.source.start,
+              n.source.end,
+              JSON.stringify(file)
+            );
+          } else {
+            const specifiers: string[] = n.specifiers.map(
+              (x: any) => `const ${x.local.name} = null;`
+            );
+            magicString.overwrite(n.start, n.end, specifiers.join(""));
+          }
+        },
+        CallExpression(n: any) {
+          if (n.callee.name === "__glob_matches__") {
+            const pattern = n.arguments[0].value;
+            const files = matchGlob({ pattern, baseDir, config });
+            magicString.overwrite(
+              n.start,
+              n.end,
+              JSON.stringify(files.length > 0)
+            );
+          }
+        },
+      });
+
+      return {
+        code: magicString.toString(),
+        map: magicString.generateMap(),
+      };
     },
   };
 }
