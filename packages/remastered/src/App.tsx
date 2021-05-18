@@ -3,11 +3,10 @@ import { useRoutes } from "react-router-dom";
 import { ErrorTracker } from "./ErrorTracker";
 import { Error404 } from "./Error404";
 import { routeElementsObject } from "./fsRoutes";
-import DefaultLayout from "./DefaultLayout";
 
-const UserLayout =
-  Object.values(import.meta.globEager("/app/layout.{t,j}sx"))[0].default ??
-  DefaultLayout;
+const UserLayout = Object.values(
+  import.meta.globEager("/app/layout.{t,j}sx")
+)[0].default;
 
 export default function App() {
   const element = useRoutes([
