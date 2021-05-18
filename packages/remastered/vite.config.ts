@@ -6,6 +6,7 @@ import fs from "fs-extra";
 import globby from "globby";
 import walk from "acorn-walk";
 import MagicString from "magic-string";
+import flatMap from "lodash/flatMap";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -119,16 +120,20 @@ function globFirst(): PluginOption {
   let config: ResolvedConfig | undefined;
 
   function matchGlob(opts: {
-    pattern: string;
+    patterns: string[];
     config: ResolvedConfig;
     baseDir: string;
   }): string[] {
-    let pattern = opts.pattern;
-    if (path.isAbsolute(pattern)) {
-      pattern = path.join(config.root, pattern.slice(1));
-    }
-    const files = globby.sync(pattern, { cwd: opts.baseDir });
-    return files;
+    const patterns = opts.patterns.map((pattern) => {
+      if (path.isAbsolute(pattern)) {
+        return path.join(config.root, pattern.slice(1));
+      }
+      return pattern;
+    });
+    const files = flatMap(patterns, (pattern) => {
+      return globby.sync(pattern, { cwd: opts.baseDir });
+    });
+    return files.map((x) => path.resolve(opts.baseDir, x));
   }
 
   return {
@@ -153,7 +158,13 @@ function globFirst(): PluginOption {
             return;
           }
           let [, pattern] = matches;
-          const [file] = matchGlob({ pattern, baseDir, config });
+          const patterns = pattern.split(";");
+          const files = matchGlob({
+            patterns,
+            baseDir,
+            config,
+          });
+          const [file] = files;
           if (file) {
             magicString.overwrite(
               n.source.start,
@@ -169,8 +180,8 @@ function globFirst(): PluginOption {
         },
         CallExpression(n: any) {
           if (n.callee.name === "__glob_matches__") {
-            const pattern = n.arguments[0].value;
-            const files = matchGlob({ pattern, baseDir, config });
+            const patterns = n.arguments.map((x: any) => x.value);
+            const files = matchGlob({ patterns, baseDir, config });
             magicString.overwrite(
               n.start,
               n.end,
