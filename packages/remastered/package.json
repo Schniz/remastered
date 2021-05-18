@@ -25,6 +25,11 @@
     "typescript": "^4.1.2",
     "vite": "^2.2.3"
   },
+  "files": [
+    "*.ts",
+    "bin",
+    "dist"
+  ],
   "dependencies": {
     "cmd-ts": "^0.6.9",
     "fastify": "~3.15.1",
