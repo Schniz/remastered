@@ -10,6 +10,13 @@ Remix looks like a really fine product. Michael and Ryan do a great job for the 
 
 By leveraging Vite, a super fast bundler with HMR and lots of convention over configuration.
 
+## Differences from Remix
+
+- Open source
+- Uses Vite under the hood instead of a custom bundler
+- First class support for CSS (using Vite), so `import './file.css'` will import your files and will add the proper link tags on production (given you have `<Links />` in your layout)
+- Route parameters in files are using `@` instead of `$` which is confusing with several shells.
+
 ## What's implemented?
 
 - [x] SSR all pages
@@ -24,7 +31,7 @@ By leveraging Vite, a super fast bundler with HMR and lots of convention over co
 
 ### SSR
 
-Every route is SSR'd completely, including the data.
+Every route is SSR'd completely.
 
 ### Nested routing
 
