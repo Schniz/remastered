@@ -30,6 +30,11 @@ const config = defineConfig({
       input: fileInCore("entry.client.js"),
     },
   },
+  ...({
+    ssr: {
+      noExternal: ["remastered"],
+    },
+  } as any),
 });
 
 export default config;
