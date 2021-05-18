@@ -1483,7 +1483,7 @@
   resolved "https://registry.npmjs.org/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.2.57.tgz#e88533769289578b7fac050b14cd3eedba5a1e48"
   integrity sha512-lPOtU1xDeF8GO+cejnyGDFXVBjVUs0DX+++6O4qSj1nbhYo64R6Ui/HpmQFaXqFq3AWCAj10GyGNrerJjNQhGg==
 
-"@swc/core@^1.2.54", "@swc/core@^1.2.55":
+"@swc/core@^1.2.54", "@swc/core@^1.2.55", "@swc/core@^1.2.57":
   version "1.2.57"
   resolved "https://registry.npmjs.org/@swc/core/-/core-1.2.57.tgz#ee5b4e2c907e5e9998c00e430e0f3a4e8c5ad866"
   integrity sha512-sO6jXmBaiP33L/y6thxa1Dx8WS0Ttg19qsr3SB9/LIovydCSNTsYuLElftZWeq8QoDBwcYCDsiYIPnfZzsRiMg==
