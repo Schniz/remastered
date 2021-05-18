@@ -9,7 +9,6 @@
     "vercel-build": "lerna run build && remastered-vercel postbuild"
   },
   "dependencies": {
-    "remastered": "^0.1.0",
     "@remastered/vercel": "^0.1.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
@@ -23,7 +22,8 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router": "^6.0.0-beta.0",
-    "react-router-dom": "^6.0.0-beta.0"
+    "react-router-dom": "^6.0.0-beta.0",
+    "remastered": "^0.1.0"
   },
   "devDependencies": {
     "@swc-node/jest": "^1.2.1",
