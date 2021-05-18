@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  useRouteData,
-  LoaderFn,
-  Link,
-  NavLink,
-  Outlet,
-} from "@remastered/core";
+import { useRouteData, LoaderFn, Link, NavLink, Outlet } from "remastered";
 import { User, database } from "../database";
 import s from "./users.module.css";
 

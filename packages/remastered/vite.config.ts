@@ -12,11 +12,11 @@ const symlinkDir = fileInCore("");
 fs.removeSync(symlinkDir);
 fs.outputFileSync(
   path.join(symlinkDir, "entry.client.js"),
-  `import '@remastered/core/dist/main';`
+  `import 'remastered/dist/main';`
 );
 fs.outputFileSync(
   path.join(symlinkDir, "entry.server.js"),
-  `export * from '@remastered/core/dist/entry-server';`
+  `export * from 'remastered/dist/entry-server';`
 );
 
 // https://vitejs.dev/config/
@@ -30,6 +30,11 @@ const config = defineConfig({
       input: fileInCore("entry.client.js"),
     },
   },
+  ...({
+    ssr: {
+      noExternal: ["remastered"],
+    },
+  } as any),
 });
 
 export default config;

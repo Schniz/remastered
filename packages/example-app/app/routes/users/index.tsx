@@ -1,5 +1,5 @@
 import React from "react";
-import { redirectTo, ActionFn, MetaFn } from "@remastered/core";
+import { redirectTo, ActionFn, MetaFn } from "remastered";
 import { database } from "../../database";
 
 export const action: ActionFn = async ({ req }) => {

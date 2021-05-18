@@ -9,10 +9,10 @@
     "dev": "remastered dev",
     "build": "remastered build",
     "start": "remastered serve",
-    "vercel-build": "yarn workspaces run build && remastered-vercel postbuild"
+    "vercel-build": "lerna run build && remastered-vercel postbuild"
   },
   "dependencies": {
-    "@remastered/core": "^0.1.0",
+    "remastered": "^0.1.0",
     "@remastered/vercel": "^0.1.0"
   },
   "devDependencies": {

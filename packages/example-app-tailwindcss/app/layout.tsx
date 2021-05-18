@@ -1,6 +1,6 @@
 import React from "react";
 import "tailwindcss/tailwind.css";
-import { Outlet, Meta, Links, Scripts, useMatches } from "@remastered/core";
+import { Outlet, Meta, Links, Scripts, useMatches } from "remastered";
 
 export default function Layout() {
   const matches = useMatches();
