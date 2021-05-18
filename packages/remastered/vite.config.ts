@@ -36,6 +36,7 @@ const config = defineConfig({
       "react-router-dom",
       "react",
       "react-dom",
+      "lodash",
       "@vitejs/plugin-react-refresh",
     ],
     exclude: ["remastered"],
