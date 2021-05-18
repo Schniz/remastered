@@ -32,6 +32,7 @@
   ],
   "dependencies": {
     "cmd-ts": "^0.6.9",
+    "esm": "^3.2.25",
     "fastify": "~3.15.1",
     "fastify-express": "^0.3.2",
     "fastify-static": "^4.0.1",
