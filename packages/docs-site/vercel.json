@@ -6,6 +6,10 @@
   },
   "rewrites": [
     {
+      "source": "/_listfiles_",
+      "destination": "/api/list-files.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/remastered-serverless.js"
     }
