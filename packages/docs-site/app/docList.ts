@@ -58,10 +58,3 @@ export async function docList(): Promise<FileEntry[]> {
 
   return categories;
 }
-
-if (import.meta.hot) {
-  import.meta.hot!.accept(() => {
-    console.log("uuuuuupdate");
-    (window as any).__$$refresh_remastered$$__?.();
-  });
-}
