@@ -2,10 +2,10 @@
   "version": 2,
   "functions": {
     "api/remastered-serverless.js": {
-      "includeFiles": "+(+(dist|docs)/**/*|node_modules/shiki/**/*)"
+      "includeFiles": "+(dist|docs)/**/*"
     },
     "api/list-files.js": {
-      "includeFiles": "+(+(dist|docs)/**/*|node_modules/shiki/**/*)"
+      "includeFiles": "+(dist|docs|node_modules/shiki)/**/*"
     }
   },
   "rewrites": [
