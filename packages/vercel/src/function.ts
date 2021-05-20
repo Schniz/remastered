@@ -10,6 +10,7 @@ export function createVercelFunction({
 }: {
   rootDir: string;
 }): VercelApiHandler {
+  process.env.REMASTER_PROJECT_DIR = rootDir;
   const manifest$ = fs.readJson(
     path.join(rootDir, "dist/client/ssr-manifest.json")
   );
