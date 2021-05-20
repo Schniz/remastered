@@ -26,7 +26,7 @@ const config = defineConfig({
   plugins: [
     globFirst(),
     ...routeTransformers(),
-    globHmrListener(),
+    // globHmrListener(),
     reactRefresh(),
   ],
   define: {
