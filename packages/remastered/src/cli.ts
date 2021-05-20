@@ -6,36 +6,65 @@ import {
   option,
   number,
   optional,
+  oneOf,
+  extendType,
 } from "cmd-ts";
 import path from "path";
 
+async function runPromises<T extends (() => Promise<any>)[]>(
+  method: "serial" | "parallel",
+  promises: T
+) {
+  if (method === "parallel") {
+    return Promise.all(promises.map((f) => f()));
+  }
+
+  const results: any[] = [];
+  for (const fn of promises) {
+    results.push(await fn());
+  }
+
+  return results;
+}
+
 const build = command({
   name: "build",
-  args: {},
-  async handler() {
+  args: {
+    method: option({
+      long: "method",
+      type: extendType(oneOf(["parallel", "serial"]), {
+        from: async (a) => a,
+        defaultValue: () => "parallel",
+        defaultValueIsSerializable: true,
+      }),
+    }),
+  },
+  async handler(args) {
     const vite = await import("vite");
     const { getViteConfigPath } = await import("./getViteConfig");
 
-    await Promise.all([
-      vite.build({
-        configFile: getViteConfigPath({ ssr: false }),
-        build: {
-          manifest: true,
-          ssrManifest: true,
-          outDir: path.join(process.cwd(), "dist", "client"),
-        },
-      }),
-      vite.build({
-        configFile: getViteConfigPath({ ssr: true }),
-        define: {
-          "process.env.REMASTER_PROJECT_DIR":
-            "process.env.REMASTER_PROJECT_DIR",
-        },
-        build: {
-          ssr: "src/entry-server.tsx",
-          outDir: path.join(process.cwd(), "dist", "server"),
-        },
-      }),
+    await runPromises(args.method, [
+      () =>
+        vite.build({
+          configFile: getViteConfigPath({ ssr: false }),
+          build: {
+            manifest: true,
+            ssrManifest: true,
+            outDir: path.join(process.cwd(), "dist", "client"),
+          },
+        }),
+      () =>
+        vite.build({
+          configFile: getViteConfigPath({ ssr: true }),
+          define: {
+            "process.env.REMASTER_PROJECT_DIR":
+              "process.env.REMASTER_PROJECT_DIR",
+          },
+          build: {
+            ssr: "src/entry-server.tsx",
+            outDir: path.join(process.cwd(), "dist", "server"),
+          },
+        }),
     ]);
   },
 });

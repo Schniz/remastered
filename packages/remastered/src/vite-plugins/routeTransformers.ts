@@ -1,13 +1,12 @@
 import { Module, parse, print } from "@swc/core";
 import fs from "fs";
 import path from "path";
-import { PluginOption } from "vite";
+import { PluginOption, ResolvedConfig } from "vite";
 
 /**
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
  */
 export function routeTransformers(): PluginOption[] {
-  const modulePrefix = path.join(process.cwd(), "./app/routes/");
   const acceptSelfCode = `
     ;if (import.meta.hot) {
       import.meta.hot.accept(() => {
@@ -16,16 +15,28 @@ export function routeTransformers(): PluginOption[] {
     }
   `;
   // let server: ViteDevServer | undefined;
+  let resolvedConfig: ResolvedConfig | undefined;
+
+  function modulePrefix(config: ResolvedConfig) {
+    return path.join(config.root, "./app/routes/");
+  }
 
   return [
     {
       enforce: "pre",
       name: "remaster:route",
+      configResolved(given) {
+        resolvedConfig = given;
+      },
       // configureServer(given) {
       //   server = given;
       // },
       load(id) {
-        if (!id.startsWith(modulePrefix)) {
+        if (!resolvedConfig) {
+          this.error(`Config is not resolved`);
+        }
+
+        if (!id.startsWith(modulePrefix(resolvedConfig))) {
           return null;
         }
         if (!/\.(t|j)sx?$/.test(id)) {
@@ -36,8 +47,11 @@ export function routeTransformers(): PluginOption[] {
         return contents + acceptSelfCode;
       },
       async transform(code, id, ssr) {
+        if (!resolvedConfig) {
+          this.error(`Config is not resolved`);
+        }
         if (ssr) return null;
-        if (!id.startsWith(modulePrefix)) {
+        if (!id.startsWith(modulePrefix(resolvedConfig))) {
           return null;
         }
         if (!/\.(t|j)sx?$/.test(id)) {
@@ -82,17 +96,11 @@ export function routeTransformers(): PluginOption[] {
         return result;
       },
       async handleHotUpdate(ctx) {
-        // const isRouteFile = ctx.modules.some((mod) =>
-        //   isRouteModule(mod, modulePrefix)
-        // );
-        // console.log({ isRouteFile });
-        // if (isRouteFile) {
         ctx.server.ws.send({
           type: "custom",
           event: "remastered:server-module-updated",
           data: {},
         });
-        // }
       },
     },
   ];
