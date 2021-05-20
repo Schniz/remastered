@@ -6,7 +6,7 @@
     "dev": "remastered dev",
     "build": "tsc && remastered build",
     "start": "remastered serve",
-    "vercel-build": "lerna run build && remastered-vercel postbuild"
+    "vercel-build": "lerna run build --scope=@remastered/example-app-1 --include-filtered-dependencies && remastered-vercel postbuild"
   },
   "dependencies": {
     "@remastered/vercel": "^0.1.11",
