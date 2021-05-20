@@ -10,6 +10,7 @@ import {
   extendType,
 } from "cmd-ts";
 import path from "path";
+import fs from "fs-extra";
 
 async function runPromises<T extends (() => Promise<any>)[]>(
   method: "serial" | "parallel",
@@ -42,6 +43,16 @@ const build = command({
   async handler(args) {
     const vite = await import("vite");
     const { getViteConfigPath } = await import("./getViteConfig");
+    const pkg = await fs
+      .readJson(path.join(process.cwd(), "package.json"))
+      .catch(() => null);
+
+    const dependencySet = new Set([
+      ...Object.keys(pkg?.dependencies ?? {}),
+      ...Object.keys(pkg?.devDependencies ?? {}),
+    ]);
+
+    process.env.NODE_ENV = "production";
 
     await runPromises(args.method, [
       () =>
@@ -66,6 +77,11 @@ const build = command({
           build: {
             ssr: "src/entry-server.tsx",
             outDir: path.join(process.cwd(), "dist", "server"),
+          },
+          ...{
+            ssr: {
+              noExternal: [...dependencySet],
+            } as unknown,
           },
         }),
     ]);
