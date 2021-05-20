@@ -7,6 +7,10 @@
   },
   "rewrites": [
     {
+      "source": "/assets/:file*",
+      "destination": "dist/client/assets/:file*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/remastered-serverless.js"
     }
