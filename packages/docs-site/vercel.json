@@ -1,7 +1,8 @@
 {
+  "version": 2,
   "functions": {
     "api/remastered-serverless.js": {
-      "includeFiles": "{dist,docs}/**/*"
+      "includeFiles": ["../dist/**/*", "../docs/**/*"]
     }
   },
   "rewrites": [
