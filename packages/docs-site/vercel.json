@@ -6,19 +6,18 @@
     },
     "api/list-files.js": {
       "includeFiles": "+(dist|docs)/**/*"
+    },
+    "api/list-files2.js": {
+      "includeFiles": "+(dist|docs)/**/*"
     }
   },
   "rewrites": [
     {
-      "source": "/__manifest__",
-      "destination": "dist/client/manifest.json"
-    },
-    {
-      "source": "/__manifest_ssr__",
-      "destination": "dist/client/ssr-manifest.json"
-    },
-    {
       "source": "/__list_files__",
+      "destination": "/api/list-files.js"
+    },
+    {
+      "source": "/__list_files2__",
       "destination": "/api/list-files.js"
     },
     {
