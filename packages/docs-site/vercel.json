@@ -10,6 +10,14 @@
   },
   "rewrites": [
     {
+      "source": "/__manifest__",
+      "destination": "dist/client/manifest.json"
+    },
+    {
+      "source": "/__manifest_ssr__",
+      "destination": "dist/client/ssr-manifest.json"
+    },
+    {
       "source": "/__list_files__",
       "destination": "/api/list-files.js"
     },
