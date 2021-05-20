@@ -47,6 +47,9 @@ const build = command({
       () =>
         vite.build({
           configFile: getViteConfigPath({ ssr: false }),
+          define: {
+            "process.env.REMASTER_PROJECT_DIR": JSON.stringify(""),
+          },
           build: {
             manifest: true,
             ssrManifest: true,
