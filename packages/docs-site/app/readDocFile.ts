@@ -7,6 +7,7 @@ import globby from "globby";
 import remarkShiki from "@stefanprobst/remark-shiki";
 import theme from "./routes/docs/dracula-dot-min-white-darker.json";
 import "watch-glob:../docs/**/*.md";
+import remarkGfm from "remark-gfm";
 
 export type Doc = { content: string; title: string };
 
@@ -40,6 +41,7 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
   const { body, attributes } = fm(contents);
   const parser = remark()
     .use(remarkShiki, { theme: theme as any })
+    .use(remarkGfm)
     .use(remarkHtml);
   const processed = await parser.process(body);
   return {

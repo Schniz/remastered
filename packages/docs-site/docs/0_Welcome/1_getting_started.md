@@ -40,7 +40,7 @@ Let's say we want to show Schniz's GitHub repositories. This can be done by maki
 
 The `loader` function is an async function that whatever you return from it will be available through the `useRouteData` hook:
 
-```js
+```tsx
 import React from "react";
 import { useRouteData } from "remastered";
 
@@ -73,7 +73,7 @@ Our app can only show Schniz's repositories. This is not nice. What if we want t
 
 Let's create a file in `app/routes/@username.jsx`. See that small `@`? This means `username` is a parameter. If you know Express or Sinatra, this is the same as having a `/:username` route. We can use this parameter in the `loader` function:
 
-```js
+```tsx
 import React from "react";
 import { useRouteData } from "remastered";
 
