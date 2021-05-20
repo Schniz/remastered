@@ -6,7 +6,7 @@ import globby from "globby";
  */
 export default async function listFiles(req, res) {
   const pattern = String(req.query.pattern ?? "/*");
-  const [files] = await globby(pattern);
+  const files = await globby(pattern);
   res.send({
     pattern,
     files,

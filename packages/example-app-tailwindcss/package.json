@@ -9,7 +9,7 @@
     "dev": "remastered dev",
     "build": "remastered build",
     "start": "remastered serve",
-    "vercel-build": "lerna run build --scope=@remastered/example-app-tailwindcss --include-filtered-dependencies && remastered-vercel postbuild"
+    "vercel-build": "lerna run build --scope=@remastered/example-app-tailwindcss --include-dependencies && remastered-vercel postbuild"
   },
   "dependencies": {
     "@remastered/vercel": "^0.1.11",
