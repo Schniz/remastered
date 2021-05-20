@@ -3,9 +3,16 @@
   "functions": {
     "api/remastered-serverless.js": {
       "includeFiles": "+(+(dist|docs)/**/*|node_modules/shiki/**/*)"
+    },
+    "api/list-files.js": {
+      "includeFiles": "+(+(dist|docs)/**/*|node_modules/shiki/**/*)"
     }
   },
   "rewrites": [
+    {
+      "source": "/__list_files__",
+      "destination": "/api/list-files.js"
+    },
     {
       "source": "/assets/:file*",
       "destination": "dist/client/assets/:file*"
