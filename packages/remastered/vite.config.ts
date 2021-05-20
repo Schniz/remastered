@@ -36,6 +36,7 @@ const config = defineConfig({
     ),
   },
   build: {
+    minify: false,
     rollupOptions: {
       input: fileInCore("entry.client.js"),
     },
