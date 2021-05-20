@@ -1,6 +1,6 @@
 import ReactDOMServer from "react-dom/server";
 import React from "react";
-import { routeElementsObject as routes, routesObject } from "./fsRoutes";
+import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import { chain } from "lodash";
@@ -26,12 +26,25 @@ type RequestContext = {
   clientManifest?: import("vite").Manifest;
 };
 
+async function checkTime<T>(tag: string, fn: () => Promise<T>): Promise<T> {
+  const hrtime = Date.now();
+  try {
+    return await fn();
+  } finally {
+    const elapsed = Date.now() - hrtime;
+    console.log({ tag, elapsed });
+  }
+}
+
 async function onGet({
   request,
   manifest,
   viteDevServer,
   clientManifest,
 }: RequestContext): Promise<Response> {
+  const routes = getRouteElements();
+  const routesObject = getRoutesObject();
+
   const url = request.url.replace(/\.json$/, "");
   const isJsonResponse =
     request.url.endsWith(".json") ||
@@ -53,9 +66,12 @@ async function onGet({
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
       const params = relevantRoute.givenRoute.params;
-      const loaderResult = await relevantRoute.loader({
-        params,
-      });
+      const loader = relevantRoute.loader;
+      const loaderResult = await checkTime(`${relevantRoute.key} loader`, () =>
+        loader({
+          params,
+        })
+      );
       loaderContext.set(relevantRoute.key, loaderResult);
 
       if (loaderResult === null || loaderResult === undefined) {
@@ -123,7 +139,10 @@ async function onGet({
       preloadLink.rel === "modulepreload" &&
       !preloadLink.href.endsWith(".css")
     ) {
-      scripts.push({ _tag: "preload", src: preloadLink.href });
+      // Only preload on production, because in dev we have tons of files and it is making it slow
+      if (!viteDevServer) {
+        scripts.push({ _tag: "preload", src: preloadLink.href });
+      }
     } else if (preloadLink.rel === "modulepreload") {
       // force load css
       links.push({ _tag: "script", script: { src: preloadLink.href } });
@@ -173,14 +192,16 @@ async function onGet({
 }
 
 export async function render(ctx: RequestContext): Promise<Response> {
-  if (ctx.request.method === "GET") {
-    return await onGet(ctx);
-  }
-  const result = await onAction(ctx);
-  if (!result) {
-    return new Response("Not found", { status: 404 });
-  }
-  return result;
+  return checkTime(`request to ${ctx.request.url}`, async () => {
+    if (ctx.request.method === "GET") {
+      return await onGet(ctx);
+    }
+    const result = await onAction(ctx);
+    if (!result) {
+      return new Response("Not found", { status: 404 });
+    }
+    return result;
+  });
 }
 
 export type RenderFn = typeof render;
@@ -188,6 +209,8 @@ export type RenderFn = typeof render;
 async function onAction({
   request,
 }: RequestContext): Promise<Response | undefined> {
+  const routes = getRouteElements();
+
   const url = request.url.replace(/\.json$/, "");
   const found = matchRoutes(routes, url) ?? [];
   const foundRouteKey = getRouteKeys(found).slice(-1)[0];

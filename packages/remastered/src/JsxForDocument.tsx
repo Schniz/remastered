@@ -86,15 +86,12 @@ export function Links() {
 
 export function Meta() {
   const matches = useMatches();
-  const metaTags = React.useMemo(() => {
-    const obj: MetaTags = {};
-    for (const match of matches) {
-      if (match.meta) {
-        Object.assign(obj, match.meta({ data: match.data }));
-      }
+  const metaTags: MetaTags = {};
+  for (const match of matches) {
+    if (match.meta) {
+      Object.assign(metaTags, match.meta({ data: match.data }));
     }
-    return obj;
-  }, [matches]);
+  }
 
   return (
     <>

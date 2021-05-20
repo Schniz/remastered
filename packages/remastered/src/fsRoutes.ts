@@ -5,7 +5,7 @@ import {
 } from "./routeTreeIntoReactRouterRoute";
 import { dynamicImportComponent } from "./DynamicImportComponent";
 
-export function loadFilesA() {
+function loadFiles() {
   const files = import.meta.glob(`/app/routes/**/*.{t,j}sx`);
   return files;
 }
@@ -38,6 +38,25 @@ export function convertRouteObjectsToRRDef(
   return routes;
 }
 
-export const routesObject = loadFilesA();
-export const componentBag = turnToComponentBag(routesObject);
-export const routeElementsObject = convertRouteObjectsToRRDef(componentBag);
+export const getRoutesObject = onceOnClient(() => loadFiles());
+export const getRouteElements = onceOnClient(() => {
+  const componentBag = turnToComponentBag(getRoutesObject());
+  return convertRouteObjectsToRRDef(componentBag);
+});
+
+function onceOnClient<F extends (...args: any[]) => any>(
+  f: F
+): (...args: Parameters<F>) => ReturnType<F> {
+  if (import.meta.env.SSR) {
+    return f;
+  } else {
+    const v: { value?: ReturnType<F> } = {};
+    return (...args): ReturnType<F> => {
+      if ("value" in v) {
+        return v.value as any;
+      }
+      v.value = f(...args);
+      return v.value as any;
+    };
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/remastered-serverless.js": {
+      "includeFiles": "dist/*/*"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/remastered-serverless.js"
+    }
+  ]
+}

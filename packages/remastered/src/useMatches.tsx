@@ -1,9 +1,8 @@
 import React from "react";
 import { useLocation, matchRoutes, Params } from "react-router";
-import { routeElementsObject } from "./fsRoutes";
+import { getRouteElements } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
 import { MetaFn } from "./routeTypes";
-/* import { RouteMatch } from "react-router"; */
 
 export type RouteDef = { hasLoader: boolean; handle?: unknown; meta?: MetaFn };
 export const MatchesContext = React.createContext<Map<string, RouteDef>>(
@@ -19,11 +18,12 @@ export type Match<Data = unknown> = {
 };
 
 export function useMatches(): Match[] {
+  const routeElements = getRouteElements();
   const location = useLocation();
   const map = React.useContext(MatchesContext);
   const loaderContext = React.useContext(LoaderContext);
   const matched = React.useMemo(() => {
-    return matchRoutes(routeElementsObject, location);
+    return matchRoutes(routeElements, location);
   }, [location]);
   const routeMatches = (matched ?? []).flatMap((route): Match[] => {
     const routeFile: string = (route.route as any).routeFile;

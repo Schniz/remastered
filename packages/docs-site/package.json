@@ -1,0 +1,45 @@
+{
+  "name": "@remastered/docs-site",
+  "version": "0.1.11",
+  "private": true,
+  "author": "Gal Schlezinger <gal@spitfire.co.il>",
+  "main": "lib/docs-site.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Schniz/remastered.git"
+  },
+  "scripts": {
+    "dev": "remastered dev",
+    "start": "remastered serve",
+    "build": "remastered build",
+    "vercel-build": "lerna run build && remastered-vercel postbuild"
+  },
+  "bugs": {
+    "url": "https://github.com/Schniz/remastered/issues"
+  },
+  "dependencies": {
+    "@remastered/vercel": "^0.1.11",
+    "@stefanprobst/remark-shiki": "^0.1.2",
+    "@tabler/icons": "^1.41.2",
+    "@tailwindcss/typography": "^0.4.0",
+    "front-matter": "^4.0.2",
+    "gatsby-remark-vscode": "^3.2.1",
+    "prismjs": "^1.23.0",
+    "remark": "^13.0.0",
+    "remark-frontmatter": "^3.0.0",
+    "remark-html": "^13.0.1",
+    "remark-prism": "^1.3.6",
+    "remastered": "^0.1.11",
+    "shiki": "^0.9.3"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.15",
+    "prettier": "^2.3.0",
+    "tailwindcss": "^2.1.2",
+    "typescript": "^4.2.4"
+  }
+}

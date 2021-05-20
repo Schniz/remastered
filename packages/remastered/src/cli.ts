@@ -27,6 +27,10 @@ const build = command({
       }),
       vite.build({
         configFile: getViteConfigPath({ ssr: true }),
+        define: {
+          "process.env.REMASTER_PROJECT_DIR":
+            "process.env.REMASTER_PROJECT_DIR",
+        },
         build: {
           ssr: "src/entry-server.tsx",
           outDir: path.join(process.cwd(), "dist", "server"),

@@ -1,7 +1,7 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import { ErrorTracker } from "./ErrorTracker";
-import { routeElementsObject } from "./fsRoutes";
+import { getRouteElements } from "./fsRoutes";
 import { Layout, Error404 } from "./UserOverridableComponents";
 
 export default function App() {
@@ -12,7 +12,7 @@ export default function App() {
         {
           element: <ErrorTracker />,
           children: [
-            ...routeElementsObject,
+            ...getRouteElements(),
             { path: "*", element: <Error404 /> },
           ],
         },
