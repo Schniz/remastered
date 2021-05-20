@@ -8,6 +8,8 @@ import remarkShiki from "@stefanprobst/remark-shiki";
 import theme from "./routes/docs/dracula-dot-min-white-darker.json";
 import "watch-glob:../docs/**/*.md";
 import remarkGfm from "remark-gfm";
+import tsxLanguage from "shiki/languages/tsx.tmLanguage.json";
+import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
 
 export type Doc = { content: string; title: string };
 
@@ -40,7 +42,23 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
   const contents = await fs.readFile(filepath, "utf8");
   const { body, attributes } = fm(contents);
   const parser = remark()
-    .use(remarkShiki, { theme: theme as any })
+    .use(remarkShiki, {
+      theme: theme as any,
+      langs: [
+        {
+          id: "tsx",
+          aliases: ["javascript", "js", "jsx", "ts", "typescript"],
+          scopeName: "source.tsx",
+          grammar: tsxLanguage as any,
+        },
+        {
+          id: "shellscript",
+          aliases: ["bash", "sh", "sh-session", "shellscript", "shell"],
+          scopeName: "source.shell",
+          grammar: shellscriptLanguage as any,
+        },
+      ],
+    })
     .use(remarkGfm)
     .use(remarkHtml);
   const processed = await parser.process(body);
