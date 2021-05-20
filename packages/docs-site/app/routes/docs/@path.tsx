@@ -9,7 +9,7 @@ export const loader: LoaderFn<Doc> = async ({ params }) => {
 
 export const headers: HeadersFn = async () => {
   return {
-    ...(import.meta.env.MODE === "production" && {
+    ...(!__DEV__ && {
       "Cache-Control": "public, max-age=3600, must-revalidate",
     }),
   };
