@@ -5,7 +5,7 @@
       "includeFiles": "+(dist|docs)/**/*"
     },
     "api/list-files.js": {
-      "includeFiles": "+(dist|docs|..)/**/*"
+      "includeFiles": "+(dist|docs)/**/*"
     }
   },
   "rewrites": [

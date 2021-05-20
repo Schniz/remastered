@@ -32,6 +32,6 @@ export default function DocPath() {
 
 export const meta: MetaFn<Doc> = ({ data }) => {
   return {
-    title: `Remastered: ${data.title}!!`,
+    title: `Remastered: ${data.title}`,
   };
 };

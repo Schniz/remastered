@@ -10,7 +10,7 @@ Some approaches were already taken to make front-end engineering closer to what 
 
 Remastered is a fresh take, which takes more of an old-school vibe:
 
-- **DX + UX:** You can use new tools to provide great user experience, without sacrificing developer experience.
+- **DX + UX:** You can use new tools to provide great user experience, without sacrificing developer experience for rapid prototyping.
 - **Own your stack:** Host your app anywhere you want
 - **TypeScript-first:** Use TypeScript and JavaScript, the two top-known and widely-available programming languages in the world, to develop your app.
 - **React:** At it's core, Remastered is a full-stack React framework, with baked-in routing and data-fetching. React is one of the leading front-end libraries which allow developers to get up started quickly.
