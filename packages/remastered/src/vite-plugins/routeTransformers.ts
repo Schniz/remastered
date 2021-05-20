@@ -95,27 +95,5 @@ export function routeTransformers(): PluginOption[] {
         // }
       },
     },
-    {
-      name: "remastered:post-route-modifiers",
-      enforce: "post",
-      buildEnd() {
-        console.log("EEEEEEEENDDDDDDDDDDDD");
-      },
-      // transform(_code, id, _ssr) {
-      //   if (!id.includes("/app/")) {
-      //     return null;
-      //   }
-      //   if (server) {
-      //     const mod = server.moduleGraph.getModuleById(id);
-      //     const missingDeps = ignoredModuleDependencies.get(mod);
-
-      //     if (missingDeps) {
-      //       console.log(missingDeps);
-      //       console.log(mod);
-      //     }
-      //   }
-      //   return null;
-      // },
-    },
   ];
 }
