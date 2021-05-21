@@ -4,7 +4,6 @@ import React from "react";
 import { Link, LoaderFn, NavLink, Outlet, useRouteData } from "remastered";
 import _ from "lodash";
 import { docList, FileEntry } from "../docList";
-import { IconExternalLink } from "@tabler/icons";
 
 export const loader: LoaderFn<FileEntry[]> = async () => {
   return docList();
@@ -28,7 +27,6 @@ export default function DocsLayout() {
             className="flex items-center justify-center text-white hover:text-pink-100 transition-all text-opacity-90"
           >
             GitHub
-            <IconExternalLink className="inline-block w-4 h-4 align-middle" />
           </a>
         </div>
       </div>
