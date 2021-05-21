@@ -25,9 +25,15 @@ fs.outputFileSync(
 const config = defineConfig({
   plugins: [
     globFirst(),
-    ...routeTransformers(),
-    // globHmrListener(),
+    routeTransformers(),
+    globHmrListener(),
     reactRefresh(),
+    {
+      name: "remastered:chunk-debug",
+      augmentChunkHash(chunk) {
+        console.log(chunk);
+      },
+    },
   ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",

@@ -6,10 +6,12 @@ import fs from "fs-extra";
 import globby from "globby";
 import remarkShiki from "@stefanprobst/remark-shiki";
 import theme from "./routes/docs/dracula-dot-min-white-darker.json";
-// import "watch-glob:../docs/**/*.md";
 import remarkGfm from "remark-gfm";
 import tsxLanguage from "shiki/languages/tsx.tmLanguage.json";
 import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
+
+// Listen to all changes in the docs so it will trigger HMR on Markdown change
+import "watch-glob:../docs/**/*.md";
 
 export type Doc = { content: string; title: string };
 

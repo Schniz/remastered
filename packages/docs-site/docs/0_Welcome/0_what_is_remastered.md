@@ -1,5 +1,5 @@
 ---
-title: What is Remastered?!
+title: What is Remastered
 ---
 
 It's been almost two decades since Rails emerged, taking the world by storm. Writing full-stack applications was never so easy. One could literally build a blog engine in 15 minutes. Back then, what was considered full-stack was mainly in the back-end. It was about writing database queries and generating HTML as a result.

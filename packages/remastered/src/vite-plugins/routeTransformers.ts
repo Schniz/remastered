@@ -1,5 +1,5 @@
 import { Module, parse, print } from "@swc/core";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { PluginOption, ResolvedConfig } from "vite";
 
