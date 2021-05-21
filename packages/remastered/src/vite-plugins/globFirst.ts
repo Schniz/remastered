@@ -64,6 +64,7 @@ export function globFirst(): PluginOption {
           });
           const [file] = files;
           if (file) {
+            console.error(`Choosing ${file}`);
             magicString.overwrite(
               n.source.start,
               n.source.end,
