@@ -8,6 +8,7 @@ export function debugPlugin(): PluginOption {
 
   return {
     name: "remastered:debug",
+    enforce: "post",
     apply: "build",
     configResolved(given) {
       resolvedConfig = given;
