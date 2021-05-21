@@ -18,25 +18,17 @@ export function debugPlugin(): PluginOption {
         output[moduleInfo.id] = moduleInfo.code;
       }
     },
-    async buildEnd() {
+    async writeBundle() {
       if (!resolvedConfig) {
         this.error(`Config file was not resolved!`);
       }
 
-      const isSsr = Boolean(resolvedConfig.build.ssr);
+      console.error("WELP");
+      const buildDir = resolvedConfig.build.outDir;
 
-      await fs.outputJson(
-        path.join(
-          process.cwd(),
-          "debug",
-          isSsr ? "ssr" : "client",
-          "debug-manifest.json"
-        ),
-        output,
-        {
-          spaces: 2,
-        }
-      );
+      await fs.outputJson(path.join(buildDir, "debug-manifest.json"), output, {
+        spaces: 2,
+      });
     },
   };
 }
