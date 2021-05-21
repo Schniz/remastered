@@ -5,6 +5,7 @@ import fs from "fs-extra";
 import { globFirst } from "./dist/vite-plugins/globFirst";
 import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
 import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
+import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -28,12 +29,7 @@ const config = defineConfig({
     routeTransformers(),
     globHmrListener(),
     reactRefresh(),
-    {
-      name: "remastered:chunk-debug",
-      augmentChunkHash(chunk) {
-        console.log(chunk);
-      },
-    },
+    debugPlugin(),
   ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
