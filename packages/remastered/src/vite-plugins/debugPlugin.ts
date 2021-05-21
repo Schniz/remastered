@@ -22,10 +22,20 @@ export function debugPlugin(): PluginOption {
         this.error(`Config file was not resolved!`);
       }
 
-      const outDir = resolvedConfig.build.outDir;
-      await fs.outputJson(path.join(outDir, "debug-manifest.json"), output, {
-        spaces: 2,
-      });
+      const isSsr = Boolean(resolvedConfig.build.ssr);
+
+      await fs.outputJson(
+        path.join(
+          process.cwd(),
+          "debug",
+          isSsr ? "ssr" : "client",
+          "debug-manifest.json"
+        ),
+        output,
+        {
+          spaces: 2,
+        }
+      );
     },
   };
 }
