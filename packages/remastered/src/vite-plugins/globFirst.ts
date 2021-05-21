@@ -26,7 +26,15 @@ export function globFirst(): PluginOption {
     const files = flatMap(patterns, (pattern) => {
       return globby.sync(pattern, { cwd: opts.baseDir });
     });
-    return files.map((x) => path.resolve(opts.baseDir, x));
+    return files
+      .map((x) => path.resolve(opts.baseDir, x))
+      .map((x) => {
+        let relative = path.relative(opts.baseDir, x);
+        if (relative.charAt(0) === ".") {
+          return relative;
+        }
+        return `./${relative}`;
+      });
   }
 
   return {
