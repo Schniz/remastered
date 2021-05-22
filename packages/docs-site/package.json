@@ -27,6 +27,7 @@
     "url": "https://github.com/Schniz/remastered/issues"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.1",
     "@remastered/vercel": "^0.1.12",
     "@stefanprobst/remark-shiki": "^0.1.2",
     "@tabler/icons": "^1.41.2",
