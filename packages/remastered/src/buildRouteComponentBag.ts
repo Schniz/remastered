@@ -14,10 +14,9 @@ export type RouteDefinition<T = unknown> = {
 };
 
 export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
-  routeKeys: readonly T[]
+  routeKeys: readonly T[],
+  routesObject: Record<string, () => Promise<any>>
 ) {
-  const routesObject = getRoutesObject();
-
   const ctx = new Map<string, RouteDefinition<T>>();
   const loadedComponents = Object.entries(routesObject)
     .flatMap(([key, value]) => {
@@ -46,10 +45,12 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
 }
 
 export async function buildRouteComponentBag(
-  routeKeys: readonly string[]
+  routeKeys: readonly string[],
+  givenRoutesObject: Record<string, () => Promise<any>>
 ): Promise<Map<string, RouteDefinition>> {
   const routeDefinitions = await buildRouteDefinitionBag(
-    routeKeys.map((routeKey) => ({ routeKey }))
+    routeKeys.map((routeKey) => ({ routeKey })),
+    givenRoutesObject
   );
   return routeDefinitions;
 }

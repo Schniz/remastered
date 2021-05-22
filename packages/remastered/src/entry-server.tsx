@@ -14,6 +14,9 @@ import {
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
+import { wrapRoutes } from "./wrapRoutes";
+import { LayoutObject } from "./UserOverridableComponents";
+import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 
 const mainFile = `node_modules/.remastered/entry.client.js`;
 
@@ -42,8 +45,11 @@ async function onGet({
   viteDevServer,
   clientManifest,
 }: RequestContext): Promise<Response> {
-  const routes = getRouteElements();
-  const routesObject = getRoutesObject();
+  const routes = wrapRoutes(getRouteElements());
+  const routesObject = {
+    ...getRoutesObject(),
+    [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
+  };
 
   const url = request.url.replace(/\.json$/, "");
   const isJsonResponse =
@@ -56,7 +62,10 @@ async function onGet({
   }
 
   const foundRouteKeys = getRouteKeys(found);
-  const relevantRoutes = await buildRouteDefinitionBag(foundRouteKeys);
+  const relevantRoutes = await buildRouteDefinitionBag(
+    foundRouteKeys,
+    routesObject
+  );
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
   const loaderContext = new Map<string, unknown>();
   let loaderNotFound = false;
@@ -127,7 +136,8 @@ async function onGet({
   const scripts: ScriptTag[] = [];
   const matchesContext = mapValues(
     await buildRouteDefinitionBag(
-      Object.keys(routesObject).map((routeKey) => ({ routeKey }))
+      Object.keys(routesObject).map((routeKey) => ({ routeKey })),
+      routesObject
     ),
     (v): RouteDef => {
       return { hasLoader: Boolean(v.loader), handle: v.handle, meta: v.meta };
@@ -217,7 +227,10 @@ async function onAction({
   if (!foundRouteKey) {
     return;
   }
-  const relevantRouteBag = await buildRouteDefinitionBag([foundRouteKey]);
+  const relevantRouteBag = await buildRouteDefinitionBag(
+    [foundRouteKey],
+    getRoutesObject()
+  );
   const route = [...relevantRouteBag.values()][0];
 
   if (!route.action) {
