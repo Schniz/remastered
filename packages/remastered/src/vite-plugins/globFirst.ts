@@ -85,17 +85,6 @@ export function globFirst(): PluginOption {
             magicString.overwrite(n.start, n.end, specifiers.join(""));
           }
         },
-        CallExpression(n: any) {
-          if (n.callee.name === "__glob_matches__") {
-            const patterns = n.arguments.map((x: any) => x.value);
-            const files = matchGlob({ patterns, baseDir, config });
-            magicString.overwrite(
-              n.start,
-              n.end,
-              JSON.stringify(files.length > 0)
-            );
-          }
-        },
       });
 
       return {
