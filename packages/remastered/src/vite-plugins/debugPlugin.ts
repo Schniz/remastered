@@ -32,14 +32,14 @@ export function debugPlugin(): PluginOption {
         const buildDir = resolvedConfig.build.outDir;
 
         await fs.outputJson(
-          path.join(buildDir, "debug-manifest.json"),
+          path.join(buildDir, "assets", "debug-manifest.json"),
           output,
           {
             spaces: 2,
           }
         );
         await fs.outputJson(
-          path.join(buildDir, "debug-chunks.json"),
+          path.join(buildDir, "assets", "debug-chunks.json"),
           chunkData,
           {
             spaces: 2,

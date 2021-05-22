@@ -21,7 +21,7 @@
     "dev": "remastered dev",
     "start": "remastered serve",
     "build": "REMASTERED_DEBUG_MANIFEST=true remastered build",
-    "vercel-build": "lerna run build --scope=@remastered/docs-site --include-dependencies && remastered-vercel postbuild && cp ./dist/client/debug-chunks.json ./public/assets/client.json && cp ./dist/server/debug-chunks.json ./public/assets/server.json"
+    "vercel-build": "lerna run build --scope=@remastered/docs-site --include-dependencies && remastered-vercel postbuild"
   },
   "bugs": {
     "url": "https://github.com/Schniz/remastered/issues"
