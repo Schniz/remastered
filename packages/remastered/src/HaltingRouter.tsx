@@ -12,25 +12,21 @@ import {
   Location,
 } from "history";
 import React from "react";
-import { routeElementsObject, routesObject } from "./fsRoutes";
+import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 
 type PendingState<T> = { value: T; tx: string };
-function usePendableState<T>(
-  initialValue: T
-): {
+function usePendableState<T>(initialValue: T): {
   currentValue: T;
   pendingState: PendingState<T> | null;
   commit(tx: string): void;
   rollback(tx: string): void;
   begin(t: T): void;
 } {
-  const [
-    pendingState,
-    setPendingState,
-  ] = React.useState<PendingState<T> | null>(null);
+  const [pendingState, setPendingState] =
+    React.useState<PendingState<T> | null>(null);
   const [currentValue, setCurrentValue] = React.useState(initialValue);
 
   const commit = React.useCallback(
@@ -76,14 +72,22 @@ export function HaltingRouter(props: {
   const [loaderContext, setLoaderContext] = React.useState(
     loaderContextRef.current
   );
-  const { currentValue: state, commit, pendingState, begin } = usePendableState(
-    {
-      action: history.action,
-      location: history.location,
-    }
-  );
+  const {
+    currentValue: state,
+    commit,
+    pendingState,
+    begin,
+  } = usePendableState({
+    action: history.action,
+    location: history.location,
+  });
 
   React.useEffect(() => {
+    if (import.meta.env.MODE === "development") {
+      (window as any).__$$refresh_remastered$$__ = () =>
+        navigator.replace(history.location);
+    }
+
     return history.listen((state) => {
       begin(state);
     });
@@ -178,6 +182,7 @@ async function handlePendingState(
     currentState,
     pendingState.value
   );
+  const routesObject = getRoutesObject();
 
   const components = newRoutes.map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
@@ -251,10 +256,10 @@ function diffRoutes(
   currentState: { location: Location; action: Action },
   pendingState: { location: Location; action: Action }
 ): { newRoutes: RouteMatch[]; keepRoutes: RouteMatch[] } {
-  const pendingRoutes =
-    matchRoutes(routeElementsObject, pendingState.location) ?? [];
+  const routeElements = getRouteElements();
+  const pendingRoutes = matchRoutes(routeElements, pendingState.location) ?? [];
   const currentMatches = (
-    matchRoutes(routeElementsObject, currentState.location) ?? []
+    matchRoutes(routeElements, currentState.location) ?? []
   ).map((route) => {
     return `${route.pathname}/${JSON.stringify(route.params)}`;
   });
@@ -280,4 +285,10 @@ function diffRoutes(
     const keepRoutes = pendingRoutes.filter((x) => !newRoutes.includes(x));
     return { newRoutes, keepRoutes };
   }
+}
+
+if (import.meta.hot) {
+  import.meta.hot!.on("remastered:server-module-updated", () => {
+    (window as any).__$$refresh_remastered$$__();
+  });
 }

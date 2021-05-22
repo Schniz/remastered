@@ -1,4 +1,4 @@
-import { routesObject } from "./fsRoutes";
+import { getRoutesObject } from "./fsRoutes";
 import { LoaderFn, ActionFn, LinksFn, HeadersFn, MetaFn } from "./routeTypes";
 
 export type RouteDefinition<T = unknown> = {
@@ -16,6 +16,8 @@ export type RouteDefinition<T = unknown> = {
 export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
   routeKeys: readonly T[]
 ) {
+  const routesObject = getRoutesObject();
+
   const ctx = new Map<string, RouteDefinition<T>>();
   const loadedComponents = Object.entries(routesObject)
     .flatMap(([key, value]) => {

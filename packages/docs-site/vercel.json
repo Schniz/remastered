@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "functions": {
+    "api/remastered-serverless.js": {
+      "includeFiles": "+(dist|docs|node_modules)/**/*"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/assets/:file*",
+      "destination": "dist/client/assets/:file*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/remastered-serverless.js"
+    }
+  ]
+}

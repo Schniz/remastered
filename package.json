@@ -8,9 +8,9 @@
     "postinstall": "lerna bootstrap",
     "preversion": "lerna run build"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": ["packages/*"]
+  },
   "license": "MIT",
   "devDependencies": {
     "lerna": "^4.0.0"

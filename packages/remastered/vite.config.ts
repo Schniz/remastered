@@ -1,12 +1,11 @@
-import { defineConfig, PluginOption, ResolvedConfig } from "vite";
-import { Module, parse, print } from "@swc/core";
+import { defineConfig } from "vite";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import path from "path";
 import fs from "fs-extra";
-import globby from "globby";
-import walk from "acorn-walk";
-import MagicString from "magic-string";
-import flatMap from "lodash/flatMap";
+import { globFirst } from "./dist/vite-plugins/globFirst";
+import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
+import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
+import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -25,11 +24,21 @@ fs.outputFileSync(
 
 // https://vitejs.dev/config/
 const config = defineConfig({
-  plugins: [globFirst(), routeTransformer(), reactRefresh()],
+  plugins: [
+    globFirst(),
+    routeTransformers(),
+    globHmrListener(),
+    reactRefresh(),
+    debugPlugin(),
+  ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
+    "process.env.REMASTER_PROJECT_DIR": JSON.stringify(
+      process.env.REMASTER_PROJECT_DIR
+    ),
   },
   build: {
+    minify: false,
     rollupOptions: {
       input: fileInCore("entry.client.js"),
     },
@@ -53,148 +62,3 @@ const config = defineConfig({
 });
 
 export default config;
-
-/**
- * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
- */
-function routeTransformer(): PluginOption {
-  const modulePrefix = path.join(process.cwd(), "./app/routes/");
-  const acceptSelfCode = `
-    ;if (import.meta.hot) {
-      import.meta.hot.accept();
-    }
-  `;
-
-  return {
-    enforce: "pre",
-    name: "remaster:route",
-    async transform(code, id, ssr) {
-      if (ssr) return null;
-      if (!id.startsWith(modulePrefix)) {
-        return null;
-      }
-      if (!/\.(t|j)sx?$/.test(id)) {
-        return null;
-      }
-
-      const body: Module["body"] = [];
-
-      const parsed = await parse(code, { syntax: "typescript", tsx: true });
-
-      for (const item of parsed.body) {
-        if (item.type !== "ExportDeclaration") {
-          body.push(item);
-        } else if (item.declaration.type === "VariableDeclaration") {
-          const declarations = item.declaration.declarations.filter(
-            (declaration) => {
-              return (
-                declaration.id.type === "Identifier" &&
-                ["handle", "meta"].includes(declaration.id.value)
-              );
-            }
-          );
-          if (declarations.length) {
-            body.push({
-              ...item,
-              declaration: {
-                ...item.declaration,
-                declarations,
-              },
-            });
-          }
-        }
-      }
-
-      const result = await print({ ...parsed, body });
-      result.code = result.code + acceptSelfCode;
-      return result;
-    },
-  };
-}
-
-/**
- * Adds the `__glob_matches__` function
- * and `import A from 'glob-first:/app/*.ts'`
- */
-function globFirst(): PluginOption {
-  let config: ResolvedConfig | undefined;
-
-  function matchGlob(opts: {
-    patterns: string[];
-    config: ResolvedConfig;
-    baseDir: string;
-  }): string[] {
-    const patterns = opts.patterns.map((pattern) => {
-      if (path.isAbsolute(pattern)) {
-        return path.join(config.root, pattern.slice(1));
-      }
-      return pattern;
-    });
-    const files = flatMap(patterns, (pattern) => {
-      return globby.sync(pattern, { cwd: opts.baseDir });
-    });
-    return files.map((x) => path.resolve(opts.baseDir, x));
-  }
-
-  return {
-    name: "remastered:glob-first",
-    enforce: "pre",
-    configResolved(given) {
-      config = given;
-    },
-    async transform(code, importer) {
-      if (!code.includes("glob-first:")) {
-        return;
-      }
-
-      const magicString = new MagicString(code);
-      const baseDir = path.dirname(importer);
-
-      const node = this.parse(code);
-      walk.simple(node, {
-        ImportDeclaration(n: any) {
-          const matches = n.source.value.match(/^glob-first:(.+)$/);
-          if (!matches) {
-            return;
-          }
-          let [, pattern] = matches;
-          const patterns = pattern.split(";");
-          const files = matchGlob({
-            patterns,
-            baseDir,
-            config,
-          });
-          const [file] = files;
-          if (file) {
-            magicString.overwrite(
-              n.source.start,
-              n.source.end,
-              JSON.stringify(file)
-            );
-          } else {
-            const specifiers: string[] = n.specifiers.map(
-              (x: any) => `const ${x.local.name} = null;`
-            );
-            magicString.overwrite(n.start, n.end, specifiers.join(""));
-          }
-        },
-        CallExpression(n: any) {
-          if (n.callee.name === "__glob_matches__") {
-            const patterns = n.arguments.map((x: any) => x.value);
-            const files = matchGlob({ patterns, baseDir, config });
-            magicString.overwrite(
-              n.start,
-              n.end,
-              JSON.stringify(files.length > 0)
-            );
-          }
-        },
-      });
-
-      return {
-        code: magicString.toString(),
-        map: magicString.generateMap(),
-      };
-    },
-  };
-}
