@@ -1,6 +1,6 @@
 {
   "name": "@remastered/docs-site",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "private": true,
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "main": "lib/docs-site.js",
@@ -12,7 +12,10 @@
     "url": "git+https://github.com/Schniz/remastered.git"
   },
   "workspaces": {
-    "nohoist": ["**/shiki", "**/shiki/**"]
+    "nohoist": [
+      "**/shiki",
+      "**/shiki/**"
+    ]
   },
   "scripts": {
     "dev": "remastered dev",
@@ -24,7 +27,7 @@
     "url": "https://github.com/Schniz/remastered/issues"
   },
   "dependencies": {
-    "@remastered/vercel": "^0.1.11",
+    "@remastered/vercel": "^0.1.12",
     "@stefanprobst/remark-shiki": "^0.1.2",
     "@tabler/icons": "^1.41.2",
     "@tailwindcss/typography": "^0.4.0",
@@ -39,7 +42,7 @@
     "remark-frontmatter": "^3.0.0",
     "remark-gfm": "^1.0.0",
     "remark-html": "^13.0.1",
-    "remastered": "^0.1.11",
+    "remastered": "^0.1.12",
     "shiki": "^0.9.3"
   },
   "devDependencies": {
