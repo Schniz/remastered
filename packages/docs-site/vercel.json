@@ -2,13 +2,13 @@
   "version": 2,
   "functions": {
     "api/remastered-serverless.js": {
-      "includeFiles": "+(dist|docs)/**/*"
+      "includeFiles": "+(dist|docs|node_modules)/**/*"
     },
     "api/list-files.js": {
-      "includeFiles": "+(dist|docs)/**/*"
+      "includeFiles": "+(dist|docs|node_modules)/**/*"
     },
     "api/list-files2.js": {
-      "includeFiles": "+(dist|docs)/**/*"
+      "includeFiles": "+(dist|docs|node_modules)/**/*"
     }
   },
   "rewrites": [

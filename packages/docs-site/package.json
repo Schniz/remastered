@@ -11,6 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/Schniz/remastered.git"
   },
+  "workspaces": {
+    "nohoist": ["**/shiki", "**/shiki/**"]
+  },
   "scripts": {
     "dev": "remastered dev",
     "start": "remastered serve",
