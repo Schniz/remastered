@@ -15,6 +15,10 @@ export function debugPlugin(): PluginOption {
     ...(isEnabled && {
       configResolved(given) {
         resolvedConfig = given;
+
+        for (const plugin of given.plugins) {
+          console.log(`Loaded plugin ${plugin.name}`);
+        }
       },
       moduleParsed(moduleInfo) {
         if (moduleInfo.code) {
