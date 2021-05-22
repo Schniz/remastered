@@ -1,6 +1,10 @@
 import { PluginOption, ResolvedConfig } from "vite";
 import fs from "fs-extra";
 import path from "path";
+import createDebugger from "debug";
+
+const PLUGIN_NAME = `remastered:debug`;
+const debug = createDebugger(PLUGIN_NAME);
 
 export function debugPlugin(): PluginOption {
   let resolvedConfig: ResolvedConfig;
@@ -9,15 +13,17 @@ export function debugPlugin(): PluginOption {
   const chunkData: Record<string, unknown> = {};
 
   return {
-    name: "remastered:debug",
+    name: PLUGIN_NAME,
     enforce: "post",
     apply: "build",
     ...(isEnabled && {
       configResolved(given) {
         resolvedConfig = given;
 
-        for (const plugin of given.plugins) {
-          console.log(`Loaded plugin ${plugin.name}`);
+        if (debug.enabled) {
+          for (const plugin of given.plugins) {
+            debug(`Loaded plugin ${plugin.name}`, plugin.options);
+          }
         }
       },
       moduleParsed(moduleInfo) {
