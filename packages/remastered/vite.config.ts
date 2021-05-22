@@ -41,6 +41,11 @@ const config = defineConfig({
     minify: false,
     rollupOptions: {
       input: fileInCore("entry.client.js"),
+      output: {
+        entryFileNames: "entry-[name].js",
+        chunkFileNames: "chunk-[name].js",
+        assetFileNames: "asset-[name].[ext]",
+      },
     },
   },
   optimizeDeps: {
@@ -59,6 +64,10 @@ const config = defineConfig({
     exclude: ["remastered", "glob-first:*"],
   },
   resolve: {
+    // alias: {
+    //   react: require.resolve("react"),
+    //   "react-dom": require.resolve("react-dom"),
+    // },
     dedupe: ["react", "react-dom"],
   },
   ...({

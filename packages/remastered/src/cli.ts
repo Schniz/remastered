@@ -45,22 +45,22 @@ const build = command({
 
     process.env.NODE_ENV = "production";
 
-    const resolvedConfig = await vite.resolveConfig(
-      {
-        configFile: getViteConfigPath({ ssr: false }),
-        define: {
-          "process.env.REMASTER_PROJECT_DIR": JSON.stringify(""),
-        },
-        build: {
-          manifest: true,
-          ssrManifest: true,
-          outDir: path.join(process.cwd(), "dist", "client"),
-        },
-      },
-      "build"
-    );
+    // const resolvedConfig = await vite.resolveConfig(
+    //   {
+    //     configFile: getViteConfigPath({ ssr: false }),
+    //     define: {
+    //       "process.env.REMASTER_PROJECT_DIR": JSON.stringify(""),
+    //     },
+    //     build: {
+    //       manifest: true,
+    //       ssrManifest: true,
+    //       outDir: path.join(process.cwd(), "dist", "client"),
+    //     },
+    //   },
+    //   "build"
+    // );
 
-    await vite.optimizeDeps(resolvedConfig);
+    // await vite.optimizeDeps(resolvedConfig);
 
     await runPromises(args.method, [
       () =>
