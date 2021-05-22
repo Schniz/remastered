@@ -75,9 +75,9 @@ const build = command({
             outDir: path.join(process.cwd(), "dist", "client"),
             rollupOptions: {
               output: {
-                entryFileNames: "assets/entry-[name].js",
-                chunkFileNames: "assets/chunk-[name].js",
-                assetFileNames: "assets/asset-[name].[ext]",
+                entryFileNames: "assets/[name].js",
+                chunkFileNames: "assets/[name].js",
+                assetFileNames: "assets/[name].[ext]",
               },
             },
           },
