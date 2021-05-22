@@ -6,6 +6,7 @@ export function debugPlugin(): PluginOption {
   let resolvedConfig: ResolvedConfig;
   const isEnabled = Boolean(process.env.REMASTERED_DEBUG_MANIFEST);
   const output: Record<string, string> = {};
+  const chunkData: Record<string, unknown> = {};
 
   return {
     name: "remastered:debug",
@@ -20,6 +21,9 @@ export function debugPlugin(): PluginOption {
           output[moduleInfo.id] = moduleInfo.code;
         }
       },
+      augmentChunkHash(chunk) {
+        chunkData[chunk.name] = chunk;
+      },
       async writeBundle() {
         if (!resolvedConfig) {
           this.error(`Config file was not resolved!`);
@@ -30,6 +34,13 @@ export function debugPlugin(): PluginOption {
         await fs.outputJson(
           path.join(buildDir, "debug-manifest.json"),
           output,
+          {
+            spaces: 2,
+          }
+        );
+        await fs.outputJson(
+          path.join(buildDir, "debug-chunks.json"),
+          chunkData,
           {
             spaces: 2,
           }
