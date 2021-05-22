@@ -20,7 +20,7 @@
   "scripts": {
     "dev": "remastered dev",
     "start": "remastered serve",
-    "build": "remastered build",
+    "build": "REMASTERED_DEBUG_MANIFEST=true remastered build",
     "vercel-build": "lerna run build --scope=@remastered/docs-site --include-dependencies && remastered-vercel postbuild"
   },
   "bugs": {
