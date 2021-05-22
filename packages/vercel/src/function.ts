@@ -7,8 +7,10 @@ import _ from "lodash";
 
 export function createVercelFunction({
   rootDir,
+  serverEntry: givenServerEntry,
 }: {
   rootDir: string;
+  serverEntry?: unknown;
 }): VercelApiHandler {
   process.env.REMASTER_PROJECT_DIR = rootDir;
   const manifest$ = fs.readJson(
@@ -17,9 +19,9 @@ export function createVercelFunction({
   const clientManifest$ = fs.readJson(
     path.join(rootDir, "dist/client/manifest.json")
   );
-  const serverEntry$ = import(
-    path.join(rootDir, "dist/server/entry.server.js")
-  );
+  const serverEntry$ =
+    givenServerEntry ??
+    import(path.join(rootDir, "dist/server/entry.server.js"));
 
   return async (req, res) => {
     const [manifest, clientManifest, serverEntry] = await Promise.all([
