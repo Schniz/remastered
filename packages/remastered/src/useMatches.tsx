@@ -3,6 +3,7 @@ import { useLocation, matchRoutes, Params } from "react-router";
 import { getRouteElements } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
 import { MetaFn } from "./routeTypes";
+import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 
 export type RouteDef = { hasLoader: boolean; handle?: unknown; meta?: MetaFn };
 export const MatchesContext = React.createContext<Map<string, RouteDef>>(
@@ -23,7 +24,20 @@ export function useMatches(): Match[] {
   const map = React.useContext(MatchesContext);
   const loaderContext = React.useContext(LoaderContext);
   const matched = React.useMemo(() => {
-    return matchRoutes(routeElements, location);
+    const matchedRoutes = [...(matchRoutes(routeElements, location) ?? [])];
+    matchedRoutes.unshift({
+      route: {
+        caseSensitive: false,
+        path: "/",
+        element: {},
+        ...({
+          routeFile: LAYOUT_ROUTE_KEY,
+        } as any),
+      },
+      pathname: "/",
+      params: {},
+    });
+    return matchedRoutes;
   }, [location]);
   const routeMatches = (matched ?? []).flatMap((route): Match[] => {
     const routeFile: string = (route.route as any).routeFile;

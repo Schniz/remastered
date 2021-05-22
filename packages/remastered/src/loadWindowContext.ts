@@ -3,11 +3,14 @@ import {
   RouteDefinition,
 } from "./buildRouteComponentBag";
 import type { DynamicImportComponentContext } from "./DynamicImportComponent";
+import { getRoutesObject } from "./fsRoutes";
 import type { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
 import type { LoaderContext } from "./LoaderContext";
+import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { mapValues } from "./Map";
 import type { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
 import type { MatchesContext } from "./useMatches";
+import { Layout, LayoutObject } from "./UserOverridableComponents";
 
 export type Context = {
   loaderContext: React.ContextType<typeof LoaderContext>;
@@ -35,9 +38,13 @@ export async function loadWindowContext(): Promise<Context> {
   const loadCtx = new Map(
     ctx.loadCtx.map(([key, value]) => [`${historyKey}@${key}`, value])
   );
-  const loadedRoutes = await buildRouteComponentBag(ctx.ssrRoutes);
+  const loadedRoutes = await buildRouteComponentBag(ctx.ssrRoutes, {
+    ...getRoutesObject(),
+    [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
+  });
   const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
   const matchesContext = new Map(ctx.routeDefs);
+  matchesContext.set(LAYOUT_ROUTE_KEY, LayoutObject);
 
   for (const route of loadedRoutes.values()) {
     applyRouteHandlesToCtx(matchesContext, route);
