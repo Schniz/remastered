@@ -58,6 +58,9 @@ const config = defineConfig({
     ],
     exclude: ["remastered", "glob-first:*"],
   },
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   ...({
     ssr: {
       noExternal: ["remastered"],
