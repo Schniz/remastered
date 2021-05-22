@@ -28,6 +28,10 @@ export function globHmrListener(): PluginOption[] {
           return null;
         }
 
+        if (!server) {
+          return null;
+        }
+
         const ast = this.parse(code);
         const relativeGlobs: string[] = [];
         walk.simple(ast, {
@@ -45,28 +49,24 @@ export function globHmrListener(): PluginOption[] {
           },
         });
 
-        if (server) {
-          const absoluteGlobs = relativeGlobs.map((relativeGlob) => {
-            return path.resolve(path.dirname(id), relativeGlob);
-          });
+        const absoluteGlobs = relativeGlobs.map((relativeGlob) => {
+          return path.resolve(path.dirname(id), relativeGlob);
+        });
 
-          const mod = server.moduleGraph.idToModuleMap.get(id);
+        const mod = server.moduleGraph.idToModuleMap.get(id);
 
-          if (mod && mod.file) {
-            const oldGlobImporter = (server as any)._globImporters[mod.file];
-            if (oldGlobImporter) {
-              absoluteGlobs.unshift(oldGlobImporter.pattern);
-            }
-
-            (server as any)._globImporters[mod.file] = {
-              module: mod,
-              base: server.config.base,
-              pattern: `+(${absoluteGlobs.join("|")})`,
-            };
+        if (mod && mod.file) {
+          const oldGlobImporter = (server as any)._globImporters[mod.file];
+          if (oldGlobImporter) {
+            absoluteGlobs.unshift(oldGlobImporter.pattern);
           }
-        }
 
-        return null;
+          (server as any)._globImporters[mod.file] = {
+            module: mod,
+            base: server.config.base,
+            pattern: `+(${absoluteGlobs.join("|")})`,
+          };
+        }
       },
     },
   ];

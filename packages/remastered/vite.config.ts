@@ -52,7 +52,18 @@ const config = defineConfig({
       "lodash",
       "@vitejs/plugin-react-refresh",
     ],
-    exclude: ["remastered"],
+    entries: [
+      path.join(__dirname, "./dist/main.js"),
+      path.join(__dirname, "./dist/entry-server.js"),
+    ],
+    exclude: ["remastered", "glob-first:*"],
+  },
+  resolve: {
+    // alias: {
+    //   react: require.resolve("react"),
+    //   "react-dom": require.resolve("react-dom"),
+    // },
+    dedupe: ["react", "react-dom"],
   },
   ...({
     ssr: {

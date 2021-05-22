@@ -20,11 +20,11 @@ export default function DocPath() {
   const routeData = useRouteData<Doc>();
   return (
     <>
-      <h1 className="py-4 text-xl font-bold text-black text-opacity-90">
+      <h1 className="py-4 px-2 text-xl font-bold text-black text-opacity-90">
         {routeData.title}
       </h1>
       <div
-        className="w-screen prose"
+        className="w-screen px-2 prose"
         dangerouslySetInnerHTML={{ __html: routeData.content }}
       />
     </>

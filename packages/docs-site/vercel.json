@@ -7,6 +7,10 @@
   },
   "rewrites": [
     {
+      "source": "/__dbg__",
+      "destination": "dist/client/debug-chunks.json"
+    },
+    {
       "source": "/assets/:file*",
       "destination": "dist/client/assets/:file*"
     },
