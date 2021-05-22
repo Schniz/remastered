@@ -42,9 +42,9 @@ const config = defineConfig({
     rollupOptions: {
       input: fileInCore("entry.client.js"),
       output: {
-        entryFileNames: "entry-[name].js",
-        chunkFileNames: "chunk-[name].js",
-        assetFileNames: "asset-[name].[ext]",
+        entryFileNames: "assets/entry-[name].js",
+        chunkFileNames: "assets/chunk-[name].js",
+        assetFileNames: "assets/asset-[name].[ext]",
       },
     },
   },
