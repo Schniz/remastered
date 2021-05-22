@@ -13,7 +13,8 @@
   },
   "workspaces": {
     "nohoist": [
-      "**"
+      "**/shiki",
+      "**/shiki/**"
     ]
   },
   "scripts": {
