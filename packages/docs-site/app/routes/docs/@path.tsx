@@ -10,7 +10,8 @@ export const loader: LoaderFn<Doc> = async ({ params }) => {
 export const headers: HeadersFn = async () => {
   return {
     ...(!__DEV__ && {
-      "Cache-Control": "public, max-age=3600, must-revalidate",
+      "Cache-Control":
+        "public, s-max-age=3600, must-revalidate, stale-while-revalidate=31536000",
     }),
   };
 };
