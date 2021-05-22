@@ -4,6 +4,17 @@ import { flatMap } from "lodash";
 import globby from "globby";
 import * as walk from "acorn-walk";
 import MagicString from "magic-string";
+import createDebugger from "debug";
+
+const PLUGIN_NAME = `remastered:glob-first`;
+const debug = createDebugger(PLUGIN_NAME);
+
+type ReplacableImport = {
+  start: number;
+  end: number;
+  pattern: string;
+  resolved?: string;
+};
 
 /**
  * Adds the `__glob_matches__` function
@@ -38,7 +49,7 @@ export function globFirst(): PluginOption {
   }
 
   return {
-    name: "remastered:glob-first",
+    name: PLUGIN_NAME,
     enforce: "pre",
     configResolved(given) {
       resolvedConfig = given;
@@ -57,6 +68,7 @@ export function globFirst(): PluginOption {
       const baseDir = path.dirname(importer);
 
       const node = this.parse(code);
+      const replacableImports: ReplacableImport[] = [];
       walk.simple(node, {
         ImportDeclaration(n: any) {
           const matches = n.source.value.match(/^glob-first:(.+)$/);
@@ -71,21 +83,36 @@ export function globFirst(): PluginOption {
             config,
           });
           const [file] = files;
-          if (file) {
-            console.error(`Choosing ${file}`);
-            magicString.overwrite(
-              n.source.start,
-              n.source.end,
-              JSON.stringify(file)
-            );
-          } else {
-            const specifiers: string[] = n.specifiers.map(
-              (x: any) => `const ${x.local.name} = null;`
-            );
-            magicString.overwrite(n.start, n.end, specifiers.join(""));
-          }
+          replacableImports.push({
+            start: n.source.start,
+            end: n.source.end,
+            pattern: pattern,
+            resolved: file,
+          });
         },
       });
+
+      for (const replacable of replacableImports) {
+        if (!replacable.resolved) {
+          this.error(
+            `No file was found for pattern ${JSON.stringify(
+              replacable.pattern
+            )}\nFrom context: ${baseDir}`
+          );
+        }
+
+        debug(
+          `Pattern ${JSON.stringify(
+            replacable.pattern
+          )} resolved into ${JSON.stringify(replacable.resolved)}`
+        );
+
+        magicString.overwrite(
+          replacable.start,
+          replacable.end,
+          JSON.stringify(replacable.resolved)
+        );
+      }
 
       return {
         code: magicString.toString(),

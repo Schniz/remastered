@@ -84,9 +84,13 @@ export function Links() {
   );
 }
 
+const defaultMetaTags = {
+  charSet: "UTF-8",
+};
+
 export function Meta() {
   const matches = useMatches();
-  const metaTags: MetaTags = {};
+  const metaTags: MetaTags = { ...defaultMetaTags };
   for (const match of matches) {
     if (match.meta) {
       Object.assign(metaTags, match.meta({ data: match.data }));
@@ -99,6 +103,11 @@ export function Meta() {
         if (key === "title") {
           return <title key={key}>{value}</title>;
         }
+
+        if (key === "charSet") {
+          return <meta charSet={value} key={key} />;
+        }
+
         return <meta key={key} name={key} content={value} />;
       })}
     </>
