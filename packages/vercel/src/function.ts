@@ -3,6 +3,8 @@ import { Request } from "node-fetch";
 import type { VercelApiHandler } from "@vercel/node";
 import _ from "lodash";
 import { getRenderContext } from "./getRenderContext";
+import { deserializeResponse, getResponsePath } from "./StaticExporting";
+import fs from "fs-extra";
 
 export function createVercelFunction({
   rootDir,
@@ -23,11 +25,22 @@ export function createVercelFunction({
       // @ts-ignore
       headers: { ...req.headers },
     });
-    const response = await renderRequest(
-      await renderContext$,
-      // @ts-ignore
-      request
-    );
+
+    let response: Response;
+    const responsePath = getResponsePath(rootDir, request);
+
+    if (
+      !request.headers.has("x-skip-exported") &&
+      fs.pathExists(responsePath)
+    ) {
+      response = deserializeResponse(await fs.readJson(responsePath)) as any;
+    } else {
+      response = await renderRequest(
+        await renderContext$,
+        // @ts-ignore
+        request
+      );
+    }
 
     res.status(response.status);
     for (const [header, value] of response.headers) {

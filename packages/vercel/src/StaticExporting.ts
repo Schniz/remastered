@@ -30,24 +30,30 @@ export function deserializeResponse(serialized: SerializedResponse): Response {
   });
 }
 
+export function getResponsePath(
+  rootDir: string,
+  request: Pick<Request, "url">
+): string {
+  return path.join(rootDir, "responses", request.url, "response.json");
+}
+
 export async function store(
   rootDir: string,
   request: Request,
   response: Response
 ) {
+  const serialized = await serializeResponse(response);
+
   if (response.status === 200) {
     const filename = path.join(rootDir, "public", request.url);
-    await fs.outputFile(filename, await response.buffer());
-    console.error(`Static file exported to ${filename}`);
-  } else {
-    const filename = path.join(
-      rootDir,
-      "dist",
-      "responses",
-      request.url,
-      "response.json"
+    await fs.outputFile(
+      filename,
+      await deserializeResponse(serialized).buffer()
     );
-    await fs.outputJson(filename, serializeResponse(response));
-    console.error(`Response output exported to ${filename}`);
+    console.error(`Static file exported to ${filename}`);
   }
+
+  const responsePath = getResponsePath(rootDir, request);
+  await fs.outputJson(responsePath, serialized);
+  console.error(`Response output exported to ${responsePath}`);
 }

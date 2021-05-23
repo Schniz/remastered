@@ -86,9 +86,7 @@ const exportCmd = command({
   async handler() {
     const exportedDir = path.join(process.cwd(), "dist/exported");
     await fs.remove(exportedDir);
-    const { serializeResponse, deserializeResponse } = await import(
-      "./StaticExporting"
-    );
+    const { store: storeTraffic } = await import("./StaticExporting");
     const { Request } = await import("node-fetch");
     const { renderRequest } = await import("remastered/dist/server");
     const { getRenderContext } = await import("./getRenderContext");
@@ -109,9 +107,7 @@ const exportCmd = command({
 
     for (const request of requests) {
       const response = await renderRequest(renderContext, request as any);
-      const serialized = await serializeResponse(response as any);
-      const res2 = deserializeResponse(serialized);
-      console.log({ text: await res2.text(), url: request.url });
+      await storeTraffic(exportedDir, request, response as any);
     }
   },
 });
