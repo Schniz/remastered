@@ -71,7 +71,15 @@ const postbuild = command({
   args: {},
   async handler() {
     const assetsDir = path.join(process.cwd(), "dist/client/assets");
-    const publicAssetsDir = path.join(process.cwd(), "public/assets");
+    const publicExportedDir = path.join(process.cwd(), "dist/exported/public");
+    const publicDir = path.join(process.cwd(), "public");
+    const publicAssetsDir = path.join(publicDir, "assets");
+
+    console.error(
+      `Copying contents of ${publicExportedDir} into ${publicDir}...`
+    );
+    await fs.copy(publicExportedDir, publicDir);
+
     console.error(
       `Copying contents of ${assetsDir} into ${publicAssetsDir}...`
     );
