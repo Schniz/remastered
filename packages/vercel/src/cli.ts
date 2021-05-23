@@ -98,7 +98,7 @@ const exportCmd = command({
   async handler() {
     const exportedDir = path.join(process.cwd(), "dist/exported");
     await fs.remove(exportedDir);
-    const { getStaticRoutesFunction, store: storeTraffic } = await import(
+    const { getStaticPathsFunction, store: storeTraffic } = await import(
       "./StaticExporting"
     );
     const { Request } = await import("node-fetch");
@@ -106,8 +106,8 @@ const exportCmd = command({
     const serverEntry = await import(
       path.join(process.cwd(), "dist/server/entry.server.js")
     );
-    const getStaticRoutes = await getStaticRoutesFunction(serverEntry);
-    if (!getStaticRoutes) {
+    const getStaticPaths = await getStaticPathsFunction(serverEntry);
+    if (!getStaticPaths) {
       return;
     }
 
@@ -117,7 +117,7 @@ const exportCmd = command({
       serverEntry,
     });
     process.env.REMASTER_PROJECT_DIR = process.cwd();
-    const routes: string[] = await getStaticRoutes();
+    const routes: string[] = await getStaticPaths();
     const requests = routes.flatMap((route) => {
       return [new Request(route), new Request(`${route}.json`)];
     });

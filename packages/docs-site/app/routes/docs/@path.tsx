@@ -34,7 +34,9 @@ export const meta: MetaFn<Doc> = ({ data }) => {
   return {
     title: `Remastered: ${data.title}`,
     ...(data.description && {
-      description: `${data.description}. Learn more about Remastered!`,
+      description: `${data.description
+        .trim()
+        .replace(/\.$/, "")}. Learn more about Remastered!`,
     }),
   };
 };

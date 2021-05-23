@@ -9,6 +9,7 @@ import theme from "./routes/docs/dracula-dot-min-white-darker.json";
 import remarkGfm from "remark-gfm";
 import tsxLanguage from "shiki/languages/tsx.tmLanguage.json";
 import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
+import jsonLanguage from "shiki/languages/json.tmLanguage.json";
 
 // Listen to all changes in the docs so it will trigger HMR on Markdown change
 import "watch-glob:../docs/**/*.md";
@@ -58,6 +59,11 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
           aliases: ["bash", "sh", "sh-session", "shellscript", "shell"],
           scopeName: "source.shell",
           grammar: shellscriptLanguage as any,
+        },
+        {
+          id: "json",
+          scopeName: "source.json",
+          grammar: jsonLanguage as any,
         },
       ],
     })
