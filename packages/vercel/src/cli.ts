@@ -70,8 +70,20 @@ const postbuild = command({
   description: "This should run after `remastered build` in `vercel-build`",
   args: {},
   async handler() {
+    await exportCmd.handler({});
+
     const assetsDir = path.join(process.cwd(), "dist/client/assets");
-    const publicAssetsDir = path.join(process.cwd(), "public/assets");
+    const publicExportedDir = path.join(process.cwd(), "dist/exported/public");
+    const publicDir = path.join(process.cwd(), "public");
+    const publicAssetsDir = path.join(publicDir, "assets");
+
+    if (await fs.pathExists(publicExportedDir)) {
+      console.error(
+        `Copying contents of ${publicExportedDir} into ${publicDir}...`
+      );
+      await fs.copy(publicExportedDir, publicDir);
+    }
+
     console.error(
       `Copying contents of ${assetsDir} into ${publicAssetsDir}...`
     );
@@ -79,9 +91,47 @@ const postbuild = command({
   },
 });
 
+const exportCmd = command({
+  name: "export",
+  description: "export static routes",
+  args: {},
+  async handler() {
+    const exportedDir = path.join(process.cwd(), "dist/exported");
+    await fs.remove(exportedDir);
+    const { getStaticRoutesFunction, store: storeTraffic } = await import(
+      "./StaticExporting"
+    );
+    const { Request } = await import("node-fetch");
+    const { renderRequest } = await import("remastered/dist/server");
+    const serverEntry = await import(
+      path.join(process.cwd(), "dist/server/entry.server.js")
+    );
+    const getStaticRoutes = await getStaticRoutesFunction(serverEntry);
+    if (!getStaticRoutes) {
+      return;
+    }
+
+    const { getRenderContext } = await import("./getRenderContext");
+    const renderContext = await getRenderContext({
+      rootDir: process.cwd(),
+      serverEntry,
+    });
+    process.env.REMASTER_PROJECT_DIR = process.cwd();
+    const routes: string[] = await getStaticRoutes();
+    const requests = routes.flatMap((route) => {
+      return [new Request(route), new Request(`${route}.json`)];
+    });
+
+    for (const request of requests) {
+      const response = await renderRequest(renderContext, request as any);
+      await storeTraffic(exportedDir, request, response as any);
+    }
+  },
+});
+
 const cli = subcommands({
   name: "remastered-vercel",
-  cmds: { setup, postbuild },
+  cmds: { setup, postbuild, export: exportCmd },
 });
 
 run(binary(cli), process.argv);
