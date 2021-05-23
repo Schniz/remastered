@@ -18,6 +18,8 @@ import { wrapRoutes } from "./wrapRoutes";
 import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 
+export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
+
 const mainFile = `node_modules/.remastered/entry.client.js`;
 
 globalPatch();

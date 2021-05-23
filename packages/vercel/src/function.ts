@@ -1,9 +1,8 @@
 import { renderRequest } from "remastered/dist/server";
 import { Request } from "node-fetch";
 import type { VercelApiHandler } from "@vercel/node";
-import fs from "fs-extra";
-import path from "path";
 import _ from "lodash";
+import { getRenderContext } from "./getRenderContext";
 
 export function createVercelFunction({
   rootDir,
@@ -13,19 +12,9 @@ export function createVercelFunction({
   serverEntry: unknown;
 }): VercelApiHandler {
   process.env.REMASTER_PROJECT_DIR = rootDir;
-  const manifest$ = fs.readJson(
-    path.join(rootDir, "dist/client/ssr-manifest.json")
-  );
-  const clientManifest$ = fs.readJson(
-    path.join(rootDir, "dist/client/manifest.json")
-  );
+  const renderContext$ = getRenderContext({ rootDir, serverEntry });
 
   return async (req, res) => {
-    const [manifest, clientManifest] = await Promise.all([
-      manifest$,
-      clientManifest$,
-    ]);
-
     const method = req.method?.toUpperCase() ?? "GET";
     const request = new Request(req.url ?? "/", {
       method,
@@ -35,11 +24,7 @@ export function createVercelFunction({
       headers: { ...req.headers },
     });
     const response = await renderRequest(
-      {
-        manifest,
-        serverEntry,
-        clientManifest,
-      },
+      await renderContext$,
       // @ts-ignore
       request
     );
