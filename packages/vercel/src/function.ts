@@ -31,7 +31,7 @@ export function createVercelFunction({
 
     if (
       !request.headers.has("x-skip-exported") &&
-      fs.pathExists(responsePath)
+      (await fs.pathExists(responsePath))
     ) {
       response = deserializeResponse(await fs.readJson(responsePath)) as any;
     } else {
