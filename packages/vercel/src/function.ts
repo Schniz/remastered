@@ -34,6 +34,7 @@ export function createVercelFunction({
       (await fs.pathExists(responsePath))
     ) {
       response = deserializeResponse(await fs.readJson(responsePath)) as any;
+      response.headers.set("x-remastered-static-exported", "true");
     } else {
       response = await renderRequest(
         await renderContext$,
