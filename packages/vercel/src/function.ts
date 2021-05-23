@@ -26,22 +26,13 @@ export function createVercelFunction({
       headers: { ...req.headers },
     });
 
-    let response: Response;
-    const responsePath = getResponsePath(rootDir, request);
-
-    if (
-      !request.headers.has("x-skip-exported") &&
-      (await fs.pathExists(responsePath))
-    ) {
-      response = deserializeResponse(await fs.readJson(responsePath)) as any;
-      response.headers.set("x-remastered-static-exported", "true");
-    } else {
-      response = await renderRequest(
+    const response =
+      (await findExportedResponse(rootDir, request)) ??
+      (await renderRequest(
         await renderContext$,
         // @ts-ignore
         request
-      );
-    }
+      ));
 
     res.status(response.status);
     for (const [header, value] of response.headers) {
@@ -49,4 +40,24 @@ export function createVercelFunction({
     }
     res.end(response.body);
   };
+}
+
+async function findExportedResponse(
+  rootDir: string,
+  request: Request
+): Promise<Response | null> {
+  if (request.headers.has("x-skip-exported")) {
+    return null;
+  }
+
+  const responsePath = getResponsePath(rootDir, request);
+
+  try {
+    const response = deserializeResponse(await fs.readJson(responsePath));
+    response.headers.set("x-remastered-static-exported", "true");
+    return response as any;
+  } catch (e) {
+    console.error(`Can't read exported file from ${responsePath}`, e);
+    return null;
+  }
 }
