@@ -21,6 +21,7 @@ export default function Layout() {
 export const meta: MetaFn<unknown> = () => {
   return {
     title: `Remastered v${remasteredPkg.version}`,
+    description: `Remastered: a full-stack approach to React development.`,
   };
 };
 
