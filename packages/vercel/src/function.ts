@@ -5,6 +5,7 @@ import _ from "lodash";
 import { getRenderContext } from "./getRenderContext";
 import { deserializeResponse, getResponsePath } from "./StaticExporting";
 import fs from "fs-extra";
+import path from "path";
 
 export function createVercelFunction({
   rootDir,
@@ -50,7 +51,10 @@ async function findExportedResponse(
     return null;
   }
 
-  const responsePath = getResponsePath(rootDir, request);
+  const responsePath = getResponsePath(
+    path.join(rootDir, "dist", "exported"),
+    request
+  );
 
   try {
     const response = deserializeResponse(await fs.readJson(responsePath));

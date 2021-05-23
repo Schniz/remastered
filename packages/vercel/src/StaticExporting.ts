@@ -30,6 +30,9 @@ export function deserializeResponse(serialized: SerializedResponse): Response {
   });
 }
 
+/**
+ * @param rootDir `${process.cwd()}/dist/exported`
+ */
 export function getResponsePath(
   rootDir: string,
   request: Pick<Request, "url">
