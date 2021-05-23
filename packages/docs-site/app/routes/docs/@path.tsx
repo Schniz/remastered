@@ -19,7 +19,7 @@ export default function DocPath() {
   const routeData = useRouteData<Doc>();
   return (
     <>
-      <h1 className="py-4 px-2 text-xl font-bold text-black text-opacity-90">
+      <h1 className="px-2 py-4 text-xl font-bold text-black text-opacity-90">
         {routeData.title}
       </h1>
       <div
@@ -33,5 +33,8 @@ export default function DocPath() {
 export const meta: MetaFn<Doc> = ({ data }) => {
   return {
     title: `Remastered: ${data.title}`,
+    ...(data.description && {
+      description: `${data.description}. Learn more about Remastered!`,
+    }),
   };
 };

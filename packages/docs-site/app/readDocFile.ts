@@ -13,7 +13,7 @@ import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
 // Listen to all changes in the docs so it will trigger HMR on Markdown change
 import "watch-glob:../docs/**/*.md";
 
-export type Doc = { content: string; title: string };
+export type Doc = { content: string; title: string; description?: string };
 
 export async function readDocFile(givenPath: string): Promise<Doc | null> {
   const pathParts =
@@ -67,5 +67,6 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
   return {
     content: String(processed),
     title: (attributes as any).title,
+    description: (attributes as any).description,
   };
 }

@@ -1,5 +1,6 @@
 ---
 title: Routing
+description: Routes and URLs go hand by hand in Remastered. And just like URLs, routes in Remastered are nested.
 ---
 
 Routes and URLs go hand by hand in Remastered. And just like URLs, routes in Remastered are nested. Most websites share the same layout strategy: a master layout and a detailed page. Consider this very page: we have a top navigation bar, the side-panel which shows the list of documentation files to read, and the actual content.

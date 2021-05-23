@@ -1,5 +1,6 @@
 ---
 title: Data Fetching
+description: Data fetching is not a special case in front-end applications. It's the core of our work. In Remastered, we've got you covered.
 ---
 
 Data fetching is not a special case in front-end applications. It's the core of our work. In Remastered, we've got you covered.
