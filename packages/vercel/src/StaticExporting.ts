@@ -1,6 +1,7 @@
 import { Request, Response } from "node-fetch";
 import path from "path";
 import fs from "fs-extra";
+import crypto from "crypto";
 
 type SerializedResponse = {
   body: number[];
@@ -37,7 +38,11 @@ export function getResponsePath(
   exportDir: string,
   request: Pick<Request, "url">
 ): string {
-  return path.join(exportDir, "responses", request.url, "response.json");
+  return path.join(exportDir, "responses", sha1(request.url), "response.json");
+}
+
+function sha1(s: string): string {
+  return crypto.createHash("sha1").update(s).digest("hex");
 }
 
 export async function store(
