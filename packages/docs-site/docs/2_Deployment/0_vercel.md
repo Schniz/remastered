@@ -38,20 +38,23 @@ Some pages can be generated in build time. Look at this documentation site, for 
 Thankfully, `@remastered/vercel` supports generating static content in build time. To do that, create a new file under `config/vercel.ts`:
 
 ```ts
-export async function getStaticRoutes(): string[] {
+import type { GetStaticPathsFn } from "@remastered/vercel";
+
+export const getStaticPaths: GetStaticPathsFn = async () => {
   return [];
-}
+};
 ```
 
 Every element in the array would be a path we will generate static content for. You can import your app logic to generate the list dynamically:
 
 ```ts
+import type { GetStaticPathsFn } from "@remastered/vercel";
 import { getAllDocs } from "../app/getAllDocs";
 
-export async function getStaticRoutes(): string[] {
+export const getStaticPaths: GetStaticPathsFn = async () => {
   const allDocs = await getAllDocs();
   return allDocs.map((doc) => doc.absoluteUrl);
-}
+};
 ```
 
 Now, when `remastered-vercel postbuild` will be called, the static content will be ready for Remastered to pick up in Vercel, allowing you to have awesome performance in Vercel.

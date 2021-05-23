@@ -1,6 +1,7 @@
+import type { GetStaticPathsFn } from "@remastered/vercel";
 import { docList, FileEntry } from "../app/docList";
 
-export async function getStaticRoutes(): Promise<string[]> {
+export const getStaticPaths: GetStaticPathsFn = async () => {
   const docs = await docList();
   const docUrls: string[] = [];
   const queue: FileEntry[] = [...docs];
@@ -15,4 +16,4 @@ export async function getStaticRoutes(): Promise<string[]> {
   }
 
   return [...docUrls, "/docs", "/"];
-}
+};

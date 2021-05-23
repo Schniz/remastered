@@ -66,7 +66,26 @@ export async function store(
   console.error(`Response output exported to ${responsePath}`);
 }
 
-export async function getStaticRoutesFunction(
+/**
+ * This function should be defined in `config/vercel.ts`.
+ * It allows static generation of content based on the pathnames
+ * defined by this function. Each array entry is a pathname which
+ * will be uploaded as a static response to Vercel.
+ *
+ * @example
+ * ```ts
+ * export const getStaticPaths: GetStaticPathsFn = async () => {
+ *   return ["/about", "/some/markdown-content"];
+ *   // Now the `/about` and `/some/markdown-content` will
+ *   // not use SSR and wouldn't call `loader` on generation.
+ *   // They will simply return the output of the values generated
+ *   // at build time.
+ * }
+ * ```
+ */
+export type GetStaticPathsFn = () => string[] | Promise<string[]>;
+
+export async function getStaticPathsFunction(
   serverEntry: any
 ): Promise<(() => Promise<string[]>) | undefined> {
   const configs = serverEntry?.configs ?? {};
@@ -80,8 +99,8 @@ export async function getStaticRoutesFunction(
   for (const key of configPlaces) {
     if (configs[key]) {
       const mod = await configs[key]();
-      if (typeof mod?.getStaticRoutes === "function") {
-        return mod.getStaticRoutes;
+      if (typeof mod?.getStaticPaths === "function") {
+        return mod.getStaticPaths;
       }
     }
   }
