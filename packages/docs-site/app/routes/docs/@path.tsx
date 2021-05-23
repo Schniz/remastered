@@ -3,7 +3,6 @@ import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "remastered";
 import { Doc, readDocFile } from "../../readDocFile";
 
 export const loader: LoaderFn<Doc> = async ({ params }) => {
-  /* const { readDocFile } = await import("../../readDocFile"); */
   return readDocFile(params.path);
 };
 
