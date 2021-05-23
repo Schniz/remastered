@@ -47,7 +47,7 @@ export async function store(
 ) {
   const serialized = await serializeResponse(response);
 
-  if (response.status === 200) {
+  if (response.status === 200 && path.extname(request.url)) {
     const filename = path.join(rootDir, "public", request.url);
     await fs.outputFile(
       filename,

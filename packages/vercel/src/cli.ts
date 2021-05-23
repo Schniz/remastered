@@ -75,10 +75,12 @@ const postbuild = command({
     const publicDir = path.join(process.cwd(), "public");
     const publicAssetsDir = path.join(publicDir, "assets");
 
-    console.error(
-      `Copying contents of ${publicExportedDir} into ${publicDir}...`
-    );
-    await fs.copy(publicExportedDir, publicDir);
+    if (await fs.pathExists(publicExportedDir)) {
+      console.error(
+        `Copying contents of ${publicExportedDir} into ${publicDir}...`
+      );
+      await fs.copy(publicExportedDir, publicDir);
+    }
 
     console.error(
       `Copying contents of ${assetsDir} into ${publicAssetsDir}...`
