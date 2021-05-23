@@ -70,6 +70,8 @@ const postbuild = command({
   description: "This should run after `remastered build` in `vercel-build`",
   args: {},
   async handler() {
+    await exportCmd.handler({});
+
     const assetsDir = path.join(process.cwd(), "dist/client/assets");
     const publicExportedDir = path.join(process.cwd(), "dist/exported/public");
     const publicDir = path.join(process.cwd(), "public");
@@ -96,21 +98,26 @@ const exportCmd = command({
   async handler() {
     const exportedDir = path.join(process.cwd(), "dist/exported");
     await fs.remove(exportedDir);
-    const { store: storeTraffic } = await import("./StaticExporting");
+    const { getStaticRoutesFunction, store: storeTraffic } = await import(
+      "./StaticExporting"
+    );
     const { Request } = await import("node-fetch");
     const { renderRequest } = await import("remastered/dist/server");
-    const { getRenderContext } = await import("./getRenderContext");
     const serverEntry = await import(
       path.join(process.cwd(), "dist/server/entry.server.js")
     );
+    const getStaticRoutes = await getStaticRoutesFunction(serverEntry);
+    if (!getStaticRoutes) {
+      return;
+    }
+
+    const { getRenderContext } = await import("./getRenderContext");
     const renderContext = await getRenderContext({
       rootDir: process.cwd(),
       serverEntry,
     });
-    const { configs } = serverEntry;
-    const config = await configs["/config/vercel.tsx"]();
     process.env.REMASTER_PROJECT_DIR = process.cwd();
-    const routes: string[] = await config.getStaticRoutes();
+    const routes: string[] = await getStaticRoutes();
     const requests = routes.flatMap((route) => {
       return [new Request(route), new Request(`${route}.json`)];
     });
