@@ -35,46 +35,27 @@ export default function DocsLayout() {
   }, [isMenuOpen]);
 
   return (
-    <div className="flex flex-col w-screen h-screen">
-      <div className="p-2 px-4 text-white bg-black shadow-sm">
-        <div className="flex max-w-5xl mx-auto">
-          <Link className="font-bold" to="/">
-            Remastered
-          </Link>
-          <div className="flex-1" />
-          <a
-            href="https://github.com/Schniz/remastered"
-            target="_blank"
-            rel="noopener noreferer"
-            className="flex items-center justify-center text-white hover:text-pink-100 transition-all text-opacity-90"
-          >
-            GitHub
-            <ExternalLinkIcon className="w-4 h-4 opacity-75" />
-          </a>
+    <div className="flex-1 w-full mx-auto md:flex max-w-screen-lg">
+      <div className="w-screen md:w-auto">
+        <div
+          tabIndex={0}
+          ref={directoryListingRef}
+          className={cx(
+            "p-2 pt-4 pr-8 bg-white bg-opacity-80 z-10 backdrop-filter backdrop-blur-sm",
+            "fixed bottom-0 w-screen",
+            "md:static md:w-72 md:pt-6 md:block",
+            {
+              block: isMenuOpen,
+              hidden: !isMenuOpen,
+            }
+          )}
+        >
+          <DirectoryListing paths={files} />
         </div>
+        <MenuButton />
       </div>
-      <div className="flex-1 w-full mx-auto md:flex max-w-screen-lg">
-        <div className="w-screen md:w-auto">
-          <div
-            tabIndex={0}
-            ref={directoryListingRef}
-            className={cx(
-              "p-2 pt-4 pr-8 bg-white bg-opacity-80 z-10 backdrop-filter backdrop-blur-sm",
-              "fixed bottom-0 w-screen",
-              "md:static md:w-72 md:pt-6 md:block",
-              {
-                block: isMenuOpen,
-                hidden: !isMenuOpen,
-              }
-            )}
-          >
-            <DirectoryListing paths={files} />
-          </div>
-          <MenuButton />
-        </div>
-        <div className="flex-row flex-1 pb-10 overflow-scroll box-border md:pb-0">
-          <Outlet />
-        </div>
+      <div className="flex-row flex-1 pb-10 overflow-scroll box-border md:pb-0">
+        <Outlet />
       </div>
     </div>
   );

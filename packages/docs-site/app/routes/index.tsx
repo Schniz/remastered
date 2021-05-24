@@ -4,22 +4,37 @@ export default function Home() {
   return (
     <>
       <div className="p-4 text-white bg-black">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="inline-block text-6xl font-bold text-transparent from-red-400 to-pink-500 bg-gradient-to-r bg-clip-text">
-            Remastered
-          </h1>
-          <p className="text-lg text-red-100 text-opacity-75">
-            A full-stack approach to React
+        {/* <h1 className="flex items-center inline-block font-bold leading-relaxed text-9xl"> */}
+        {/*   <span aria-hidden className="block pr-1 -ml-2"> */}
+        {/*     🎚 */}
+        {/*   </span> */}
+        {/*   Remastered */}
+        {/* </h1> */}
+        <h2 className="pt-8 pb-12 font-black text-center text-9xl">
+          <span className="block">a genuine</span>
+          <span className="block text-transparent from-red-400 to-pink-500 bg-gradient-to-r bg-clip-text">
+            full-stack approach
+          </span>
+          <span className="block">to React development</span>
+        </h2>
+        <div className="max-w-3xl mx-auto leading-relaxed space-y-2">
+          <p className="text-xl text-red-100 text-opacity-90">
+            Modern front-end tools have changed the way we expect the web
+            platform to behave. They also made us forgot some of the
+            fundamentals and kinda make shipping.. harder.
           </p>
-          <p>
-            Remastered is a full-stack framework based on React, that puts
-            routing as the center of your application. Building web-apps has
-            never been so easy!
+          <p className="text-lg">
+            <strong>Remastered</strong> is a full-stack framework based on
+            React, that puts routing as the center of your application. That
+            means owning back the entire stack, leveraging HTTP to its fullest
+            capabilities and shipping <em>faster</em> with great confidence,
+            without risking developer experience.
           </p>
+          <p className="text-lg">Ready to learn more?</p>
           <div className="flex justify-between p-4">
             <a
               href="docs"
-              className="inline-block px-4 py-2 text-sm text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
+              className="inline-block px-4 py-2 text-sm font-bold text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
             >
               Read the docs
             </a>
@@ -27,7 +42,7 @@ export default function Home() {
               href="https://github.com/Schniz/remastered"
               target="_blank"
               rel="noreferer noopener"
-              className="inline-block bg-clip-text px-4 py-2 text-sm font-bold uppercase rounded-sm opacity-95 hover:opacity-100 text-red-200 underline"
+              className="inline-block px-4 py-2 text-sm font-bold text-red-200 underline uppercase rounded-sm bg-clip-text opacity-95 hover:opacity-100"
             >
               See the source
             </a>
