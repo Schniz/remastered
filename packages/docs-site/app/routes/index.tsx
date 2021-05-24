@@ -3,14 +3,8 @@ import React from "react";
 export default function Home() {
   return (
     <>
-      <div className="p-4 text-white bg-black">
-        {/* <h1 className="flex items-center inline-block font-bold leading-relaxed text-9xl"> */}
-        {/*   <span aria-hidden className="block pr-1 -ml-2"> */}
-        {/*     🎚 */}
-        {/*   </span> */}
-        {/*   Remastered */}
-        {/* </h1> */}
-        <h2 className="pt-8 pb-12 font-black text-center text-9xl">
+      <div className="p-4 text-white from-black via-black to-pink-900 bg-gradient-to-br">
+        <h2 className="pb-4 text-2xl font-black sm:text-4xl lg:pb-12 lg:pt-8 sm:text-center lg:text-9xl">
           <span className="block">a genuine</span>
           <span className="block text-transparent from-red-400 to-pink-500 bg-gradient-to-r bg-clip-text">
             full-stack approach
@@ -31,10 +25,10 @@ export default function Home() {
             without risking developer experience.
           </p>
           <p className="text-lg">Ready to learn more?</p>
-          <div className="flex justify-between p-4">
+          <div className="flex justify-between lg:p-4">
             <a
               href="docs"
-              className="inline-block px-4 py-2 text-sm font-bold text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
+              className="inline-block px-4 py-2 text-sm font-bold text-center text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
             >
               Read the docs
             </a>
@@ -42,7 +36,7 @@ export default function Home() {
               href="https://github.com/Schniz/remastered"
               target="_blank"
               rel="noreferer noopener"
-              className="inline-block px-4 py-2 text-sm font-bold text-red-200 underline uppercase rounded-sm bg-clip-text opacity-95 hover:opacity-100"
+              className="inline-block px-4 py-2 text-sm font-bold text-center text-red-200 underline uppercase rounded-sm bg-clip-text opacity-95 hover:opacity-100"
             >
               See the source
             </a>

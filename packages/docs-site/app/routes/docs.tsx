@@ -102,7 +102,6 @@ function DirectoryListing({ paths }: { paths: FileEntry[] }) {
 
 export const meta: MetaFn<unknown> = () => {
   return {
-    viewport: "width=device-width, initial-scale=1",
     description: `The documentation for Remastered, the real full-stack approach to React development.`,
   };
 };
