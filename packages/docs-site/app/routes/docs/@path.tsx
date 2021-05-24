@@ -23,7 +23,7 @@ export default function DocPath() {
         {routeData.title}
       </h1>
       <div
-        className="w-screen px-2 prose"
+        className="w-screen px-2 md:w-full prose"
         dangerouslySetInnerHTML={{ __html: routeData.content }}
       />
     </>
