@@ -24,7 +24,7 @@ export default function DocsLayout() {
   const { MenuButton, isMenuOpen } = useMenuButton();
   const directoryListingRef = React.useRef<HTMLDivElement>(null);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (!directoryListingRef.current) {
       return;
     }
