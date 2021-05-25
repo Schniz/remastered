@@ -139,10 +139,10 @@ function Feature(props: {
   children: React.ReactNode | React.ReactNode[];
 }) {
   return (
-    <li className="flex p-2 -mx-2 rounded items-top group hover:shadow-md hover:scale-105 transform transition-all duration-100">
+    <li className="flex p-2 -mx-2 rounded shadow-none items-top group lg:hover:shadow-lg lg:hover:scale-105 transform transition-all duration-100">
       <props.icon className="inline-block w-10 h-10 p-1 mr-4 text-gray-700 bg-gray-200 rounded-lg group-hover:text-pink-600 group-hover:bg-pink-100" />
       <div className="flex-1 prose prose-lg prose-pink">
-        <h4 className="group-hover:text-pink-600">{props.title}</h4>
+        <h4 className="md:group-hover:text-pink-600">{props.title}</h4>
         {props.children}
       </div>
     </li>
