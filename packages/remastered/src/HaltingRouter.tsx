@@ -16,6 +16,7 @@ import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
+import { PendingLocationContext } from "./PendingLocation";
 
 type PendingState<T> = { value: T; tx: string };
 function usePendableState<T>(initialValue: T): {
@@ -145,12 +146,14 @@ export function HaltingRouter(props: {
 
   return (
     <LoaderContext.Provider value={loaderContext}>
-      <Router
-        location={state.location}
-        action={state.action}
-        children={props.children}
-        navigator={navigator}
-      />
+      <PendingLocationContext.Provider value={pendingState?.value?.location}>
+        <Router
+          location={state.location}
+          action={state.action}
+          children={props.children}
+          navigator={navigator}
+        />
+      </PendingLocationContext.Provider>
     </LoaderContext.Provider>
   );
 }

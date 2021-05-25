@@ -6,3 +6,4 @@ export { useMatches } from "./useMatches";
 export type { Match } from "./useMatches";
 export { useRouteData } from "./LoaderContext";
 export * from "./routeTypes";
+export { usePendingLocation } from "./PendingLocation";

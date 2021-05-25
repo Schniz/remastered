@@ -1,19 +1,20 @@
 /// <reference types="vite/client" />
 
-import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { Spinner } from "../Spinner";
 import React from "react";
 import {
-  Link,
   LoaderFn,
   MetaFn,
   NavLink,
   Outlet,
+  usePendingLocation,
   useRouteData,
 } from "remastered";
 import _ from "lodash";
-import { docList, FileEntry } from "../docList";
+import { docList, File, FileEntry } from "../docList";
 import { MenuIcon, XIcon } from "@heroicons/react/solid";
 import cx from "classnames";
+import { useResolvedPath } from "react-router";
 
 export const loader: LoaderFn<FileEntry[]> = async () => {
   return docList();
@@ -61,22 +62,32 @@ export default function DocsLayout() {
   );
 }
 
+function DocumentLink({ file }: { file: File }) {
+  const pendingLocation = usePendingLocation()?.pathname;
+  const resolvedLocation = useResolvedPath(file.link).pathname;
+
+  return (
+    <NavLink
+      tabIndex={0}
+      key={file.link}
+      to={file.link}
+      className="flex items-center py-1 hover:underline hover:text-red-700 transition-all duration-75"
+      activeClassName="font-bold"
+    >
+      <span>{file.title}</span>
+      {pendingLocation === resolvedLocation && (
+        <Spinner className="inline-block w-4 h-4 ml-2 animate animate-spin" />
+      )}
+    </NavLink>
+  );
+}
+
 function DirectoryListing({ paths }: { paths: FileEntry[] }) {
   return (
     <>
       {paths.map((path) => {
         if (path.type === "file") {
-          return (
-            <NavLink
-              tabIndex={0}
-              key={path.link}
-              to={path.link}
-              className="block py-1 hover:underline hover:text-red-700 transition-all duration-75"
-              activeClassName="font-bold"
-            >
-              {path.title}
-            </NavLink>
-          );
+          return <DocumentLink file={path} key={path.link} />;
         } else {
           return (
             <React.Fragment key={path.title}>
