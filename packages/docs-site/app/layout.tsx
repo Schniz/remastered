@@ -17,6 +17,7 @@ export default function Layout() {
     <html>
       <head>
         <Meta />
+        <Favicons />
         <Links />
       </head>
       <body>
@@ -62,3 +63,22 @@ export const headers: HeadersFn = () => {
     "X-Framework": `Remastered v${remasteredPkg.version}`,
   };
 };
+
+function Favicons() {
+  return (
+    <>
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon-16x16.png"
+      />
+    </>
+  );
+}
