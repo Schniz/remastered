@@ -42,11 +42,11 @@ export type SessionStoreFactory<Value> = (
  * This way, every route can get the session and add stuff to it, without
  * compromising the global context.
  */
-export function createSessionStore<Factory extends SessionStoreFactory<any>>(
-  factory: Factory,
+export function createSessionStore<Store extends SessionStore<any>>(
+  factory: (header?: string) => Promise<Store>,
   headerName = "cookie"
-): (request: Request) => ReturnType<Factory> {
-  const cache = new WeakMap<Request, ReturnType<Factory>>();
+): (request: Request) => Promise<Store> {
+  const cache = new WeakMap<Request, Promise<Store>>();
 
   return (request) => {
     if (cache.has(request)) {
@@ -55,7 +55,7 @@ export function createSessionStore<Factory extends SessionStoreFactory<any>>(
 
     const sessionStorage = factory(
       request.headers.get(headerName) ?? undefined
-    ) as ReturnType<Factory>;
+    );
     cache.set(request, sessionStorage);
     return sessionStorage;
   };
