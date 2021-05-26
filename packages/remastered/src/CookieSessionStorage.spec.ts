@@ -1,7 +1,7 @@
-import { createCookieSessionStorage } from "./CookieSessionStorage";
+import { CookieSessionStorage } from "./CookieSessionStorage";
 
 test("okay", () => {
-  const getSession = createCookieSessionStorage({
+  const getSession = CookieSessionStorage({
     cookie: {
       name: "remastered_session",
       secret: "my-password",
@@ -17,7 +17,7 @@ test("okay", () => {
 });
 
 test("flash session", () => {
-  const getSession = createCookieSessionStorage({
+  const getSession = CookieSessionStorage({
     cookie: {
       name: "remastered_session",
       secret: "my-password",

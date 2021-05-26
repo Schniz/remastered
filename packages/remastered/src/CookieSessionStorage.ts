@@ -5,24 +5,18 @@ import Cryptr from "cryptr";
 type JsonObject = { [key: string]: Serializable };
 type Serializable = JsonObject | Serializable[] | undefined | string | number;
 
-export type CookieSessionStorage = SessionStore<Serializable> & {
-  /**
-   * Creates a `Set-Cookie` header content
-   * to pass to the responses
-   */
-  commit(): string;
-};
+export type CookieSessionStorage = SessionStore<Serializable>;
 
-export function createCookieSessionStorage(opts: {
+export function CookieSessionStorage(opts: {
   cookie: {
     name: string;
     secret: string;
     sameSite?: CookieSerializeOptions["sameSite"];
   };
-}): (cookieHeader?: string) => CookieSessionStorage {
+}): (cookieHeader?: string) => Promise<CookieSessionStorage> {
   const cryptr = new Cryptr(opts.cookie.secret);
 
-  return (cookieHeader) => {
+  return async (cookieHeader) => {
     const parsedCookies =
       cookieHeader &&
       (cookie.parse(cookieHeader)?.[opts.cookie.name] as string | undefined);
@@ -38,7 +32,7 @@ export function createCookieSessionStorage(opts: {
         newFlashKeys.push(key);
       },
       unset: (key) => content.delete(key),
-      commit() {
+      async commit() {
         const mapWithoutOldFlashKeys = new Map(content);
         for (const key of flashKeys) {
           mapWithoutOldFlashKeys.delete(key);
