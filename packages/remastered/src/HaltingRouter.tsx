@@ -17,6 +17,7 @@ import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 import { PendingLocationContext } from "./PendingLocation";
+import { REMASTERED_JSON_ACCEPT } from "./constants";
 
 type PendingState<T> = { value: T; tx: string };
 function usePendableState<T>(initialValue: T): {
@@ -163,7 +164,7 @@ async function fetching(
   signal: AbortSignal
 ): Promise<{ data: unknown; status: number }> {
   const response = await fetch(url, {
-    headers: { Accept: "application/json" },
+    headers: { Accept: REMASTERED_JSON_ACCEPT },
     signal,
   });
   const json = await response.json();

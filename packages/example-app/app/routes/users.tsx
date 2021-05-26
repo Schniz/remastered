@@ -6,6 +6,7 @@ import {
   NavLink,
   Outlet,
   HeadersFn,
+  json,
 } from "remastered";
 import { User, database } from "../database";
 import s from "./users.module.css";
@@ -18,18 +19,18 @@ type Data = {
   notices?: string[];
 };
 
-export const loader: LoaderFn<Data> = async ({ request }) => {
+export const loader: LoaderFn<Response> = async ({ request }) => {
   const session = await getSession(request);
   if (!session.has("userId")) {
     session.set("userId", `user-${Math.round(Math.random() * 100000)}`);
   }
 
-  return {
+  return json<Data>({
     currentUserId: String(session.get("userId")),
     users: [...database.values()],
     errors: session.get("errors") as any,
     notices: session.get("notices") as any,
-  };
+  });
 };
 
 export const headers: HeadersFn = async ({ request }) => {

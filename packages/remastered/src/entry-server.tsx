@@ -17,6 +17,7 @@ import { globalPatch } from "./globalPatch";
 import { wrapRoutes } from "./wrapRoutes";
 import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
+import { REMASTERED_JSON_ACCEPT } from "./constants";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -54,9 +55,9 @@ async function onGet({
   };
 
   const url = request.url.replace(/\.json$/, "");
-  const isJsonResponse =
-    request.url.endsWith(".json") ||
-    request.headers.get("accept")?.includes("application/json");
+  const isJsonResponse = request.headers
+    .get("accept")
+    ?.includes(REMASTERED_JSON_ACCEPT);
 
   let found = matchRoutes(routes, url) ?? [];
   if (isJsonResponse) {
@@ -91,7 +92,11 @@ async function onGet({
       }
 
       if (loaderResult instanceof Response) {
-        return loaderResult;
+        if (loaderResult.headers.get("Content-Type") === "application/json") {
+          loaderContext.set(relevantRoute.key, await loaderResult.json());
+        } else {
+          return loaderResult;
+        }
       }
     }
   }
