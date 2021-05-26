@@ -2,6 +2,7 @@ import type { LinkTag, MetaTags } from "./JsxForDocument";
 
 export type LoaderFnOpts = {
   params: Record<string, string>;
+  request: Request;
 };
 export type LoaderFn<Props> = (
   opts: LoaderFnOpts

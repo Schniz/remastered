@@ -81,6 +81,7 @@ async function onGet({
       const loaderResult = await checkTime(`${relevantRoute.key} loader`, () =>
         loader({
           params,
+          request,
         })
       );
       loaderContext.set(relevantRoute.key, loaderResult);
