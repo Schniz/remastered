@@ -94,16 +94,20 @@ async function onGet({
         return loaderResult;
       }
     }
+  }
 
+  for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.links) {
       const routeLinks = (await relevantRoute.links()).map(
         (link): AllLinkTags => ({ _tag: "link", link })
       );
       links.push(...routeLinks);
     }
+  }
 
+  for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.headers) {
-      const routeHeadersInit = await relevantRoute.headers();
+      const routeHeadersInit = await relevantRoute.headers({ request });
       const routeHeaders = new Headers(routeHeadersInit);
 
       for (const [key, value] of routeHeaders.entries()) {

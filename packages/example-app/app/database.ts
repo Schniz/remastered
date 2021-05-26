@@ -1,4 +1,4 @@
-export type User = { name: string; slug: string };
+export type User = { name: string; slug: string; createdBy?: string };
 export const database = new Map<string, User>([
   ["gal", { name: "Gal Schlezinger", slug: "gal" }],
   ["shir", { name: "Shir Ben Zvi", slug: "shir" }],

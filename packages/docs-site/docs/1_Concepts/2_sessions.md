@@ -49,7 +49,7 @@ A session can be stored anywhere. Some apps are using cookies to persist session
 
 ## Cookie-based sessions
 
-Cookie-based session allows you to persist the entire session inside the request/response cookies. There are advantages for this method, as it does not require any persistent storage services like databases or caches like Redis — and works great in production.
+Cookie-based session allows you to serialize the session into an encrypted [cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). There are advantages for this method, as it does not require any persistent storage services like databases or caches like Redis — and works great in production.
 
 The main disadvantage is that cookies are usually maxed-out at 4kb, which means your session storage has a low budget.
 

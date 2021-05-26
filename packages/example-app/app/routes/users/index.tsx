@@ -1,13 +1,27 @@
+import { getSession } from "../../session";
 import React from "react";
 import { redirectTo, ActionFn, MetaFn } from "remastered";
 import { database } from "../../database";
 
 export const action: ActionFn = async ({ req }) => {
+  const session = await getSession(req);
+  if (!session.has("userId")) {
+    session.flash("errors", ["Not authorized yet"]);
+    return redirectTo(`/users`, {
+      headers: { "Set-Cookie": await session.commit() },
+    });
+  }
+
   const body = new URLSearchParams(await req.text());
   const name = body.get("name")!;
   const slug = name.replace(/[^A-z0-9]/g, "-");
-  database.set(slug, { name, slug });
-  return redirectTo(`/users/${slug}`);
+  database.set(slug, { name, slug, createdBy: String(session.get("userId")) });
+
+  session.flash("notices", [`User ${name} was created successfuly!`]);
+
+  return redirectTo(`/users/${slug}`, {
+    headers: { "Set-Cookie": await session.commit() },
+  });
 };
 
 export default function UsersIndex() {

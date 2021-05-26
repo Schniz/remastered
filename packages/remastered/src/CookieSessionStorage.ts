@@ -11,9 +11,12 @@ export function CookieSessionStorage(opts: {
   cookie: {
     name: string;
     secret: string;
-    sameSite?: CookieSerializeOptions["sameSite"];
-  };
+  } & Pick<
+    CookieSerializeOptions,
+    "httpOnly" | "path" | "domain" | "secure" | "maxAge" | "sameSite"
+  >;
 }): (cookieHeader?: string) => Promise<CookieSessionStorage> {
+  const { name, secret, ...cookieOptions } = opts.cookie;
   const cryptr = new Cryptr(opts.cookie.secret);
 
   return async (cookieHeader) => {
@@ -45,7 +48,12 @@ export function CookieSessionStorage(opts: {
             flashKeys: newFlashKeys,
           }),
           {
-            sameSite: opts.cookie.sameSite,
+            httpOnly: true,
+            path: "/",
+            sameSite: "lax",
+            secure: true,
+            maxAge: 60 * 60,
+            ...cookieOptions,
           }
         );
       },

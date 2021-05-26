@@ -11,6 +11,8 @@ export type ActionFn = (opts: { req: Request }) => Promise<Response>;
 
 export type LinksFn = () => LinkTag[] | Promise<LinkTag[]>;
 
-export type HeadersFn = () => HeadersInit | Promise<HeadersInit>;
+export type HeadersFn = (opts: {
+  request: Request;
+}) => HeadersInit | Promise<HeadersInit>;
 
 export type MetaFn<Props = unknown> = (opts: { data: Props }) => MetaTags;
