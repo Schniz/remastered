@@ -249,7 +249,7 @@ async function onAction({
     return;
   }
 
-  return await route.action({ req: request });
+  return await route.action({ request });
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {

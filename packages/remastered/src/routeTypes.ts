@@ -7,7 +7,7 @@ export type LoaderFnOpts = {
 export type LoaderFn<Props> = (
   opts: LoaderFnOpts
 ) => Promise<Props | null | undefined>;
-export type ActionFn = (opts: { req: Request }) => Promise<Response>;
+export type ActionFn = (opts: { request: Request }) => Promise<Response>;
 
 export type LinksFn = () => LinkTag[] | Promise<LinkTag[]>;
 

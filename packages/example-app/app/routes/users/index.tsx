@@ -3,8 +3,8 @@ import React from "react";
 import { redirectTo, ActionFn, MetaFn } from "remastered";
 import { database } from "../../database";
 
-export const action: ActionFn = async ({ req }) => {
-  const session = await getSession(req);
+export const action: ActionFn = async ({ request }) => {
+  const session = await getSession(request);
   if (!session.has("userId")) {
     session.flash("errors", ["Not authorized yet"]);
     return redirectTo(`/users`, {
@@ -12,7 +12,7 @@ export const action: ActionFn = async ({ req }) => {
     });
   }
 
-  const body = new URLSearchParams(await req.text());
+  const body = new URLSearchParams(await request.text());
   const name = body.get("name")!;
   const slug = name.replace(/[^A-z0-9]/g, "-");
   database.set(slug, { name, slug, createdBy: String(session.get("userId")) });
