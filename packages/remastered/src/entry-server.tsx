@@ -55,9 +55,9 @@ async function onGet({
   };
 
   const url = request.url.replace(/\.json$/, "");
-  const isJsonResponse = request.headers
-    .get("accept")
-    ?.includes(REMASTERED_JSON_ACCEPT);
+  const isJsonResponse =
+    request.url.endsWith(".json") ||
+    request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT);
 
   let found = matchRoutes(routes, url) ?? [];
   if (isJsonResponse) {
