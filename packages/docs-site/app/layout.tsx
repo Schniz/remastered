@@ -17,6 +17,7 @@ import "tailwindcss/tailwind.css";
 type Data = {
   generationTimestamp: number;
 };
+
 export const loader: LoaderFn<Data> = async () => {
   return {
     generationTimestamp: Date.now(),
@@ -59,10 +60,17 @@ export default function Layout() {
             </div>
           </div>
           <Outlet />
-          <div className="text-sm pt-10 pb-2 text-center text-black text-opacity-50">
+          <div className="pt-10 pb-2 text-sm text-center text-black text-opacity-50">
             <p>
               This page was generated with Remastered v{remasteredPkg.version}{" "}
-              at {date.toLocaleString()}
+              at{" "}
+              <time
+                dateTime={date.toISOString()}
+                title={date.toISOString()}
+                suppressHydrationWarning
+              >
+                {date.toLocaleString(["en-US"])}
+              </time>
             </p>
           </div>
         </div>
