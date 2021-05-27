@@ -16,30 +16,30 @@ We recommend putting the session store creation in a single file, like `app/sess
 
 The session store API feels a lot like a native `Map`, but with some additions. Each session storage can allow storing different values (hence the generic `Value` in `SessionStore<Value>`), but all of the storages provided by Remastered support JSON-serializable formats.
 
-## `has(key: string): boolean`
+#### `has(key: string): boolean`
 
 Checks whether a `key` exists in the session
 
-## `get(key: string): Value`
+#### `get(key: string): Value`
 
 Retrives the value of `key` from the session
 
-## `unset(key: string): void`
+#### `unset(key: string): void`
 
 Deletes a key from the session
 
-## `set(key: string, value: Value): void`
+#### `set(key: string, value: Value): void`
 
 Sets a persistent `value` linked as `key` in the session
 
-## `flash(key: string, value: Value): void`
+#### `flash(key: string, value: Value): void`
 
 Sets a temporary `value` linked as `key` in the session.
 This is mostly handy in situations like messages or notifications into a redirect:
 
 > Note! you must `commit` the session when you read `flash` sessions in order for them to be removed from the session. This is different from frameworks like Ruby on Rails, which do that automatically for you.
 
-## `commit(): Promise<string>`
+#### `commit(): Promise<string>`
 
 Persists the session into the storage of choice and returns a `Set-Cookie` header to set in the response
 
