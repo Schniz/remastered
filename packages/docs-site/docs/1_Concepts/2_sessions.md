@@ -1,5 +1,6 @@
 ---
 title: Sessions
+description: Sessions are an integral part of a web framework. Remastered allows you to store sessions in various ways including cookies, headers or 3rd party storage engines.
 ---
 
 Sessions are an integral part of a web framework. This is how we "remember" things for our users. Remastered provides a framework to handle sessions in multiple ways:
