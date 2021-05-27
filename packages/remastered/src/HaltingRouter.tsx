@@ -106,7 +106,18 @@ export function HaltingRouter(props: {
       handlePendingState(
         state,
         pendingState,
-        commit,
+        (tx) => {
+          commit(tx);
+
+          // Remove dangling keys when we replace history
+          if (pendingState.value.action === Action.Replace) {
+            const replaced = [...loaderContextRef.current].filter(
+              ([key]) => !key.startsWith(`${state.location.key}@`)
+            );
+            loaderContextRef.current = new Map(replaced);
+            setLoaderContext(loaderContextRef.current);
+          }
+        },
         navigator,
         abortController.signal,
         (newMap) => {
@@ -238,7 +249,9 @@ async function handlePendingState(
     const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 
     if (routeInfo && routeInfo.hasLoader) {
-      if (lastMatch.pathname.endsWith("/")) return;
+      if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) {
+        return;
+      }
       if (
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
