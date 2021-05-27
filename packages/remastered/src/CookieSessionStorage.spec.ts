@@ -1,34 +1,44 @@
 import { CookieSessionStorage } from "./CookieSessionStorage";
+import { intoSessionStore } from "./SessionStore";
 
 test("okay", async () => {
-  const getSession = CookieSessionStorage({
+  const storage = CookieSessionStorage({
     cookie: {
       name: "remastered_session",
       secret: "my-password",
     },
   });
 
-  const emptySession = await getSession();
+  const emptySession = await intoSessionStore(storage);
   emptySession.set("framework", "Remastered");
-  const sessionWithData = await getSession(await emptySession.commit());
+  const sessionWithData = await intoSessionStore(
+    storage,
+    await emptySession.commit()
+  );
 
   expect(sessionWithData.get("framework")).toEqual("Remastered");
 });
 
 test("flash session", async () => {
-  const getSession = CookieSessionStorage({
+  const storage = CookieSessionStorage({
     cookie: {
       name: "remastered_session",
       secret: "my-password",
     },
   });
 
-  const newSession = await getSession();
+  const newSession = await intoSessionStore(storage);
   newSession.flash("this is flash", "flash value");
 
-  const secondSession = await getSession(await newSession.commit());
+  const secondSession = await intoSessionStore(
+    storage,
+    await newSession.commit()
+  );
   expect(secondSession.get("this is flash")).toEqual("flash value");
 
-  const thirdSession = await getSession(await secondSession.commit());
+  const thirdSession = await intoSessionStore(
+    storage,
+    await secondSession.commit()
+  );
   expect(thirdSession.get("this is flash")).not.toBeDefined();
 });
