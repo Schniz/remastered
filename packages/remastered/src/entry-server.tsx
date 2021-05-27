@@ -65,8 +65,6 @@ async function onGet({
     found = found.filter((x) => matchPath(x.pathname, url));
   }
 
-  console.log({ found });
-
   const foundRouteKeys = getRouteKeys(found);
   const relevantRoutes = await buildRouteDefinitionBag(
     foundRouteKeys,
