@@ -107,6 +107,7 @@ export function HaltingRouter(props: {
         state,
         pendingState,
         commit,
+        navigator,
         abortController.signal,
         (newMap) => {
           const mergedMap = new Map([...loaderContextRef.current, ...newMap]);
@@ -180,6 +181,7 @@ async function handlePendingState(
   currentState: { location: Location; action: Action },
   pendingState: PendingState<{ location: Location; action: Action }>,
   commit: (tx: string) => void,
+  navigator: Navigator,
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
   loaderContext: Map<string, unknown>,
@@ -210,6 +212,7 @@ async function handlePendingState(
   });
 
   const newMap = new Map<string, unknown>();
+  let hold = false;
 
   keepRoutes.forEach((route) => {
     const routeFile = (route.route as any).routeFile;
@@ -235,6 +238,7 @@ async function handlePendingState(
     const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 
     if (routeInfo && routeInfo.hasLoader) {
+      if (lastMatch.pathname.endsWith("/")) return;
       if (
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
@@ -250,7 +254,9 @@ async function handlePendingState(
         for (const [, value] of result as [string, unknown][]) {
           if (isSerializedResponse(value) && isExact) {
             const response = deserializeResponse(value);
-            applyResponse(response);
+            if (applyResponse(response, navigator)) {
+              hold = true;
+            }
           }
         }
 
@@ -270,7 +276,9 @@ async function handlePendingState(
   await Promise.all([Promise.all(components), Promise.all(loaders)]);
   setLoaderContext(newMap);
 
-  commit(pendingState.tx);
+  if (!hold) {
+    commit(pendingState.tx);
+  }
 }
 
 function diffRoutes(
@@ -316,10 +324,10 @@ if (import.meta.hot) {
 
 /** This is not SPA stuff right now because I'm lazy, but it should be
  * using the same API of PendingLocation */
-function applyResponse(response: Response): boolean {
+function applyResponse(response: Response, navigator: Navigator): boolean {
   if ([301, 302].includes(response.status)) {
     if (response.headers.get("location")) {
-      window.location.href = response.headers.get("location")!;
+      navigator.replace(response.headers.get("location")!);
       return true;
     }
   }
