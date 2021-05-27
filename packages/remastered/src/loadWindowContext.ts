@@ -44,7 +44,6 @@ export async function loadWindowContext(): Promise<Context> {
   });
   const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
   const matchesContext = new Map(ctx.routeDefs);
-  matchesContext.set(LAYOUT_ROUTE_KEY, LayoutObject);
 
   for (const route of loadedRoutes.values()) {
     applyRouteHandlesToCtx(matchesContext, route);

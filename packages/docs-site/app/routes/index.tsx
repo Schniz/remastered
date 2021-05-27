@@ -8,6 +8,7 @@ import {
   SparklesIcon,
 } from "@heroicons/react/solid";
 import React from "react";
+import { Link } from "remastered";
 
 export default function Home() {
   return (
@@ -71,7 +72,7 @@ export default function Home() {
             </Feature>
             <Feature title="And so much more." icon={DotsHorizontalIcon}>
               So many more stuff are baked in. Just come and{" "}
-              <a href="docs">read the docs to learn more!</a>
+              <Link to="docs">read the docs to learn more!</Link>
             </Feature>
           </ul>
         </div>
@@ -113,12 +114,12 @@ function HeroMessage() {
         </p>
         <p className="text-lg">Ready to learn more?</p>
         <div className="flex justify-between lg:p-4">
-          <a
-            href="docs"
+          <Link
+            to="docs"
             className="inline-block px-4 py-2 text-sm font-bold text-center text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
           >
             Read the docs
-          </a>
+          </Link>
           <a
             href="https://github.com/Schniz/remastered"
             target="_blank"

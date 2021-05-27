@@ -18,6 +18,11 @@ import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnS
 import { MatchesContext } from "./useMatches";
 import { PendingLocationContext } from "./PendingLocation";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
+import { wrapRoutes } from "./wrapRoutes";
+import {
+  deserializeResponse,
+  isSerializedResponse,
+} from "./SerializedResponse";
 
 type PendingState<T> = { value: T; tx: string };
 function usePendableState<T>(initialValue: T): {
@@ -101,7 +106,19 @@ export function HaltingRouter(props: {
       handlePendingState(
         state,
         pendingState,
-        commit,
+        (tx) => {
+          commit(tx);
+
+          // Remove dangling keys when we replace history
+          if (pendingState.value.action === Action.Replace) {
+            const replaced = [...loaderContextRef.current].filter(
+              ([key]) => !key.startsWith(`${state.location.key}@`)
+            );
+            loaderContextRef.current = new Map(replaced);
+            setLoaderContext(loaderContextRef.current);
+          }
+        },
+        navigator,
         abortController.signal,
         (newMap) => {
           const mergedMap = new Map([...loaderContextRef.current, ...newMap]);
@@ -175,6 +192,7 @@ async function handlePendingState(
   currentState: { location: Location; action: Action },
   pendingState: PendingState<{ location: Location; action: Action }>,
   commit: (tx: string) => void,
+  navigator: Navigator,
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
   loaderContext: Map<string, unknown>,
@@ -191,7 +209,10 @@ async function handlePendingState(
   const components = newRoutes.map(async (routeMatch) => {
     const routeFile = (routeMatch.route as any).routeFile;
     const key = `${routeFile}`;
-    const entry = await routesObject[key]?.();
+    let entry = (await routesObject[key]?.()) ?? matchesContext.get(key);
+    if (!entry) {
+      return;
+    }
     componentContext.set(key, entry.default);
     matchesContext.set(key, {
       hasLoader: false,
@@ -202,6 +223,7 @@ async function handlePendingState(
   });
 
   const newMap = new Map<string, unknown>();
+  let hold = false;
 
   keepRoutes.forEach((route) => {
     const routeFile = (route.route as any).routeFile;
@@ -210,22 +232,26 @@ async function handlePendingState(
     const pendingStorageKey = `${pendingState.value.location.key}@${routingKey}`;
     const currentStorageKey = `${currentState.location.key}@${routingKey}`;
 
-    if (routeInfo && routeInfo.hasLoader) {
-      if (!loaderContext.has(currentStorageKey)) {
+    if (loaderContext.has(currentStorageKey)) {
+      newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
+    } else {
+      if (routeInfo && routeInfo.hasLoader) {
         newRoutes.unshift(route);
-      } else {
-        newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
       }
     }
   });
 
   const loaders = newRoutes.map(async (lastMatch) => {
+    const isExact = lastMatch.pathname === pendingState.value.location.pathname;
     const routeFile = (lastMatch.route as any).routeFile;
     const routingKey = `${routeFile}`;
     const routeInfo = matchesContext.get(routingKey);
     const storageKey = `${pendingState.value.location.key}@${routingKey}`;
 
     if (routeInfo && routeInfo.hasLoader) {
+      if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) {
+        return;
+      }
       if (
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
@@ -237,6 +263,16 @@ async function handlePendingState(
           ([key, value]) =>
             [`${pendingState.value.location.key}@${key}`, value] as const
         );
+
+        for (const [, value] of result as [string, unknown][]) {
+          if (isSerializedResponse(value) && isExact) {
+            const response = deserializeResponse(value);
+            if (applyResponse(response, navigator)) {
+              hold = true;
+            }
+          }
+        }
+
         if (status === 404) {
           onNotFound();
         } else {
@@ -253,14 +289,16 @@ async function handlePendingState(
   await Promise.all([Promise.all(components), Promise.all(loaders)]);
   setLoaderContext(newMap);
 
-  commit(pendingState.tx);
+  if (!hold) {
+    commit(pendingState.tx);
+  }
 }
 
 function diffRoutes(
   currentState: { location: Location; action: Action },
   pendingState: { location: Location; action: Action }
 ): { newRoutes: RouteMatch[]; keepRoutes: RouteMatch[] } {
-  const routeElements = getRouteElements();
+  const routeElements = wrapRoutes(getRouteElements());
   const pendingRoutes = matchRoutes(routeElements, pendingState.location) ?? [];
   const currentMatches = (
     matchRoutes(routeElements, currentState.location) ?? []
@@ -295,4 +333,17 @@ if (import.meta.hot) {
   import.meta.hot!.on("remastered:server-module-updated", () => {
     (window as any).__$$refresh_remastered$$__();
   });
+}
+
+/** This is not SPA stuff right now because I'm lazy, but it should be
+ * using the same API of PendingLocation */
+function applyResponse(response: Response, navigator: Navigator): boolean {
+  if ([301, 302].includes(response.status)) {
+    if (response.headers.get("location")) {
+      navigator.replace(response.headers.get("location")!);
+      return true;
+    }
+  }
+
+  return false;
 }

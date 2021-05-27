@@ -2,6 +2,15 @@ import { Module, parse, print } from "@swc/core";
 import fs from "fs-extra";
 import path from "path";
 import { PluginOption, ResolvedConfig } from "vite";
+import globby from "globby";
+
+function isRoute(rootPath: string, filepath: string) {
+  const routesPath = path.join(rootPath, "./app/routes/");
+  if (filepath.startsWith(routesPath)) return true;
+  return globby
+    .sync(path.join(rootPath, "app", "layout.{t,j}s{x,}"))
+    .includes(filepath);
+}
 
 /**
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
@@ -16,10 +25,6 @@ export function routeTransformers(): PluginOption[] {
   `;
   // let server: ViteDevServer | undefined;
   let resolvedConfig: ResolvedConfig | undefined;
-
-  function modulePrefix(config: ResolvedConfig) {
-    return path.join(config.root, "./app/routes/");
-  }
 
   return [
     {
@@ -36,7 +41,7 @@ export function routeTransformers(): PluginOption[] {
           this.error(`Config is not resolved`);
         }
 
-        if (!id.startsWith(modulePrefix(resolvedConfig))) {
+        if (!isRoute(resolvedConfig.root, id)) {
           return null;
         }
         if (!/\.(t|j)sx?$/.test(id)) {
@@ -51,7 +56,7 @@ export function routeTransformers(): PluginOption[] {
           this.error(`Config is not resolved`);
         }
         if (ssr) return null;
-        if (!id.startsWith(modulePrefix(resolvedConfig))) {
+        if (!isRoute(resolvedConfig.root, id)) {
           return null;
         }
         if (!/\.(t|j)sx?$/.test(id)) {

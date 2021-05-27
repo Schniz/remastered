@@ -8,11 +8,28 @@ import {
   MetaFn,
   HeadersFn,
   Link,
+  LoaderFn,
+  useRouteData,
 } from "remastered";
 import remasteredPkg from "remastered/package.json";
 import "tailwindcss/tailwind.css";
 
+type Data = {
+  generationTimestamp: number;
+};
+
+export const loader: LoaderFn<Data> = async () => {
+  return {
+    generationTimestamp: Date.now(),
+  };
+};
+
 export default function Layout() {
+  const routeData = useRouteData<Data>();
+  const date = React.useMemo(() => {
+    return new Date(routeData.generationTimestamp);
+  }, [routeData.generationTimestamp]);
+
   return (
     <html>
       <head>
@@ -43,6 +60,19 @@ export default function Layout() {
             </div>
           </div>
           <Outlet />
+          <div className="pt-10 pb-2 text-sm text-center text-black text-opacity-50">
+            <p>
+              This page was generated with Remastered v{remasteredPkg.version}{" "}
+              at{" "}
+              <time
+                dateTime={date.toISOString()}
+                title={date.toISOString()}
+                suppressHydrationWarning
+              >
+                {date.toLocaleString(["en-US"])}
+              </time>
+            </p>
+          </div>
         </div>
         <Scripts />
       </body>
@@ -50,11 +80,16 @@ export default function Layout() {
   );
 }
 
+if (import.meta.hot) {
+  import.meta.hot!.accept();
+}
+
 export const meta: MetaFn<unknown> = () => {
   return {
     title: `Remastered v${remasteredPkg.version}`,
     description: `Remastered: a full-stack approach to React development.`,
     viewport: "width=device-width, initial-scale=1",
+    generator: `Remastered v${remasteredPkg.version}`,
   };
 };
 

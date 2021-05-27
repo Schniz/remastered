@@ -2,7 +2,7 @@ import { LoaderFn, redirectTo } from "remastered";
 import { docList } from "../../docList";
 import _ from "lodash";
 
-export const loader: LoaderFn<unknown> = async () => {
+export const loader: LoaderFn<Record<never, unknown> | Response> = async () => {
   const list = await docList();
   let file = list[0];
 

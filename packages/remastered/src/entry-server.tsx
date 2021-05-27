@@ -18,6 +18,7 @@ import { wrapRoutes } from "./wrapRoutes";
 import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
+import { serializeResponse } from "./SerializedResponse";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -94,6 +95,9 @@ async function onGet({
       if (loaderResult instanceof Response) {
         if (loaderResult.headers.get("Content-Type") === "application/json") {
           loaderContext.set(relevantRoute.key, await loaderResult.json());
+        } else if (isJsonResponse) {
+          const serializedResponse = await serializeResponse(loaderResult);
+          loaderContext.set(relevantRoute.key, serializedResponse);
         } else {
           return loaderResult;
         }
