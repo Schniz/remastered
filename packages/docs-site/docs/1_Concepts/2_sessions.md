@@ -96,6 +96,12 @@ Your storage should take the optional `header`, and return a tuple of a `StoredS
 
 The `toHeader` function takes a `StoredSession<Value>` and a `Metadata` and stores it to the device, returning a string representation for the session. It can be a session ID, a JWT, or an entire cookie header. It's up to the storage implementation to decide.
 
+### Using Remastered helpers
+
+#### `withEncryptedCookies({ cookie, storage })`
+
+The `withEncryptedCookies` function is a helper function that handles cookie parsing and encryption for you. This is how both `MemorySessionStorage` and `CookieSessionStorage` are implemented. It basically wraps your storage with a thin layer of cookie serialization/encryption into a plaintext string, and deserialization/decryption from the cookie header content.
+
 ### Tips for implementing session storages
 
 1. Encrypt or cryptographically sign whatever you pass to the user. You don't want the users to alter the session ID and be able to read another user's details
