@@ -1,0 +1,13 @@
+{
+  "name": "docs-site-e2e-tests",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Gal Schlezinger",
+  "license": "MIT",
+  "devDependencies": {
+    "@swc-node/jest": "^1.3.0",
+    "jest": "^27.0.1",
+    "puppeteer": "^9.1.1"
+  }
+}
