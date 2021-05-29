@@ -11,7 +11,7 @@ import { withEncryptedCookies, CookieSettings } from "./CookieSessionStorage";
  * It can lead to inconsistencies in production environments
  * and memory leaks.
  */
-export function MemorySessionStorage(opts: {
+export function createMemorySessionStorage(opts: {
   generateId(): string;
   cookie: CookieSettings;
 }): SessionStorage<unknown, string> {

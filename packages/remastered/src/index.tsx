@@ -9,7 +9,7 @@ export * from "./routeTypes";
 export { usePendingLocation } from "./PendingLocation";
 export * from "./SessionStore";
 export {
-  CookieSessionStorage,
+  createCookieSessionStorage,
   withEncryptedCookies,
 } from "./CookieSessionStorage";
-export { MemorySessionStorage } from "./MemorySessionStorage";
+export { createMemorySessionStorage } from "./MemorySessionStorage";

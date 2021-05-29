@@ -19,7 +19,7 @@ export type CookieSettings = {
   "httpOnly" | "path" | "domain" | "secure" | "maxAge" | "sameSite"
 >;
 
-export function CookieSessionStorage(opts: {
+export function createCookieSessionStorage(opts: {
   cookie: CookieSettings;
 }): SessionStorage<Serializable> {
   return withEncryptedCookies({

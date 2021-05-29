@@ -1,7 +1,7 @@
-import { createSessionStore, CookieSessionStorage } from "remastered";
+import { createSessionStore, createCookieSessionStorage } from "remastered";
 
 export const getSession = createSessionStore(
-  CookieSessionStorage({
+  createCookieSessionStorage({
     cookie: {
       name: "_session",
       secret: "my-secret",

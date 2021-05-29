@@ -1,8 +1,8 @@
-import { MemorySessionStorage } from "./MemorySessionStorage";
+import { createMemorySessionStorage } from "./MemorySessionStorage";
 import { intoSessionStore } from "./SessionStore";
 
 it("retrieves exact objects", async () => {
-  const storage = MemorySessionStorage({
+  const storage = createMemorySessionStorage({
     cookie: {
       name: "_session",
       secret: "my-secret",

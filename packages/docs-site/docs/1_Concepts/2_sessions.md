@@ -58,10 +58,10 @@ You can set up a cookie session by using the `CookieSessionStorage`:
 
 ```ts
 // app/sessions.ts
-import { CookieSessionStorage, getSessionStore } from "remastered";
+import { createCookieSessionStorage, getSessionStore } from "remastered";
 
 export const getSession = getSessionStore(
-  CookieSessionStorage({
+  createCookieSessionStorage({
     cookie: {
       name: "session-cookie-name",
       secret: "a secret to encrypt the session contents",

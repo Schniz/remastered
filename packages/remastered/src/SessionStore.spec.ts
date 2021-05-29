@@ -1,9 +1,9 @@
 import { createSessionStore } from "./SessionStore";
-import { CookieSessionStorage } from "./CookieSessionStorage";
+import { createCookieSessionStorage } from "./CookieSessionStorage";
 import { Request } from "node-fetch";
 
 test("it returns cached results for requests", () => {
-  const storage = CookieSessionStorage({
+  const storage = createCookieSessionStorage({
     cookie: { name: "session", secret: "secret!" },
   });
   const request = new Request("/hello-world");
