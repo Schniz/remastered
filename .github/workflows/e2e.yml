@@ -1,0 +1,25 @@
+name: e2e tests
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  docs-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: yarn --frozen-lockfile
+      - name: Build dependencies
+        run: |
+          cd packages/docs-site-e2e-tests
+          yarn test:prepare
+      - name: Run e2e tests
+        run: |
+          cd packages/docs-site-e2e-tests
+          lerna run start --scope=@remastered/docs-site &
+          npx wait-port 3000
+          yarn test
