@@ -3,6 +3,7 @@ import {
   CogIcon,
   CubeTransparentIcon,
   DotsHorizontalIcon,
+  GiftIcon,
   LinkIcon,
   RefreshIcon,
   SparklesIcon,
@@ -21,6 +22,12 @@ export default function Home() {
           </h3>
 
           <ul className="py-8 text-lg list-none space-y-8">
+            <Feature icon={GiftIcon} title="Open source">
+              Owning your stack is important. Trying before committing to a
+              solution is even more important. Freedom provides everyone the
+              ability to create something and become a better developer. And if
+              something is broken... we can all fix it together!
+            </Feature>
             <Feature icon={LinkIcon} title="URL-first approach">
               The web is focused around hyperlinks. Remastered embraces URLs as
               the most important building block. Use file-system routing to

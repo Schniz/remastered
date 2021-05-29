@@ -1,103 +1,61 @@
-# Remastered
+# 🎚 Remastered
 
-A proof of concept for an open source implementation of Remix.
+A full-stack approach to React development.
 
-## Why?
+https://remastered.hagever.com
 
-Remix looks like a really fine product. Michael and Ryan do a great job for the React community and I believe their thought should be pushed forward. Some companies and individuals won't embrace Remix because it is closed source — many devs want an open stack they can own.
+#### 🎁 Open source
 
-## How?
+Owning your stack is important. Trying before committing to a
+solution is even more important. Freedom provides everyone the
+ability to create something and become a better developer. And if
+something is broken... we can all fix it together!
 
-By leveraging Vite, a super fast bundler with HMR and lots of convention over configuration.
+#### 🔗 URL-first approach
 
-## Differences from Remix
+The web is focused around hyperlinks. Remastered embraces URLs as
+the most important building block. Use file-system routing to
+declare URLs, and allow customers to share the experience of your
+app with the world.
 
-- Open source
-- Uses Vite under the hood instead of a custom bundler
-- First class support for CSS (using Vite), so `import './file.css'` will import your files and will add the proper link tags on production (given you have `<Links />` in your layout)
-- Route parameters in files are using `@` instead of `$` which is confusing with several shells.
+#### 📄 Server-side rendered SPA
 
-## What's implemented?
+Make sure your app loads as fast as it can, with no jitter and
+"flash of unstyled content". Remastered serves your application
+ready for action, even before JavaScript loads. And when it loads,
+it acts as if you were building a single-page-application,
+providing the great modern user-experience your customers expect
+from a modern web-app.
 
-- [x] SSR all pages
-- [x] `loader`
-- [x] `links`
-- [x] `action`
-- [x] `headers`
-- [x] `handle`
-- [x] `meta`
-- [ ] Session helpers
-- [ ] custom entries (`app/entry.client.js`/`app/entry.server.js`)
+#### 🔁 Hot module reloading
 
-### SSR
+Don't squint! See the changes on your development environment once
+you save a file! By leveraging [Vite](https://vitejs.dev), a futuristic JavaScript bundler that ensures you get the best
+and fastest developer experience, no matter what size is your app.
 
-Every route is SSR'd completely.
+#### ✨ Convenient data fetching
 
-### Nested routing
+Instead of throwing useEffect everywhere, In Remastered, every
+Route might expose a co-located server-side data loader which gets
+fetched automatically and stored in the history stack. All you
+have to do is call a React hook to get it, synchronously.
 
-Every `tsx` or `jsx` file in `./app/routes/` will become a route.
-All routes are chunked so you only download the routes you are visiting.
-SSR will make sure you preload the routes you are currently looking at and enforce downloading it before hydration.
+#### 📦 File-system routing with automatic code-splitting
 
-| file                            | url               | component hierarchy                                      |
-| ------------------------------- | ----------------- | -------------------------------------------------------- |
-| `app/routes/index.tsx`          | `/`               | `index.tsx`                                              |
-| `app/routes/about.tsx`          | `/about`          | `about.tsx`                                              |
-| `app/routes/users.tsx`          | `/users`          | will be used as a nested layout, check `users/index.tsx` |
-| `app/routes/users/index.tsx`    | `/users/`         | `users.tsx` > `users/index.tsx`                          |
-| `app/routes/users/@id.tsx`      | `/users/:id`      | `users.tsx` > `users/@id.tsx`                            |
-| `app/routes/users.register.tsx` | `/users/register` | `users.register.tsx`                                     |
+Only ships assets your clients need to interact with the page they
+are visiting. Remastered will download the assets needed for new
+interactions as soon as they are needed.
 
-> 📝 Note: Use `@` to declare a parameter.
->
-> Shells will interpret `$id` as the ENV var `id`. `@` is safer for this. We might support it both ways.
->
-> `rm "app/routes/users/$id.tsx"` is parsed differently from `rm 'app/routes/users/$id.tsx'`. I don't like this.
+#### 🤩 Titles and Meta Tags... HTTP!
 
-### Loaders
+The `<title>` and the `<meta>` are
+the way to share metadata about the current page in the web
+platform. They can't be an afterthought! Remastered takes it very
+seriously and provides and easy way to declare metadata for the
+current page, allowing search engines and screen-readers to easily
+understand what they are going to experience.
 
-Every route file can export an async `loader` function and its data will be available using `useRouteData()`, synchronously.
+#### 👐 And so much more.
 
-```ts
-export async function loader() {
-  return { hello: "world" };
-}
-
-export default function MyComponent() {
-  const { hello } = useRouteData();
-  return <div>Hello, {hello}</div>;
-}
-```
-
-By returning a `Response` object from `loader`, you can bypass the server-side rendering of the app:
-
-- You can `redirectTo("/another-url")` if some page has moved
-- You can return JSON or any other request... if this is what you want!
-
-### Actions
-
-Every route can export an async function `action`, which will catch the HTTP requests that are not `GET`.
-Actions are a simple Request => Response handlers. It's all up to you how to handle them, but we provide simple utilities to construct the responses yourself.
-
-```ts
-export const action: ActionFn = async ({ req }) => {
-  const formData = new URLSearchParams(await req.text());
-  const username = formData.get("username");
-  if (!username) {
-    return redirectTo(`/users/new`);
-  }
-  await database.createUser(username);
-  return redirectTo(`/users/${username}`);
-};
-```
-
-### Meta tags
-
-Generating meta tags is _synchronous_:
-
-```ts
-export const meta: MetaFn = () => ({
-  title: "This is the document title",
-  description: "My very own app!",
-});
-```
+So many more stuff are baked in. Just come and
+[read the docs to learn more!](https://remastered.hagever.com/)
