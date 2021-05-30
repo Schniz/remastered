@@ -61,9 +61,17 @@ async function onGet({
     request.url.endsWith(".json") ||
     request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT);
 
+  let status = 200;
+
   let found = matchRoutes(routes, url) ?? [];
+  const exactFound = found.filter((x) => matchPath(x.pathname, url));
+
+  if (exactFound.length === 0) {
+    status = 404;
+  }
+
   if (isJsonResponse) {
-    found = found.filter((x) => matchPath(x.pathname, url));
+    found = exactFound;
   }
 
   const foundRouteKeys = getRouteKeys(found);
@@ -125,8 +133,6 @@ async function onGet({
       }
     }
   }
-
-  let status = 200;
 
   if (loaderNotFound) {
     loaderContext.clear();
