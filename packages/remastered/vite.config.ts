@@ -49,6 +49,8 @@ const config = defineConfig({
       "react",
       "react-dom",
       "lodash",
+      "cookie",
+      "cryptr",
       "@vitejs/plugin-react-refresh",
     ],
     entries: [
