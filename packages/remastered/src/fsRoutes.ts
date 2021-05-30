@@ -4,21 +4,36 @@ import {
   routeTreeIntoReactRouterRoute,
 } from "./routeTreeIntoReactRouterRoute";
 import { dynamicImportComponent } from "./DynamicImportComponent";
+import type { LoaderFn, MetaFn } from "./routeTypes";
 
-function loadFiles() {
+export type RouteFile = {
+  /** The renderable React component */
+  default?: React.ComponentType;
+  /** The data loader, should exist only on back-end code */
+  loader?: LoaderFn<unknown>;
+  /** Any meta tags/title that the component will add to the mix */
+  meta?: MetaFn<unknown>;
+  /** A route can export anything using the `handle` named export */
+  handle?: unknown;
+};
+
+function loadFiles(): Record<string, () => Promise<RouteFile>> {
   const files = import.meta.glob(`/app/routes/**/*.{t,j}sx`);
   return files;
 }
 
-function turnToComponentBag(files: Record<string, () => Promise<unknown>>) {
+function turnToComponentBag(
+  files: Record<string, (() => Promise<RouteFile>) | RouteFile>
+) {
   const components: Record<string, React.ComponentType> = {};
 
   for (const key in files) {
-    const file = files[key] as { default: any } | (() => unknown);
-    components[key] =
-      typeof file === "function"
-        ? dynamicImportComponent(key, file as any)
-        : file.default;
+    const file = files[key];
+    if (typeof file === "function") {
+      components[key] = dynamicImportComponent(key, file);
+    } else if (typeof file.default === "function") {
+      components[key] = file.default;
+    }
   }
   return components;
 }

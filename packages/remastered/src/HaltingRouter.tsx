@@ -213,7 +213,9 @@ async function handlePendingState(
     if (!entry) {
       return;
     }
-    componentContext.set(key, entry.default);
+    if (entry.default) {
+      componentContext.set(key, entry.default);
+    }
     matchesContext.set(key, {
       hasLoader: false,
       ...matchesContext.get(key),
