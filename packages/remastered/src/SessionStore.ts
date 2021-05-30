@@ -1,3 +1,5 @@
+import { HttpRequest } from "./HttpTypes";
+
 export type StoredSession<Value> = {
   flashedKeys: Set<string>;
   content: Map<string, Value>;
@@ -101,8 +103,8 @@ export async function intoSessionStore<Value, Metadata>(
 export function createSessionStore<Value>(
   storage: SessionStorage<Value>,
   headerName = "cookie"
-): (request: Request) => Promise<SessionStore<Value>> {
-  const cache = new WeakMap<Request, Promise<SessionStore<Value>>>();
+): (request: HttpRequest) => Promise<SessionStore<Value>> {
+  const cache = new WeakMap<HttpRequest, Promise<SessionStore<Value>>>();
 
   return (request) => {
     if (cache.has(request)) {

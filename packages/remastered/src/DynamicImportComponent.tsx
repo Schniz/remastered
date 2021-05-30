@@ -1,4 +1,5 @@
 import React from "react";
+import { RouteFile } from "./fsRoutes";
 
 type State =
   | {
@@ -15,7 +16,7 @@ type State =
 
 export function dynamicImportComponent(
   key: string,
-  p: () => Promise<{ default: any }>
+  p: () => Promise<{ default?: React.ComponentType }>
 ): React.ComponentType {
   return () => <DynamicImportComponent component={p} contextKey={key} />;
 }
@@ -43,7 +44,7 @@ export function DynamicImportComponent({
 }
 
 export function DynamicImportComponentRenderer(props: {
-  component: () => Promise<{ default: any }>;
+  component: () => Promise<{ default?: React.ComponentType }>;
   initialState?: State;
   loadingElement?: React.ReactNode;
   contextKey?: string;
@@ -62,9 +63,16 @@ export function DynamicImportComponentRenderer(props: {
     props
       .component()
       .then((mod) => {
-        setState({ tag: "loaded", component: mod.default });
-        if (props.contextKey) {
-          ctx.set(props.contextKey, mod.default);
+        if (!mod.default) {
+          setState({
+            tag: "error",
+            error: `Module does not have a valid React.Component exported from default export`,
+          });
+        } else {
+          setState({ tag: "loaded", component: mod.default });
+          if (props.contextKey) {
+            ctx.set(props.contextKey, mod.default);
+          }
         }
       })
       .catch((err) => {

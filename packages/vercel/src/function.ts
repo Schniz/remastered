@@ -6,6 +6,7 @@ import { getRenderContext } from "./getRenderContext";
 import { deserializeResponse, getResponsePath } from "./StaticExporting";
 import fs from "fs-extra";
 import path from "path";
+import { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
 
 export function createVercelFunction({
   rootDir,
@@ -21,9 +22,8 @@ export function createVercelFunction({
     const method = req.method?.toUpperCase() ?? "GET";
     const request = new Request(req.url ?? "/", {
       method,
-      // @ts-ignore
       body: method !== "GET" && method !== "HEAD" ? req : undefined,
-      // @ts-ignore
+      // @ts-expect-error
       headers: { ...req.headers },
     });
 
@@ -45,8 +45,8 @@ export function createVercelFunction({
 
 async function findExportedResponse(
   rootDir: string,
-  request: Request
-): Promise<Response | null> {
+  request: HttpRequest
+): Promise<HttpResponse | null> {
   if (request.headers.has("x-skip-exported")) {
     return null;
   }
@@ -59,7 +59,7 @@ async function findExportedResponse(
   try {
     const response = deserializeResponse(await fs.readJson(responsePath));
     response.headers.set("x-remastered-static-exported", "true");
-    return response as any;
+    return response;
   } catch (e) {
     console.error(`Can't read exported file from ${responsePath}`, e);
     return null;

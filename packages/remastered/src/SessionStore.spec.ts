@@ -8,8 +8,8 @@ test("it returns cached results for requests", () => {
   });
   const request = new Request("/hello-world");
   const getSession = createSessionStore(storage);
-  const req1 = getSession(request as any);
-  const req2 = getSession(request as any);
+  const req1 = getSession(request);
+  const req2 = getSession(request);
 
   expect(req1).toBe(req2);
 });
