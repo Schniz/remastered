@@ -5,6 +5,7 @@
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {
+    "test": "jest",
     "build": "tsc"
   },
   "bin": {

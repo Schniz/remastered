@@ -1,11 +1,29 @@
-name: e2e tests
+name: tests
+
 on:
   pull_request:
   push:
     branches:
       - main
+
 jobs:
+
+  remastered:
+    name: 'remastered'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: yarn --frozen-lockfile
+      - name: Run tests
+        run: |
+          cd packages/remastered
+          yarn test
+
   docs-site:
+    name: '@remastered/docs-site'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
