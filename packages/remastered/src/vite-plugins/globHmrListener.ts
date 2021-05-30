@@ -57,15 +57,17 @@ export function globHmrListener(): PluginOption[] {
 
         if (mod && mod.file) {
           const oldGlobImporter = (server as any)._globImporters[mod.file];
-          if (oldGlobImporter) {
-            absoluteGlobs.unshift(oldGlobImporter.pattern);
-          }
-
-          (server as any)._globImporters[mod.file] = {
+          const globImporter = oldGlobImporter ?? {
             module: mod,
-            base: server.config.base,
-            pattern: `+(${absoluteGlobs.join("|")})`,
+            importGlobs: [],
           };
+
+          for (const pattern of absoluteGlobs) {
+            globImporter.importGlobs.push({
+              base: server.config.base,
+              pattern,
+            });
+          }
         }
       },
     },
