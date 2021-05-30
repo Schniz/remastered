@@ -1,35 +1,14 @@
-import { Request, Response } from "node-fetch";
+import { Request } from "node-fetch";
 import path from "path";
 import fs from "fs-extra";
 import crypto from "crypto";
+import { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
+import {
+  serializeResponse,
+  deserializeResponse,
+} from "remastered/dist/SerializedResponse";
 
-type SerializedResponse = {
-  body: number[];
-  headers: [string, string][];
-  url?: string;
-  status: number;
-};
-
-export async function serializeResponse(
-  response: Response
-): Promise<SerializedResponse> {
-  const body = await response.arrayBuffer();
-  return {
-    headers: [...response.headers],
-    body: [...new Uint8Array(body)],
-    url: response.url,
-    status: response.status,
-  };
-}
-
-export function deserializeResponse(serialized: SerializedResponse): Response {
-  const body = Buffer.from(new Uint8Array(serialized.body));
-  return new Response(body, {
-    headers: serialized.headers,
-    url: serialized.url,
-    status: serialized.status,
-  });
-}
+export { deserializeResponse };
 
 /**
  * @param exportDir `${process.cwd()}/dist/exported`
@@ -47,8 +26,8 @@ function sha1(s: string): string {
 
 export async function store(
   exportDir: string,
-  request: Request,
-  response: Response
+  request: HttpRequest,
+  response: HttpResponse
 ) {
   const serialized = await serializeResponse(response);
 
@@ -56,7 +35,7 @@ export async function store(
     const filename = path.join(exportDir, "public", request.url);
     await fs.outputFile(
       filename,
-      await deserializeResponse(serialized).buffer()
+      new Int8Array(await deserializeResponse(serialized).arrayBuffer())
     );
     console.error(`Static file exported to ${filename}`);
   }

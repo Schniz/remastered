@@ -123,8 +123,8 @@ const exportCmd = command({
     });
 
     for (const request of requests) {
-      const response = await renderRequest(renderContext, request as any);
-      await storeTraffic(exportedDir, request, response as any);
+      const response = await renderRequest(renderContext, request);
+      await storeTraffic(exportedDir, request, response);
     }
   },
 });
