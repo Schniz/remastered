@@ -1,9 +1,7 @@
-import fastify from "fastify";
+import express from "express";
 import { createServer as createViteServer, ViteDevServer } from "vite";
-import fastifyExpress from "fastify-express";
 import fs from "fs";
 import path from "path";
-import fastifyStatic from "fastify-static";
 import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
@@ -35,9 +33,8 @@ function findDistRoot() {
 
 export async function createServer(root: string) {
   process.env.REMASTER_PROJECT_DIR = root;
-  const app = fastify({ logger: isProd });
-  await app.register(fastifyExpress);
-  app.addContentTypeParser("*", (_request, _payload, done) => done(null));
+  const app = express();
+  app.use(express.static(path.join(root, "public")));
 
   const vite = isProd
     ? undefined
@@ -52,17 +49,14 @@ export async function createServer(root: string) {
   if (vite) {
     app.use(vite.middlewares);
   } else {
-    await app.register(fastifyStatic, {
-      root: path.join(distRoot!, "client/assets"),
-      prefix: "/assets/",
-    });
+    app.use("/assets", express.static(path.join(distRoot!, "client/assets")));
   }
 
-  app.all("*", async (req, reply) => {
+  app.all("*", async (req, res) => {
     const method = req.method.toUpperCase();
     const request = new NFRequest(req.url, {
       method,
-      body: method !== "GET" && method !== "HEAD" ? req.raw : undefined,
+      body: method !== "GET" && method !== "HEAD" ? req : undefined,
       headers: _(req.headers)
         .entries()
         .map(([key, value]) => value !== undefined && [key, String(value)])
@@ -77,7 +71,7 @@ export async function createServer(root: string) {
     const headers = _([...response.headers.entries()])
       .fromPairs()
       .value();
-    reply.status(response.status).headers(headers).send(response.body);
+    res.writeHead(response.status, headers).end(response.body);
   });
 
   return app;
@@ -117,7 +111,7 @@ export async function main(root: string) {
   const app = await createServer(root);
   console.log(`Server bootstrapped. Listening at ${port}`);
 
-  app.listen(port, "0.0.0.0");
+  app.listen(Number(port), "0.0.0.0");
 }
 
 if (require.main === module) {
