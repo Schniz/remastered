@@ -1,7 +1,11 @@
 import fetch, { Response, Request, Headers } from "node-fetch";
 export function globalPatch() {
-  global.fetch = fetch as any;
-  global.Response = Response as any;
-  global.Request = Request as any;
-  global.Headers = Headers as any;
+  // @ts-expect-error types are not 100% aligned
+  global.fetch = fetch;
+  // @ts-expect-error types are not 100% aligned
+  global.Response = Response;
+  // @ts-expect-error types are not 100% aligned
+  global.Request = Request;
+  // @ts-expect-error types are not 100% aligned
+  global.Headers = Headers;
 }

@@ -207,18 +207,18 @@ async function handlePendingState(
   const routesObject = getRoutesObject();
 
   const components = newRoutes.map(async (routeMatch) => {
-    const routeFile = (routeMatch.route as any).routeFile;
-    const key = `${routeFile}`;
-    let entry = (await routesObject[key]?.()) ?? matchesContext.get(key);
+    const { routeFile } = routeMatch.route;
+    let entry =
+      (await routesObject[routeFile]?.()) ?? matchesContext.get(routeFile);
     if (!entry) {
       return;
     }
     if (entry.default) {
-      componentContext.set(key, entry.default);
+      componentContext.set(routeFile, entry.default);
     }
-    matchesContext.set(key, {
+    matchesContext.set(routeFile, {
       hasLoader: false,
-      ...matchesContext.get(key),
+      ...matchesContext.get(routeFile),
       handle: entry.handle,
       meta: entry.meta,
     });
@@ -228,11 +228,10 @@ async function handlePendingState(
   let hold = false;
 
   keepRoutes.forEach((route) => {
-    const routeFile = (route.route as any).routeFile;
-    const routingKey = `${routeFile}`;
-    const routeInfo = matchesContext.get(routingKey);
-    const pendingStorageKey = `${pendingState.value.location.key}@${routingKey}`;
-    const currentStorageKey = `${currentState.location.key}@${routingKey}`;
+    const { routeFile } = route.route;
+    const routeInfo = matchesContext.get(routeFile);
+    const pendingStorageKey = `${pendingState.value.location.key}@${routeFile}`;
+    const currentStorageKey = `${currentState.location.key}@${routeFile}`;
 
     if (loaderContext.has(currentStorageKey)) {
       newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
@@ -245,10 +244,9 @@ async function handlePendingState(
 
   const loaders = newRoutes.map(async (lastMatch) => {
     const isExact = lastMatch.pathname === pendingState.value.location.pathname;
-    const routeFile = (lastMatch.route as any).routeFile;
-    const routingKey = `${routeFile}`;
-    const routeInfo = matchesContext.get(routingKey);
-    const storageKey = `${pendingState.value.location.key}@${routingKey}`;
+    const { routeFile } = lastMatch.route;
+    const routeInfo = matchesContext.get(routeFile);
+    const storageKey = `${pendingState.value.location.key}@${routeFile}`;
 
     if (routeInfo && routeInfo.hasLoader) {
       if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) {
@@ -296,20 +294,28 @@ async function handlePendingState(
   }
 }
 
+type RemasteredRouteMatch = RouteMatch & {
+  route: RouteMatch["route"] & { routeFile: string };
+};
+
 function diffRoutes(
   currentState: { location: Location; action: Action },
   pendingState: { location: Location; action: Action }
-): { newRoutes: RouteMatch[]; keepRoutes: RouteMatch[] } {
+): { newRoutes: RemasteredRouteMatch[]; keepRoutes: RemasteredRouteMatch[] } {
   const routeElements = wrapRoutes(getRouteElements());
-  const pendingRoutes = matchRoutes(routeElements, pendingState.location) ?? [];
+  const pendingRoutes =
+    (matchRoutes(
+      routeElements,
+      pendingState.location
+    ) as RemasteredRouteMatch[]) ?? [];
   const currentMatches = (
     matchRoutes(routeElements, currentState.location) ?? []
   ).map((route) => {
     return `${route.pathname}/${JSON.stringify(route.params)}`;
   });
 
-  const keepRoutes: RouteMatch[] = [];
-  const newRoutes: RouteMatch[] = [];
+  const keepRoutes: RemasteredRouteMatch[] = [];
+  const newRoutes: RemasteredRouteMatch[] = [];
 
   for (const route of pendingRoutes) {
     const key = `${route.pathname}/${JSON.stringify(route.params)}`;

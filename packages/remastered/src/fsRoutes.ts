@@ -68,10 +68,10 @@ function onceOnClient<F extends (...args: any[]) => any>(
     const v: { value?: ReturnType<F> } = {};
     return (...args): ReturnType<F> => {
       if ("value" in v) {
-        return v.value as any;
+        return v.value as ReturnType<F>;
       }
       v.value = f(...args);
-      return v.value as any;
+      return v.value as ReturnType<F>;
     };
   }
 }

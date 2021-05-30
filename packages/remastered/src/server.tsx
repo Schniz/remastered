@@ -8,6 +8,7 @@ import { Request as NFRequest } from "node-fetch";
 import type { RenderFn } from "./entry-server";
 import _ from "lodash";
 import { getViteConfigPath } from "./getViteConfig";
+import type { HttpResponse } from "./HttpTypes";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -86,7 +87,7 @@ export async function renderRequest(
   handlers: ViteHandlers,
   request: Request,
   vite?: ViteDevServer
-): Promise<Response> {
+): Promise<HttpResponse> {
   try {
     const render: RenderFn = handlers.serverEntry.render;
     return await render({

@@ -19,6 +19,7 @@ import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { serializeResponse } from "./SerializedResponse";
+import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -27,7 +28,7 @@ const mainFile = `node_modules/.remastered/entry.client.js`;
 globalPatch();
 
 type RequestContext = {
-  request: Request;
+  request: HttpRequest;
   manifest?: Record<string, string[]>;
   viteDevServer?: ViteDevServer;
   clientManifest?: import("vite").Manifest;
@@ -48,7 +49,7 @@ async function onGet({
   manifest,
   viteDevServer,
   clientManifest,
-}: RequestContext): Promise<Response> {
+}: RequestContext): Promise<HttpResponse> {
   const routes = wrapRoutes(getRouteElements());
   const routesObject = {
     ...getRoutesObject(),
@@ -92,7 +93,7 @@ async function onGet({
         loaderNotFound = true;
       }
 
-      if (loaderResult instanceof Response) {
+      if (isHttpResponse(loaderResult)) {
         if (loaderResult.headers.get("Content-Type") === "application/json") {
           loaderContext.set(relevantRoute.key, await loaderResult.json());
         } else if (isJsonResponse) {
@@ -217,7 +218,7 @@ async function onGet({
   });
 }
 
-export async function render(ctx: RequestContext): Promise<Response> {
+export async function render(ctx: RequestContext): Promise<HttpResponse> {
   return checkTime(`request to ${ctx.request.url}`, async () => {
     if (ctx.request.method === "GET") {
       return await onGet(ctx);
@@ -234,7 +235,7 @@ export type RenderFn = typeof render;
 
 async function onAction({
   request,
-}: RequestContext): Promise<Response | undefined> {
+}: RequestContext): Promise<HttpResponse | undefined> {
   const routes = getRouteElements();
 
   const url = request.url.replace(/\.json$/, "");

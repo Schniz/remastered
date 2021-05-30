@@ -1,3 +1,5 @@
+import { HttpResponse } from "./HttpTypes";
+
 export function isSerializedResponse(x: any): x is SerializedResponse {
   return "@remastered/serialized-response" in x;
 }
@@ -11,7 +13,7 @@ export type SerializedResponse = {
 };
 
 export async function serializeResponse(
-  response: Response
+  response: HttpResponse
 ): Promise<SerializedResponse> {
   const body = await response.arrayBuffer();
   return {
