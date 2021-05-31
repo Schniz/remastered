@@ -3,19 +3,11 @@ import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "remastered";
 import { Doc, readDocFile } from "../../readDocFile";
 import { ogMeta } from "../../ogMeta";
 
-type Data = Doc & { pathname: string };
+type Data = Doc;
 
 export const loader: LoaderFn<Data> = async ({ params }) => {
   const doc = await readDocFile(params.path);
-
-  if (!doc) {
-    return null;
-  }
-
-  return {
-    ...doc,
-    pathname: `/docs/${params.path}`,
-  };
+  return doc;
 };
 
 export const headers: HeadersFn = async () => {
@@ -44,7 +36,6 @@ export default function DocPath() {
 
 export const meta: MetaFn<Data> = ({ data }) => {
   return {
-    /* "og:url": `https://remastered.hagever.com${data.pathname}`, */
     ...ogMeta({
       title: `Remastered: ${data.title}`,
       description:

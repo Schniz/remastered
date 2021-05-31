@@ -10,6 +10,7 @@ import {
   Link,
   LoaderFn,
   useRouteData,
+  useLocation,
 } from "remastered";
 import remasteredPkg from "remastered/package.json";
 import "tailwindcss/tailwind.css";
@@ -17,12 +18,10 @@ import { ogMeta } from "./ogMeta";
 
 type Data = {
   generationTimestamp: number;
-  pathname: string;
 };
 
-export const loader: LoaderFn<Data> = async ({ request }) => {
+export const loader: LoaderFn<Data> = async () => {
   return {
-    pathname: request.url.replace(/\.json$/, ""),
     generationTimestamp: Date.now(),
   };
 };
@@ -32,6 +31,7 @@ export default function Layout() {
   const date = React.useMemo(() => {
     return new Date(routeData.generationTimestamp);
   }, [routeData.generationTimestamp]);
+  const location = useLocation();
 
   return (
     <html>
@@ -39,6 +39,10 @@ export default function Layout() {
         <Meta />
         <Favicons />
         <Links />
+        <meta
+          property="og:url"
+          content={`https://remastered.hagever.com${location.pathname}`}
+        />
       </head>
       <body>
         <div className="flex flex-col w-screen h-screen">
@@ -87,12 +91,11 @@ if (import.meta.hot) {
   import.meta.hot!.accept();
 }
 
-export const meta: MetaFn<Data> = ({ data }) => {
+export const meta: MetaFn<Data> = () => {
   const title = `Remastered`;
   const description = `Remastered: a full-stack approach to React development.`;
 
   return {
-    "og:url": `https://remastered.hagever.com${data.pathname}`,
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
     ...ogMeta({

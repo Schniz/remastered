@@ -24,7 +24,7 @@ export type AllLinkTags =
 
 export const LinkTagsContext = React.createContext<AllLinkTags[]>([]);
 
-export type MetaTags = Record<string, string>;
+export type MetaTags = Record<string, string | null>;
 
 export function Scripts() {
   const scripts = React.useContext(ScriptTagsContext);
@@ -100,12 +100,18 @@ export function Meta() {
   return (
     <>
       {Object.entries(metaTags).map(([key, value]) => {
+        if (value === null) return null;
+
         if (key === "title") {
           return <title key={key}>{value}</title>;
         }
 
         if (key === "charSet") {
           return <meta charSet={value} key={key} />;
+        }
+
+        if (key.startsWith("og:")) {
+          return <meta key={key} property={key} content={value} />;
         }
 
         return <meta key={key} name={key} content={value} />;

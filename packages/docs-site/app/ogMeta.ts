@@ -10,7 +10,5 @@ export function ogMeta(record: Partial<Rec>): Record<string, string | null> {
     meta[`og:${key}`] = value;
   }
 
-  console.log(meta);
-
   return meta;
 }
