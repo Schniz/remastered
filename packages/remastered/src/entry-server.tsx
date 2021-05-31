@@ -20,6 +20,7 @@ import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { serializeResponse } from "./SerializedResponse";
 import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
+import createDebugger from "debug";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -35,12 +36,13 @@ type RequestContext = {
 };
 
 async function checkTime<T>(tag: string, fn: () => Promise<T>): Promise<T> {
+  const debug = createDebugger("remastered:time");
   const hrtime = Date.now();
   try {
     return await fn();
   } finally {
     const elapsed = Date.now() - hrtime;
-    console.log({ tag, elapsed });
+    debug(`${tag} finished. time taken: ${elapsed}ms`);
   }
 }
 
