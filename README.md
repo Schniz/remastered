@@ -36,7 +36,7 @@ and fastest developer experience, no matter what size is your app.
 #### ✨ Convenient data fetching
 
 Instead of throwing useEffect everywhere, In Remastered, every
-Route might expose a co-located server-side data loader which gets
+route can expose a co-located server-side data loader which gets
 fetched automatically and stored in the history stack. All you
 have to do is call a React hook to get it, synchronously.
 
