@@ -92,17 +92,14 @@ if (import.meta.hot) {
 }
 
 export const meta: MetaFn<Data> = () => {
-  const title = `Remastered`;
-  const description = `Remastered: a full-stack approach to React development.`;
-
   return {
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
     "og:image": "https://remastered.hagever.com/banner.png",
     "og:type": "website",
     ...ogMeta({
-      title,
-      description,
+      title: "Remastered: a full-stack React framework",
+      description: `Modern front-end tools have changed the way we expect the web platform to behave, but they made shipping... harder. Remastered is a full-stack framework based on React, that puts routing as the center of your application. That means owning back the entire stack, leveraging HTTP to its fullest capabilities and shipping faster with great confidence, without risking developer experience.`,
     }),
   };
 };
