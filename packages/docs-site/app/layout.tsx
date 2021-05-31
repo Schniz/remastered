@@ -86,7 +86,7 @@ if (import.meta.hot) {
 
 export const meta: MetaFn<unknown> = () => {
   return {
-    title: `Remastered v${remasteredPkg.version}`,
+    title: `Remastered`,
     description: `Remastered: a full-stack approach to React development.`,
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
