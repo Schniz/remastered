@@ -136,22 +136,14 @@ const dev = command({
     }),
   },
   async handler({ port }) {
+    const rootDir = process.cwd();
     if (typeof port === "number") {
       process.env.PORT = String(port);
     }
-    const rootDir = process.cwd();
-    await copyNodeModule(rootDir);
     const { main } = await import("./server");
     await main(rootDir);
   },
 });
-
-async function copyNodeModule(rootDir: string) {
-  const fs = await import("fs-extra");
-  const localPath = path.join(rootDir, ".remastered");
-  await fs.remove(localPath);
-  await fs.ensureSymlink(path.dirname(__dirname), localPath);
-}
 
 const cli = subcommands({
   cmds: { build, serve, dev },
