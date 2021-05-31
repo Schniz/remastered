@@ -1,9 +1,21 @@
 import React from "react";
 import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "remastered";
 import { Doc, readDocFile } from "../../readDocFile";
+import { ogMeta } from "../../ogMeta";
 
-export const loader: LoaderFn<Doc> = async ({ params }) => {
-  return readDocFile(params.path);
+type Data = Doc & { pathname: string };
+
+export const loader: LoaderFn<Data> = async ({ params }) => {
+  const doc = await readDocFile(params.path);
+
+  if (!doc) {
+    return null;
+  }
+
+  return {
+    ...doc,
+    pathname: `/docs/${params.path}`,
+  };
 };
 
 export const headers: HeadersFn = async () => {
@@ -16,7 +28,7 @@ export const headers: HeadersFn = async () => {
 };
 
 export default function DocPath() {
-  const routeData = useRouteData<Doc>();
+  const routeData = useRouteData<Data>();
   return (
     <>
       <h1 className="px-2 py-4 text-xl font-bold text-black text-opacity-90">
@@ -30,13 +42,16 @@ export default function DocPath() {
   );
 }
 
-export const meta: MetaFn<Doc> = ({ data }) => {
+export const meta: MetaFn<Data> = ({ data }) => {
   return {
-    title: `Remastered: ${data.title}`,
-    ...(data.description && {
-      description: `${data.description
-        .trim()
-        .replace(/\.$/, "")}. Learn more about Remastered!`,
+    /* "og:url": `https://remastered.hagever.com${data.pathname}`, */
+    ...ogMeta({
+      title: `Remastered: ${data.title}`,
+      description:
+        data.description &&
+        `${data.description
+          .trim()
+          .replace(/\.$/, "")}. Learn more about Remastered!`,
     }),
   };
 };

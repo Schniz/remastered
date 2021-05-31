@@ -13,13 +13,16 @@ import {
 } from "remastered";
 import remasteredPkg from "remastered/package.json";
 import "tailwindcss/tailwind.css";
+import { ogMeta } from "./ogMeta";
 
 type Data = {
   generationTimestamp: number;
+  pathname: string;
 };
 
-export const loader: LoaderFn<Data> = async () => {
+export const loader: LoaderFn<Data> = async ({ request }) => {
   return {
+    pathname: request.url.replace(/\.json$/, ""),
     generationTimestamp: Date.now(),
   };
 };
@@ -84,12 +87,18 @@ if (import.meta.hot) {
   import.meta.hot!.accept();
 }
 
-export const meta: MetaFn<unknown> = () => {
+export const meta: MetaFn<Data> = ({ data }) => {
+  const title = `Remastered`;
+  const description = `Remastered: a full-stack approach to React development.`;
+
   return {
-    title: `Remastered`,
-    description: `Remastered: a full-stack approach to React development.`,
+    "og:url": `https://remastered.hagever.com${data.pathname}`,
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
+    ...ogMeta({
+      title,
+      description,
+    }),
   };
 };
 
