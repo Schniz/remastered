@@ -118,14 +118,16 @@ const exportCmd = command({
     });
     process.env.REMASTER_PROJECT_DIR = process.cwd();
     const routes: string[] = await getStaticPaths();
-    const requests = routes.flatMap((route) => {
-      return [new Request(route), new Request(`${route}.json`)];
-    });
+    const requests = routes
+      .flatMap((route) => {
+        return [new Request(route), new Request(`${route}.json`)];
+      })
+      .map(async (request) => {
+        const response = await renderRequest(renderContext, request);
+        await storeTraffic(exportedDir, request, response);
+      });
 
-    for (const request of requests) {
-      const response = await renderRequest(renderContext, request);
-      await storeTraffic(exportedDir, request, response);
-    }
+    await Promise.all(requests);
   },
 });
 

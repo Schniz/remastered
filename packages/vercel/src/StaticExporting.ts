@@ -31,8 +31,21 @@ export async function store(
 ) {
   const serialized = await serializeResponse(response);
 
-  if (response.status === 200 && path.extname(request.url)) {
-    const filename = path.join(exportDir, "public", request.url);
+  let url = request.url;
+
+  if (
+    response.headers.get("content-type") === "text/html" &&
+    !path.extname(url)
+  ) {
+    if (url.endsWith("/")) {
+      url = `${url}index.html`;
+    } else {
+      url = `${url}/index.html`;
+    }
+  }
+
+  if (response.status === 200 && path.extname(url)) {
+    const filename = path.join(exportDir, "public", url);
     await fs.outputFile(
       filename,
       new Int8Array(await deserializeResponse(serialized).arrayBuffer())
