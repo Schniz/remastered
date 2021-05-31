@@ -17,7 +17,7 @@ test.only("refresh after history will re-fetch data", async () => {
     expect(page).toClick("a", { text: "Remastered" }),
   ]);
 
-  await expect(page).toMatchElement("title", { text: /^Remastered v\d/ });
+  await expect(page).toMatchElement("title", { text: "Remastered" });
 
   await page.reload();
 
