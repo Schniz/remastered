@@ -66,3 +66,6 @@ common/autoinstallers/*/.npmrc
 
 # tsc dist
 dist
+
+# The remastered directory
+.remastered

@@ -6,6 +6,7 @@ import { globFirst } from "./dist/vite-plugins/globFirst";
 import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
 import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
 import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
+import { redirectRemasteredImports } from "./dist/vite-plugins/redirectRemasteredImports";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -30,6 +31,7 @@ const config = defineConfig({
     globHmrListener(),
     reactRefresh(),
     debugPlugin(),
+    redirectRemasteredImports(),
   ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
