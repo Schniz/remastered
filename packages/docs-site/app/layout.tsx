@@ -47,10 +47,10 @@ export default function Layout() {
       <body>
         <div className="flex flex-col w-screen h-screen">
           <div className="p-2 px-4 text-white bg-black shadow-sm">
-            <div className="flex max-w-5xl mx-auto">
+            <div className="flex max-w-5xl mx-auto space-x-4">
               <Link className="flex items-center font-bold" to="/">
                 <span aria-hidden className="block pr-1">
-                  🎚
+                  🎷
                 </span>
                 <span>Remastered</span>
               </Link>
@@ -64,10 +64,19 @@ export default function Layout() {
                 GitHub
                 <ExternalLinkIcon className="w-4 h-4 opacity-75" />
               </a>
+              <a
+                href="https://twitter.com/galstar"
+                target="_blank"
+                rel="noopener noreferer"
+                className="flex items-center justify-center text-white hover:text-pink-100 transition-all text-opacity-90"
+              >
+                Twitter
+                <ExternalLinkIcon className="w-4 h-4 opacity-75" />
+              </a>
             </div>
           </div>
           <Outlet />
-          <div className="pt-10 pb-2 text-sm text-center text-black text-opacity-50">
+          <div className="pt-10 pb-4 text-sm text-center text-black text-opacity-50">
             <p>
               This page was generated with Remastered v{remasteredPkg.version}{" "}
               at{" "}
@@ -78,6 +87,18 @@ export default function Layout() {
               >
                 {date.toLocaleString(["en-US"])}
               </time>
+            </p>
+            <p>
+              Wanna talk? Feel free to{" "}
+              <a
+                href="https://twitter.com/galstar"
+                target="_blank"
+                rel="noopener noreferer"
+                className="text-pink-700 hover:text-pink-900 transition-all"
+              >
+                tweet at @galstar
+              </a>
+              .
             </p>
           </div>
         </div>

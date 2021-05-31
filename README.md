@@ -1,4 +1,4 @@
-# 🎚 Remastered
+# 🎷 Remastered
 
 A full-stack approach to React development.
 
