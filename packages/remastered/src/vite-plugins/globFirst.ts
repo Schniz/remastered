@@ -8,8 +8,8 @@ const PLUGIN_NAME = `remastered:glob-first`;
 const debug = createDebugger(PLUGIN_NAME);
 
 /**
- * Adds the `__glob_matches__` function
- * and `import A from 'glob-first:/app/*.ts'`
+ * Adds the `import A from 'glob-first:/app/*.ts'`
+ * import hook
  */
 export function globFirst(): PluginOption {
   let resolvedConfig: ResolvedConfig | undefined;

@@ -136,11 +136,12 @@ const dev = command({
     }),
   },
   async handler({ port }) {
+    const rootDir = process.cwd();
     if (typeof port === "number") {
       process.env.PORT = String(port);
     }
     const { main } = await import("./server");
-    await main(process.cwd());
+    await main(rootDir);
   },
 });
 
