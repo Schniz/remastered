@@ -217,7 +217,7 @@ async function onGet({
     <RemasteredAppServer ctx={remasteredAppContext} />
   );
 
-  return new Response(string, {
+  return new Response(`<!DOCTYPE html>` + string, {
     status,
     headers: {
       "Content-Type": "text/html",
