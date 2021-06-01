@@ -107,9 +107,9 @@ export async function renderRequest(
 
 export async function main(root: string) {
   const port = process.env.PORT || 3000;
-  console.log(`Bootstrapping...`);
+  console.log(`🌬 Warming up...`);
   const app = await createServer(root);
-  console.log(`Server bootstrapped. Listening at ${port}`);
+  console.log(`🎷 Pum, pum, pum! Server is playing at ${port}`);
 
   app.listen(Number(port), "0.0.0.0");
 }
