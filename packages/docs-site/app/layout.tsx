@@ -116,6 +116,9 @@ export const meta: MetaFn<Data> = () => {
   return {
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
+    "twitter:card": "summary_large_image",
+    "twitter:site": "@galstar",
+    "twitter:creator": "@galstar",
     "og:image": "https://remastered.hagever.com/banner.png?v=1",
     "og:type": "website",
     ...ogMeta({
