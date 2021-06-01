@@ -13,3 +13,7 @@ export {
   withEncryptedCookies,
 } from "./CookieSessionStorage";
 export { createMemorySessionStorage } from "./MemorySessionStorage";
+export type {
+  RenderServerEntryFn,
+  RenderServerEntryOptions,
+} from "./defaultServerEntry";

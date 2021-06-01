@@ -2,37 +2,25 @@ import {
   buildRouteComponentBag,
   RouteDefinition,
 } from "./buildRouteComponentBag";
-import type { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { getRoutesObject } from "./fsRoutes";
-import type { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
-import type { LoaderContext } from "./LoaderContext";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { mapValues } from "./Map";
-import type { HistoryResponseState } from "./NotFoundAndSkipRenderOnServerContext";
 import type { MatchesContext } from "./useMatches";
-import { Layout, LayoutObject } from "./UserOverridableComponents";
-
-export type Context = {
-  loaderContext: React.ContextType<typeof LoaderContext>;
-  componentsContext: React.ContextType<typeof DynamicImportComponentContext>;
-  historyResponseState: HistoryResponseState;
-  links: React.ContextType<typeof LinkTagsContext>;
-  scripts: React.ContextType<typeof ScriptTagsContext>;
-  matchesContext: React.ContextType<typeof MatchesContext>;
-};
+import { LayoutObject } from "./UserOverridableComponents";
+import type { RemasteredAppContext } from "./WrapWithContext";
 
 declare global {
   interface Window {
-    $$remasteredCtx?: { value?: Context };
+    $$remasteredCtx?: { value?: RemasteredAppContext };
   }
 }
 
-export let readyContext: { value?: Context } =
+export let readyContext: { value?: RemasteredAppContext } =
   import.meta.env.SSR || import.meta.env.PROD
     ? {}
     : window.$$remasteredCtx ?? {};
 
-export async function loadWindowContext(): Promise<Context> {
+export async function loadWindowContext(): Promise<RemasteredAppContext> {
   const ctx = __REMASTERED_CTX;
   const historyKey = window.history.state?.key ?? "default";
   const loadCtx = new Map(
@@ -51,9 +39,9 @@ export async function loadWindowContext(): Promise<Context> {
 
   readyContext.value = {
     links: ctx.linkTags,
-    scripts: ctx.scriptTags,
-    componentsContext: loadedComponents,
-    historyResponseState: new Map([
+    scripts: [{ _tag: "eager", contents: "" }, ...ctx.scriptTags],
+    loadedComponentsContext: loadedComponents,
+    loadingErrorContext: new Map([
       [historyKey, ctx.splashState === 404 ? "not_found" : "ok"],
     ]),
     loaderContext: loadCtx,

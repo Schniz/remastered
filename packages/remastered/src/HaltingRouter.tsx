@@ -152,10 +152,7 @@ export function HaltingRouter(props: {
         props.loadedComponentContext,
         matchesContext,
         () =>
-          historyResponseState.state?.set(
-            pendingState.value.location.key,
-            "not_found"
-          )
+          historyResponseState.set(pendingState.value.location.key, "not_found")
       );
     }
 

@@ -1,4 +1,3 @@
-import ReactDOMServer from "react-dom/server";
 import React from "react";
 import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
@@ -7,10 +6,6 @@ import { chain } from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
-import {
-  RemasteredAppServer,
-  RemasteredAppServerCtx,
-} from "./RemasteredAppServer";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
@@ -21,6 +16,9 @@ import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { serializeResponse } from "./SerializedResponse";
 import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
 import createDebugger from "debug";
+import { RemasteredAppContext } from "./WrapWithContext";
+import userCreateResponse from "glob-first:/app/entry.server.{t,j}s{x,};./defaultServerEntry.js";
+import { RemasteredAppServer } from "./RemasteredAppServer";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -199,31 +197,38 @@ async function onGet({
 
   scripts.unshift(inlineScript);
 
-  const loadingErrorContext: RemasteredAppServerCtx["loadingErrorContext"] = {
-    state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
-  };
-
-  const remasteredAppContext: RemasteredAppServerCtx = {
-    loadingErrorContext,
+  const remasteredAppContext: RemasteredAppContext = {
+    loadingErrorContext: new Map([
+      ["default", loaderNotFound ? "not_found" : "ok"],
+    ]),
     links,
     loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
     loadedComponentsContext: loadedComponents,
-    requestedUrl: url,
     scripts,
     matchesContext,
   };
 
-  const string = ReactDOMServer.renderToString(
-    <RemasteredAppServer ctx={remasteredAppContext} />
-  );
+  if (typeof userCreateResponse !== "function") {
+    return new Response(
+      `<h1>Error!</h1>Please export a function from the export default of your custom server entry.`,
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "text/html",
+        },
+      }
+    );
+  }
 
-  return new Response(`<!DOCTYPE html>` + string, {
-    status,
-    headers: {
-      "Content-Type": "text/html",
-      ...Object.fromEntries(headers.entries()),
-    },
+  const response = await userCreateResponse({
+    request,
+    Component: RemasteredAppServer,
+    ctx: remasteredAppContext,
+    httpStatus: status,
+    httpHeaders: headers,
   });
+
+  return response;
 }
 
 export async function render(ctx: RequestContext): Promise<HttpResponse> {
