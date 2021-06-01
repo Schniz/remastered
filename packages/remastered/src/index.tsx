@@ -17,3 +17,7 @@ export type {
   RenderServerEntryFn,
   RenderServerEntryOptions,
 } from "./defaultServerEntry";
+export type {
+  RenderClientEntryFn,
+  RenderClientEntryOptions,
+} from "./defaultClientEntry";

@@ -1,9 +1,8 @@
-import React from "react";
-import ReactDOM from "react-dom";
 import { RemasteredApp } from "./RemasteredAppClient";
 import type { AllLinkTags, ScriptTag } from "./JsxForDocument";
 import type { RouteDef } from "./useMatches";
 import { loadWindowContext } from "./loadWindowContext";
+import renderClientEntry from "glob-first:/app/entry.client.{t,j}s{x,};./defaultClientEntry.js";
 
 declare global {
   const __REMASTERED_CTX: {
@@ -38,10 +37,5 @@ document
   .forEach((x) => x.remove());
 
 loadWindowContext().then(() => {
-  ReactDOM.hydrate(
-    <React.StrictMode>
-      <RemasteredApp />
-    </React.StrictMode>,
-    document
-  );
+  return renderClientEntry({ Component: RemasteredApp });
 });

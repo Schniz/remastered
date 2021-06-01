@@ -3,7 +3,7 @@ title: Custom Entries
 description: Remastered does not lock you to render your apps in a specific way. Need to do something prior to rendering? Or maybe track something while rendering or after that? You can always opt out from our defaults to add custom code and logic.
 ---
 
-Remastered does not lock you to render your apps in a specific way. Need to do something prior to rendering? Or maybe track something while rendering or after that? You can always opt out from our defaults to add custom code and logic. Right now, it is only allowed to do in the server, but client overrides are on their way too.
+Remastered does not lock you to render your apps in a specific way. Need to do something prior to rendering? Or maybe track something while rendering or after that? You can always opt out from our defaults to add custom code and logic.
 
 ## Overriding the server entry
 
@@ -39,5 +39,29 @@ export default async function renderServer(
       ...Object.fromEntries(opts.httpHeaders.entries()),
     },
   });
+}
+```
+
+## Overriding the client entry
+
+A server entry is a function to hydrate your application. When we say "is a function to hydrate your application", we literally mean it because the default implementation calls `ReactDOM.hydrate` and that's it. Maybe you want to do more stuff before hydrating or after that. It's all good! This is what this is for. These files should be in the following paths:
+
+- `app/entry.client.tsx`
+- `app/entry.client.ts`
+- `app/entry.client.jsx`
+- `app/entry.client.js`
+
+The type signature for the server entry is exported under the name `RenderClientEntryFn`. Here is the default implementation:
+
+```tsx
+export default async function defaultClientEntry(
+  opts: RenderClientEntryOptions
+) {
+  ReactDOM.hydrate(
+    <React.StrictMode>
+      <opts.Component />
+    </React.StrictMode>,
+    document
+  );
 }
 ```
