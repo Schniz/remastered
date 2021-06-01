@@ -1,9 +1,10 @@
 ---
 title: Differences from Next.js
 link_title: "from Next.js"
+description: Next.js is a wonderful front-end framework, built by the great people at Vercel. Remastered is a full-stack framework which focuses on fast prototyping and developer experience, and lets you own the entire stack without sacrificing speed and performance.
 ---
 
-Next.js is a wonderful front-end framework, build by Vercel, which is meant to be deployed at the Vercel cloud. Although supporting SSR out-of-the-box, Next.js is mainly a front-end framework, and as such, it does not suggest using `<form>`, and HTTP headers are an afterthought. Remastered knows how your app is built. So it provides a friction-free data fetching, nested routes for better accessibility and fast prototyping, co-located API endpoints which can be used with a simple `<form>` tag.
+Next.js is a wonderful front-end framework, built by Vercel, which is meant to be deployed at the Vercel cloud. Although supporting SSR out-of-the-box, Next.js is mainly a front-end framework, and as such, it does not suggest using `<form>`, and HTTP headers are an afterthought. Remastered knows how your app is built. So it provides a friction-free data fetching, nested routes for better accessibility and fast prototyping, co-located API endpoints which can be used with a simple `<form>` tag.
 
 Next.js' router is a custom router, which does not support nested routes. Remastered is using [React Router], the de-facto standard router for React apps, which supports nested routes, nested layouts, relative links and more advanced features.
 
