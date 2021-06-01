@@ -1,7 +1,7 @@
 {
   "name": "docs-site-e2e-tests",
   "private": true,
-  "version": "0.1.17",
+  "version": "0.1.21",
   "main": "index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
