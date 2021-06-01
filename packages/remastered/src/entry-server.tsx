@@ -7,10 +7,7 @@ import { chain } from "lodash";
 import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
-import {
-  RemasteredAppServer,
-  RemasteredAppServerCtx,
-} from "./RemasteredAppServer";
+import { RemasteredAppServer } from "./RemasteredAppServer";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
 import { globalPatch } from "./globalPatch";
@@ -21,6 +18,7 @@ import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { serializeResponse } from "./SerializedResponse";
 import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
 import createDebugger from "debug";
+import { RemasteredAppServerCtx } from "./WrapWithContext";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -199,22 +197,20 @@ async function onGet({
 
   scripts.unshift(inlineScript);
 
-  const loadingErrorContext: RemasteredAppServerCtx["loadingErrorContext"] = {
-    state: new Map([["default", loaderNotFound ? "not_found" : "ok"]]),
-  };
+  const loadingErrorContext: RemasteredAppServerCtx["loadingErrorContext"] =
+    new Map([["default", loaderNotFound ? "not_found" : "ok"]]);
 
   const remasteredAppContext: RemasteredAppServerCtx = {
     loadingErrorContext,
     links,
     loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
     loadedComponentsContext: loadedComponents,
-    requestedUrl: url,
     scripts,
     matchesContext,
   };
 
   const string = ReactDOMServer.renderToString(
-    <RemasteredAppServer ctx={remasteredAppContext} />
+    <RemasteredAppServer ctx={remasteredAppContext} requestedUrl={url} />
   );
 
   return new Response(`<!DOCTYPE html>` + string, {
