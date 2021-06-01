@@ -24,12 +24,27 @@ import {
   isSerializedResponse,
 } from "./SerializedResponse";
 
+/**
+ * An in-progress transaction value
+ */
 type PendingState<T> = { value: T; tx: string };
-function usePendableState<T>(initialValue: T): {
+
+/**
+ * A transactional state. Much like a normal `useState`, but applying a new state
+ * requires a two-step process: calling `begin` (like `setState`) and then `commit(pendingState.tx)`.
+ *
+ * > Note: The `tx` (transaction token) is important to eliminate race conditions.
+ */
+function useTransactionalState<T>(initialValue: T): {
+  /** The last committed value */
   currentValue: T;
+  /** An in-progress transaction */
   pendingState: PendingState<T> | null;
+  /** Commit a transaction using `pendingState.tx` */
   commit(tx: string): void;
+  /** Roll-back a transaction using `pendingState.tx` */
   rollback(tx: string): void;
+  /** Start a new transaction */
   begin(t: T): void;
 } {
   const [pendingState, setPendingState] =
@@ -60,6 +75,14 @@ function usePendableState<T>(initialValue: T): {
   };
 }
 
+/**
+ * This is a custom React Router router that will "halt" navigation
+ * in order to download the dynamically loaded components (the routes)
+ * and their corresponding "loader"s.
+ *
+ * Internally it uses a transactional state to manage everything and the `handlePendingState`
+ * mega-function, that we might split in the future.
+ */
 export function HaltingRouter(props: {
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
@@ -84,7 +107,7 @@ export function HaltingRouter(props: {
     commit,
     pendingState,
     begin,
-  } = usePendableState({
+  } = useTransactionalState({
     action: history.action,
     location: history.location,
   });
@@ -92,7 +115,7 @@ export function HaltingRouter(props: {
   React.useEffect(() => {
     if (import.meta.env.MODE === "development") {
       (window as any).__$$refresh_remastered$$__ = () =>
-        navigator.replace(history.location);
+        history.replace(history.location);
     }
 
     return history.listen((state) => {
@@ -118,7 +141,7 @@ export function HaltingRouter(props: {
             setLoaderContext(loaderContextRef.current);
           }
         },
-        navigator,
+        history,
         abortController.signal,
         (newMap) => {
           const mergedMap = new Map([...loaderContextRef.current, ...newMap]);
@@ -139,29 +162,6 @@ export function HaltingRouter(props: {
     return () => abortController.abort();
   }, [pendingState]);
 
-  const navigator = React.useMemo(
-    (): Navigator => ({
-      go(delta) {
-        history.go(delta);
-      },
-      push(to, state) {
-        history.push(to, state);
-      },
-      block(blocker) {
-        return () => {
-          history.block(blocker)();
-        };
-      },
-      createHref(to) {
-        return history.createHref(to);
-      },
-      replace(to) {
-        history.replace(to);
-      },
-    }),
-    [historyRef]
-  );
-
   return (
     <LoaderContext.Provider value={loaderContext}>
       <PendingLocationContext.Provider value={pendingState?.value?.location}>
@@ -169,7 +169,7 @@ export function HaltingRouter(props: {
           location={state.location}
           action={state.action}
           children={props.children}
-          navigator={navigator}
+          navigator={history}
         />
       </PendingLocationContext.Provider>
     </LoaderContext.Provider>
@@ -208,6 +208,7 @@ async function handlePendingState(
 
   const components = newRoutes.map(async (routeMatch) => {
     const { routeFile } = routeMatch.route;
+    // TODO: what if we fail to grab a route? let's make a hard-refresh maybe?
     let entry =
       (await routesObject[routeFile]?.()) ?? matchesContext.get(routeFile);
     if (!entry) {
@@ -343,8 +344,11 @@ if (import.meta.hot) {
   });
 }
 
-/** This is not SPA stuff right now because I'm lazy, but it should be
- * using the same API of PendingLocation */
+/**
+ * A very ugly implementation of redirects for responses
+ *
+ * TODO think about error handling here...
+ */
 function applyResponse(response: Response, navigator: Navigator): boolean {
   if ([301, 302].includes(response.status)) {
     if (response.headers.get("location")) {
