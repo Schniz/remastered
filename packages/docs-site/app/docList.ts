@@ -28,7 +28,9 @@ export async function docList(): Promise<FileEntry[]> {
           path.join(process.env.REMASTER_PROJECT_DIR!, file.path),
           "utf8"
         );
-        const { attributes } = fm(contents);
+        const { attributes } =
+          fm<{ title?: string; link_title?: string }>(contents);
+        console.log(contents, attributes);
         return {
           type: "file",
           link: file.path
@@ -38,7 +40,7 @@ export async function docList(): Promise<FileEntry[]> {
             .replace("/", ":")
             .replace(/\.md$/, "")
             .toLowerCase(),
-          title: (attributes as any)?.title ?? file.path,
+          title: attributes.link_title ?? attributes.title ?? file.path,
         };
       });
     })

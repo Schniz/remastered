@@ -17,7 +17,8 @@ import cx from "classnames";
 import { useResolvedPath } from "react-router";
 
 export const loader: LoaderFn<FileEntry[]> = async () => {
-  return docList();
+  const docs = await docList();
+  return docs;
 };
 
 export default function DocsLayout() {

@@ -10,6 +10,7 @@ import remarkGfm from "remark-gfm";
 import tsxLanguage from "shiki/languages/tsx.tmLanguage.json";
 import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
 import jsonLanguage from "shiki/languages/json.tmLanguage.json";
+import remarkEmoji from "remark-emoji";
 
 // Listen to all changes in the docs so it will trigger HMR on Markdown change
 import "watch-glob:../docs/**/*.md";
@@ -68,6 +69,7 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
       ],
     })
     .use(remarkGfm)
+    .use(remarkEmoji, { padSpaceAfter: true })
     .use(remarkHtml);
   const processed = await parser.process(body);
   return {
