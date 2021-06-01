@@ -116,7 +116,7 @@ export const meta: MetaFn<Data> = () => {
   return {
     viewport: "width=device-width, initial-scale=1",
     generator: `Remastered v${remasteredPkg.version}`,
-    "og:image": "https://remastered.hagever.com/banner.png",
+    "og:image": "https://remastered.hagever.com/banner.png?v=1",
     "og:type": "website",
     ...ogMeta({
       title: "Remastered: a full-stack React framework",
