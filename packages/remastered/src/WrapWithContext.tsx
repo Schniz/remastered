@@ -5,7 +5,7 @@ import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 
-export type RemasteredAppServerCtx = {
+export type RemasteredAppContext = {
   loadingErrorContext: React.ContextType<
     typeof NotFoundAndSkipRenderOnServerContext
   >;
@@ -22,7 +22,7 @@ export function WrapWithContext({
   ctx,
   children,
 }: {
-  ctx: RemasteredAppServerCtx;
+  ctx: RemasteredAppContext;
   children: React.ReactNode;
 }) {
   return (

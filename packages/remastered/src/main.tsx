@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { RemasteredApp } from "./RemasteredApp";
+import { RemasteredApp } from "./RemasteredAppClient";
 import type { AllLinkTags, ScriptTag } from "./JsxForDocument";
 import type { RouteDef } from "./useMatches";
 import { loadWindowContext } from "./loadWindowContext";

@@ -18,7 +18,7 @@ import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { serializeResponse } from "./SerializedResponse";
 import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
 import createDebugger from "debug";
-import { RemasteredAppServerCtx } from "./WrapWithContext";
+import { RemasteredAppContext } from "./WrapWithContext";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -197,11 +197,10 @@ async function onGet({
 
   scripts.unshift(inlineScript);
 
-  const loadingErrorContext: RemasteredAppServerCtx["loadingErrorContext"] =
-    new Map([["default", loaderNotFound ? "not_found" : "ok"]]);
-
-  const remasteredAppContext: RemasteredAppServerCtx = {
-    loadingErrorContext,
+  const remasteredAppContext: RemasteredAppContext = {
+    loadingErrorContext: new Map([
+      ["default", loaderNotFound ? "not_found" : "ok"],
+    ]),
     links,
     loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
     loadedComponentsContext: loadedComponents,
