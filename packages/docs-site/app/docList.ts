@@ -30,7 +30,6 @@ export async function docList(): Promise<FileEntry[]> {
         );
         const { attributes } =
           fm<{ title?: string; link_title?: string }>(contents);
-        console.log(contents, attributes);
         return {
           type: "file",
           link: file.path
