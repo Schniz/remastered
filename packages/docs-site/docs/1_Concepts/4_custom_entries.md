@@ -9,6 +9,13 @@ Remastered does not lock you to render your apps in a specific way. Need to do s
 
 A server entry is a simple function that turns a `Request` into a `Response`. The function also gets more stuff that are needed for Remastered to render your app correctly, such as the rendered components, the data that was loaded by the `loader`s, etc.
 
+These files should be in the following paths:
+
+- `app/entry.server.tsx`
+- `app/entry.server.ts`
+- `app/entry.server.jsx`
+- `app/entry.server.js`
+
 The type signature for the server entry is exported under the name `RenderServerEntryFn`. Here is the default implementation:
 
 ```tsx
