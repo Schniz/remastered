@@ -1,6 +1,10 @@
 # 🎷 Remastered
 
-A full-stack approach to React development.
+> A full-stack approach to React development.
+
+Modern front-end tools have changed the way we expect the web platform to behave. They also made us forgot some of the fundamentals and kinda make shipping.. harder.
+
+Remastered is a full-stack framework based on React, that puts routing as the center of your application. That means owning back the entire stack, leveraging HTTP to its fullest capabilities and shipping faster with great confidence, without risking developer experience.
 
 https://remastered.hagever.com
 
