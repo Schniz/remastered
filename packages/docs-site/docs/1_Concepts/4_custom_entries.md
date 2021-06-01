@@ -1,8 +1,9 @@
 ---
 title: Custom Entries
+description: Remastered does not lock you to render your apps in a specific way. Need to do something prior to rendering? Or maybe track something while rendering or after that? You can always opt out from our defaults to add custom code and logic.
 ---
 
-Remastered does not lock you to render your apps in a specific way. You can always opt out from our defaults. Right now, it is only allowed to do in the server, but client overrides are on their way too.
+Remastered does not lock you to render your apps in a specific way. Need to do something prior to rendering? Or maybe track something while rendering or after that? You can always opt out from our defaults to add custom code and logic. Right now, it is only allowed to do in the server, but client overrides are on their way too.
 
 ## Overriding the server entry
 
