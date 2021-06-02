@@ -1,4 +1,5 @@
 import path from "path";
+import type { Plugin } from "unified";
 import fm from "front-matter";
 import remark from "remark";
 import remarkHtml from "remark-html";
@@ -71,20 +72,7 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
     })
     .use(remarkGfm)
     .use(remarkEmoji, { padSpaceAfter: true })
-    .use(() => {
-      return (tree) => {
-        visit(tree, ["link"], (link) => {
-          const url = link.url as string;
-          if (url.startsWith(".") && url.endsWith(".md")) {
-            link.url = url
-              .split("/")
-              .map((x) => x.replace(/^\d+_/, ""))
-              .join("/")
-              .replace(/\.md$/, "");
-          }
-        });
-      };
-    })
+    .use(replaceLocalMarkdownLinkWithActualContent)
     .use(remarkHtml);
   const processed = await parser.process(body);
   return {
@@ -93,3 +81,25 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
     description: (attributes as any).description,
   };
 }
+
+/**
+ * This remark plugin replaces all relative markdown links to regular links:
+ * * `../category/file.md` => `../category/file`
+ * * `./file.md` => `./file`
+ *
+ * Later on we will use `useCatchLinks` to replace them with soft navigation
+ */
+const replaceLocalMarkdownLinkWithActualContent: Plugin = () => {
+  return (tree) => {
+    visit(tree, ["link"], (link) => {
+      const url = link.url as string;
+      if (url.startsWith(".") && url.endsWith(".md")) {
+        link.url = url
+          .split("/")
+          .map((x) => x.replace(/^\d+_/, ""))
+          .join("/")
+          .replace(/\.md$/, "");
+      }
+    });
+  };
+};
