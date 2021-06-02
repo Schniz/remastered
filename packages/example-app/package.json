@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@remastered/vercel": "^0.1.21",
-    "@swc-node/register": "^1.2.1",
-    "@swc/core": "^1.2.55",
     "esm": "^3.2.25",
     "history": "^5.0.0",
     "lodash": "^4.17.21",
