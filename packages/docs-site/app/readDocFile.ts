@@ -16,6 +16,7 @@ import visit from "unist-util-visit";
 
 // Listen to all changes in the docs so it will trigger HMR on Markdown change
 import "watch-glob:../docs/**/*.md";
+import { convertDocPathToLink } from "./docList";
 
 export type Doc = { content: string; title: string; description?: string };
 
@@ -94,11 +95,7 @@ const replaceLocalMarkdownLinkWithActualContent: Plugin = () => {
     visit(tree, ["link"], (link) => {
       const url = link.url as string;
       if (url.startsWith(".") && url.endsWith(".md")) {
-        link.url = url
-          .split("/")
-          .map((x) => x.replace(/^\d+_/, ""))
-          .join("/")
-          .replace(/\.md$/, "");
+        link.url = convertDocPathToLink(url);
       }
     });
   };
