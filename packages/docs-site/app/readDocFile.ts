@@ -11,6 +11,7 @@ import tsxLanguage from "shiki/languages/tsx.tmLanguage.json";
 import shellscriptLanguage from "shiki/languages/shellscript.tmLanguage.json";
 import jsonLanguage from "shiki/languages/json.tmLanguage.json";
 import remarkEmoji from "remark-emoji";
+import visit from "unist-util-visit";
 
 // Listen to all changes in the docs so it will trigger HMR on Markdown change
 import "watch-glob:../docs/**/*.md";
@@ -70,6 +71,20 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
     })
     .use(remarkGfm)
     .use(remarkEmoji, { padSpaceAfter: true })
+    .use(() => {
+      return (tree) => {
+        visit(tree, ["link"], (link) => {
+          const url = link.url as string;
+          if (url.startsWith(".") && url.endsWith(".md")) {
+            link.url = url
+              .split("/")
+              .map((x) => x.replace(/^\d+_/, ""))
+              .join("/")
+              .replace(/\.md$/, "");
+          }
+        });
+      };
+    })
     .use(remarkHtml);
   const processed = await parser.process(body);
   return {

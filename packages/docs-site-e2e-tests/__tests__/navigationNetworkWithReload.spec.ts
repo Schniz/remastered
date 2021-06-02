@@ -19,7 +19,7 @@ test.only("refresh after history will re-fetch data", async () => {
 
   await expect(page).toMatchElement("title", { text: "Remastered" });
 
-  await page.reload();
+  await Promise.all([page.waitForNavigation(), page.reload()]);
 
   const historyRequests: string[] = [];
   page.on("request", (request) => {
@@ -31,11 +31,12 @@ test.only("refresh after history will re-fetch data", async () => {
 
   await expect(page).toMatchElement("title", {
     text: /What is Remastered/,
+    timeout: 1000,
   });
   expect(historyRequests).toMatchInlineSnapshot(`
 Array [
   "http://localhost:3000/assets/docs.js",
-  "http://localhost:3000/assets/@path.js",
+  "http://localhost:3000/assets/@file.js",
   "http://localhost:3000/docs.loader.json",
   "http://localhost:3000/docs/welcome/what-is-remastered.loader.json",
 ]
