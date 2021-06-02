@@ -1,8 +1,11 @@
-import { Module, parse, print } from "@swc/core";
 import fs from "fs-extra";
 import path from "path";
 import { PluginOption, ResolvedConfig } from "vite";
 import globby from "globby";
+import { parse as parseWithBabel } from "@babel/core";
+import type { ParserPlugin } from "@babel/parser";
+import traverse from "@babel/traverse";
+import MagicString, { SourceMap } from "magic-string";
 
 function isRoute(rootPath: string, filepath: string) {
   const routesPath = path.join(rootPath, "./app/routes/");
@@ -14,11 +17,6 @@ function isRoute(rootPath: string, filepath: string) {
 
 /**
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
- *
- * TODO this code uses SWC. Maybe we should use Babel?
- * We also use `print` by SWC which I do not want. I would want to only parse using SWC.
- * Unfortunately, the spans SWC produces do not reflect the actual code we send to it.
- * Meaning that if we use MagicString with it, it blows up: https://github.com/swc-project/swc/issues/1366
  */
 export function routeTransformers(): PluginOption[] {
   const acceptSelfCode = `
@@ -64,42 +62,7 @@ export function routeTransformers(): PluginOption[] {
           return null;
         }
 
-        const body: Module["body"] = [];
-
-        const parsed = await parse(code, {
-          syntax: "typescript",
-          tsx: true,
-          dynamicImport: true,
-          target: "es2020",
-        });
-
-        for (const item of parsed.body) {
-          if (item.type !== "ExportDeclaration") {
-            body.push(item);
-          } else if (item.declaration.type === "VariableDeclaration") {
-            const declarations = item.declaration.declarations.filter(
-              (declaration) => {
-                return (
-                  declaration.id.type === "Identifier" &&
-                  ["handle", "meta"].includes(declaration.id.value)
-                );
-              }
-            );
-            if (declarations.length) {
-              body.push({
-                ...item,
-                declaration: {
-                  ...item.declaration,
-                  declarations,
-                },
-              });
-            }
-          }
-        }
-
-        const result = await print({ ...parsed, body });
-        result.code = result.code;
-        return result;
+        return transform(code, id);
       },
       async handleHotUpdate(ctx) {
         ctx.server.ws.send({
@@ -110,4 +73,69 @@ export function routeTransformers(): PluginOption[] {
       },
     },
   ];
+}
+
+export function transform(
+  code: string,
+  filename: string
+): null | { code: string; map: SourceMap } {
+  const parserPlugins: ParserPlugin[] = [
+    "importMeta",
+    // since the plugin now applies before esbuild transforms the code,
+    // we need to enable some stage 3 syntax since they are supported in
+    // TS and some environments already.
+    "topLevelAwait",
+    "classProperties",
+    "classPrivateProperties",
+    "classPrivateMethods",
+  ];
+
+  if (filename.endsWith("x")) {
+    parserPlugins.push("jsx");
+  }
+
+  if (/\.tsx?$/.test(filename)) {
+    parserPlugins.push("typescript");
+  }
+
+  const magicString = new MagicString(code);
+
+  const program = parseWithBabel(code, {
+    filename,
+    sourceType: "module",
+    parserOpts: {
+      plugins: parserPlugins,
+    },
+  });
+
+  if (!program) {
+    return null;
+  }
+
+  const allowedExports = ["handle", "meta"];
+
+  traverse(program, {
+    ExportNamedDeclaration(node) {
+      const declaration = node.get("declaration").node;
+      if (declaration?.type === "FunctionDeclaration") {
+        if (!allowedExports.includes(declaration.id?.name!)) {
+          magicString.remove(node.node.start!, node.node.end!);
+        }
+      } else if (declaration?.type === "VariableDeclaration") {
+        let shouldRemoveEntireNode = true;
+        for (const decl of declaration.declarations) {
+          if (allowedExports.includes((decl.id as any).name)) {
+            shouldRemoveEntireNode = false;
+          } else if (decl.start && decl.end) {
+            magicString.remove(decl.start, decl.end);
+          }
+        }
+        if (shouldRemoveEntireNode) {
+          magicString.remove(node.node.start!, node.node.end!);
+        }
+      }
+    },
+  });
+
+  return { code: magicString.toString(), map: magicString.generateMap() };
 }
