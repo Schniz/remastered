@@ -16,6 +16,7 @@ export function wrapRoutes(
     caseSensitive: false,
     routeFile: LAYOUT_ROUTE_KEY,
     element: <Layout />,
+    hadElement: true,
     children: [
       {
         path: "/",

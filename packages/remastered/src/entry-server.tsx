@@ -65,8 +65,14 @@ async function onGet({
 
   let found = matchRoutes(routes, url) ?? [];
   const exactFound = found.filter((x) => matchPath(x.pathname, url));
+  let loaderNotFound = false;
 
-  if (exactFound.length === 0) {
+  const weHaveElementToRender = (
+    exactFound.slice(-1)[0].route as RouteObjectWithFilename
+  )?.hadElement;
+
+  if (exactFound.length === 0 || !weHaveElementToRender) {
+    loaderNotFound = true;
     status = 404;
   }
 
@@ -81,7 +87,6 @@ async function onGet({
   );
   const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
   const loaderContext = new Map<string, unknown>();
-  let loaderNotFound = false;
   const links: AllLinkTags[] = [];
   const headers = new Headers();
 
