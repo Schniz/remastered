@@ -41,8 +41,8 @@ test("going through history does not re-fetch data", async () => {
   expect(historyRequests).toEqual([]);
   expect(allRequests).toMatchInlineSnapshot(`
 Array [
-  "http://localhost:3000/docs/welcome:getting-started.json",
-  "http://localhost:3000/docs/concepts:sessions.json",
+  "http://localhost:3000/docs/welcome/getting-started.loader.json",
+  "http://localhost:3000/docs/concepts/sessions.loader.json",
 ]
 `);
 });

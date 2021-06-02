@@ -36,8 +36,8 @@ test.only("refresh after history will re-fetch data", async () => {
 Array [
   "http://localhost:3000/assets/docs.js",
   "http://localhost:3000/assets/@path.js",
-  "http://localhost:3000/docs.json",
-  "http://localhost:3000/docs/welcome:what-is-remastered.json",
+  "http://localhost:3000/docs.loader.json",
+  "http://localhost:3000/docs/welcome/what-is-remastered.loader.json",
 ]
 `);
 });
