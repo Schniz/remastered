@@ -254,7 +254,7 @@ async function handlePendingState(
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
       ) {
-        const url = `${lastMatch.pathname}.json`;
+        const url = `${lastMatch.pathname}.loader.json`;
 
         const { data: result, status } = await fetching(url, signal);
         const migrated = (result as [string, unknown][]).map(

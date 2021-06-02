@@ -120,7 +120,7 @@ const exportCmd = command({
     const routes: string[] = await getStaticPaths();
     const requests = routes
       .flatMap((route) => {
-        return [new Request(route), new Request(`${route}.json`)];
+        return [new Request(route), new Request(`${route}.loader.json`)];
       })
       .map(async (request) => {
         const response = await renderRequest(renderContext, request);

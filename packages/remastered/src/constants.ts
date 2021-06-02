@@ -1,1 +1,1 @@
-export const REMASTERED_JSON_ACCEPT = "application/remastered+json";
+export const REMASTERED_JSON_ACCEPT = "application/json+loader";
