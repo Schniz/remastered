@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { useMatches } from "./useMatches";
 
 export type EagerScriptTag = {
@@ -90,10 +91,13 @@ const defaultMetaTags = {
 
 export function Meta() {
   const matches = useMatches();
+
   const metaTags: MetaTags = { ...defaultMetaTags };
   for (const match of matches) {
     if (match.meta) {
-      Object.assign(metaTags, match.meta({ data: match.data }));
+      try {
+        Object.assign(metaTags, match.meta({ data: match.data }));
+      } catch {}
     }
   }
 

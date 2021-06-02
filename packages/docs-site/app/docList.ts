@@ -32,13 +32,7 @@ export async function docList(): Promise<FileEntry[]> {
           fm<{ title?: string; link_title?: string }>(contents);
         return {
           type: "file",
-          link: file.path
-            .replace(/^docs\//, "")
-            .replace(/(^|\/)(\d+)_/g, "$1")
-            .replace(/_/g, "-")
-            .replace("/", ":")
-            .replace(/\.md$/, "")
-            .toLowerCase(),
+          link: convertDocPathToLink(file.path),
           title: attributes.link_title ?? attributes.title ?? file.path,
         };
       });
@@ -58,4 +52,13 @@ export async function docList(): Promise<FileEntry[]> {
     .value();
 
   return categories;
+}
+
+export function convertDocPathToLink(docPath: string): string {
+  return docPath
+    .replace(/^docs\//, "")
+    .replace(/(^|\/)(\d+)_/g, "$1")
+    .replace(/_/g, "-")
+    .replace(/\.md$/, "")
+    .toLowerCase();
 }

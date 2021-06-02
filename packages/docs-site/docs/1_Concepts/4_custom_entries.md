@@ -44,14 +44,14 @@ export default async function renderServer(
 
 ## Overriding the client entry
 
-A server entry is a function to hydrate your application. When we say "is a function to hydrate your application", we literally mean it because the default implementation calls `ReactDOM.hydrate` and that's it. Maybe you want to do more stuff before hydrating or after that. It's all good! This is what this is for. These files should be in the following paths:
+A client entry is a function to hydrate your application. When we say "is a function to hydrate your application", we literally mean it because the default implementation calls `ReactDOM.hydrate` and that's it. Maybe you want to do more stuff before hydrating or after that. It's all good! This is what this is for. These files should be in the following paths:
 
 - `app/entry.client.tsx`
 - `app/entry.client.ts`
 - `app/entry.client.jsx`
 - `app/entry.client.js`
 
-The type signature for the server entry is exported under the name `RenderClientEntryFn`. Here is the default implementation:
+The type signature for the client entry is exported under the name `RenderClientEntryFn`. Here is the default implementation:
 
 ```tsx
 export default async function defaultClientEntry(

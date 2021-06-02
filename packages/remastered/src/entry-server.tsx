@@ -56,9 +56,9 @@ async function onGet({
     [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
   };
 
-  const url = request.url.replace(/\.json$/, "");
-  const isJsonResponse =
-    request.url.endsWith(".json") ||
+  const url = request.url.replace(/\.loader\.json$/, "");
+  const isLoaderJsonResponse =
+    request.url.endsWith(".loader.json") ||
     request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT);
 
   let status = 200;
@@ -70,7 +70,7 @@ async function onGet({
     status = 404;
   }
 
-  if (isJsonResponse) {
+  if (isLoaderJsonResponse) {
     found = exactFound;
   }
 
@@ -104,7 +104,7 @@ async function onGet({
       if (isHttpResponse(loaderResult)) {
         if (loaderResult.headers.get("Content-Type") === "application/json") {
           loaderContext.set(relevantRoute.key, await loaderResult.json());
-        } else if (isJsonResponse) {
+        } else if (isLoaderJsonResponse) {
           const serializedResponse = await serializeResponse(loaderResult);
           loaderContext.set(relevantRoute.key, serializedResponse);
         } else {
@@ -135,15 +135,14 @@ async function onGet({
   }
 
   if (loaderNotFound) {
-    loaderContext.clear();
     status = 404;
   }
 
-  if (isJsonResponse) {
+  if (isLoaderJsonResponse) {
     return new Response(JSON.stringify({ data: [...loaderContext] }), {
       status,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json+loader",
         ...Object.fromEntries(headers.entries()),
       },
     });
