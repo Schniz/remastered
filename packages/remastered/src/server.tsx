@@ -32,7 +32,7 @@ function findDistRoot() {
 }
 
 export async function createServer(root: string) {
-  process.env.REMASTER_PROJECT_DIR = root;
+  process.env.REMASTERED_PROJECT_DIR = root;
   const app = express();
   app.use(express.static(path.join(root, "public")));
 

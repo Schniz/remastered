@@ -33,7 +33,7 @@ export function routeTransformers(): PluginOption[] {
   return [
     {
       enforce: "pre",
-      name: "remaster:route",
+      name: "remastered:route",
       configResolved(given) {
         resolvedConfig = given;
       },

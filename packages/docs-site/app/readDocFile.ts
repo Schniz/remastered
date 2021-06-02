@@ -29,12 +29,12 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
       .join("/") + ".md";
 
   const fullPattern = path.resolve(
-    process.env.REMASTER_PROJECT_DIR!,
+    process.env.REMASTERED_PROJECT_DIR!,
     "docs",
     pathParts
   );
 
-  const root = path.resolve(process.env.REMASTER_PROJECT_DIR!, "docs");
+  const root = path.resolve(process.env.REMASTERED_PROJECT_DIR!, "docs");
 
   if (!fullPattern.startsWith(root)) {
     return null;

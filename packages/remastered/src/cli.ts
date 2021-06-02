@@ -45,29 +45,12 @@ const build = command({
 
     process.env.NODE_ENV = "production";
 
-    // const resolvedConfig = await vite.resolveConfig(
-    //   {
-    //     configFile: getViteConfigPath({ ssr: false }),
-    //     define: {
-    //       "process.env.REMASTER_PROJECT_DIR": JSON.stringify(""),
-    //     },
-    //     build: {
-    //       manifest: true,
-    //       ssrManifest: true,
-    //       outDir: path.join(process.cwd(), "dist", "client"),
-    //     },
-    //   },
-    //   "build"
-    // );
-
-    // await vite.optimizeDeps(resolvedConfig);
-
     await runPromises(args.method, [
       () =>
         vite.build({
           configFile: getViteConfigPath({ ssr: false }),
           define: {
-            "process.env.REMASTER_PROJECT_DIR": JSON.stringify(""),
+            "process.env.REMASTERED_PROJECT_DIR": JSON.stringify(""),
           },
           build: {
             manifest: true,
@@ -86,8 +69,8 @@ const build = command({
         vite.build({
           configFile: getViteConfigPath({ ssr: true }),
           define: {
-            "process.env.REMASTER_PROJECT_DIR":
-              "process.env.REMASTER_PROJECT_DIR",
+            "process.env.REMASTERED_PROJECT_DIR":
+              "process.env.REMASTERED_PROJECT_DIR",
           },
           build: {
             ssr: "src/entry-server.tsx",
