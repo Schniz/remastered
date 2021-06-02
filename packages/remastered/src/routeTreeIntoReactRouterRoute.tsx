@@ -27,6 +27,7 @@ export function routeTreeIntoReactRouterRoute(
       path: key,
       children: routeTreeIntoReactRouterRoute(branch.children),
       routeFile: branch.filepath,
+      hadElement: !!branch.element,
     };
     route.element = (
       <ClosestRouteContext.Provider value={route}>
@@ -40,5 +41,6 @@ export function routeTreeIntoReactRouterRoute(
 }
 
 export type RouteObjectWithFilename = RouteObject & {
+  hadElement: boolean;
   routeFile?: string;
 };
