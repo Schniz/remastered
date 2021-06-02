@@ -68,7 +68,7 @@ async function onGet({
   let loaderNotFound = false;
 
   const weHaveElementToRender = (
-    exactFound.slice(-1)[0].route as RouteObjectWithFilename
+    exactFound.slice(-1)[0]?.route as RouteObjectWithFilename
   )?.hadElement;
 
   if (exactFound.length === 0 || !weHaveElementToRender) {
