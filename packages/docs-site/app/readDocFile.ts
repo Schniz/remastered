@@ -21,7 +21,7 @@ export async function readDocFile(givenPath: string): Promise<Doc | null> {
   const pathParts =
     givenPath
       .replace(/-/g, "_")
-      .split(":")
+      .split("/")
       .map((x) => `*_${x}`)
       .join("/") + ".md";
 

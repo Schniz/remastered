@@ -1,12 +1,13 @@
 import React from "react";
 import { HeadersFn, LoaderFn, MetaFn, useRouteData } from "remastered";
-import { Doc, readDocFile } from "../../readDocFile";
-import { ogMeta } from "../../ogMeta";
+import { Doc, readDocFile } from "../../../readDocFile";
+import { ogMeta } from "../../../ogMeta";
 
 type Data = Doc;
 
 export const loader: LoaderFn<Data> = async ({ params }) => {
-  const doc = await readDocFile(params.path);
+  const path = `${params.category}/${params.file}`;
+  const doc = await readDocFile(path);
   return doc;
 };
 

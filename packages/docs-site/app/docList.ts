@@ -36,7 +36,6 @@ export async function docList(): Promise<FileEntry[]> {
             .replace(/^docs\//, "")
             .replace(/(^|\/)(\d+)_/g, "$1")
             .replace(/_/g, "-")
-            .replace("/", ":")
             .replace(/\.md$/, "")
             .toLowerCase(),
           title: attributes.link_title ?? attributes.title ?? file.path,
