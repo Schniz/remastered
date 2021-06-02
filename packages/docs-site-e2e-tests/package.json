@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "test:prepare": "lerna run build --scope=@remastered/docs-site --include-dependencies",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "devDependencies": {
     "@swc-node/jest": "^1.3.0",
