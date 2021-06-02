@@ -35,8 +35,8 @@ const config = defineConfig({
   ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",
-    "process.env.REMASTER_PROJECT_DIR": JSON.stringify(
-      process.env.REMASTER_PROJECT_DIR
+    "process.env.REMASTERED_PROJECT_DIR": JSON.stringify(
+      process.env.REMASTERED_PROJECT_DIR
     ),
   },
   build: {

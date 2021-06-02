@@ -116,7 +116,7 @@ const exportCmd = command({
       rootDir: process.cwd(),
       serverEntry,
     });
-    process.env.REMASTER_PROJECT_DIR = process.cwd();
+    process.env.REMASTERED_PROJECT_DIR = process.cwd();
     const routes: string[] = await getStaticPaths();
     const requests = routes
       .flatMap((route) => {

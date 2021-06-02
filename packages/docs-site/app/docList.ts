@@ -10,7 +10,7 @@ export type FileEntry = Directory | File;
 
 export async function docList(): Promise<FileEntry[]> {
   const files = await globby("docs/**/*.md", {
-    cwd: String(process.env.REMASTER_PROJECT_DIR),
+    cwd: String(process.env.REMASTERED_PROJECT_DIR),
   });
   const categories = _(files)
     .map((p) => p.replace("../../", ""))
@@ -25,7 +25,7 @@ export async function docList(): Promise<FileEntry[]> {
     .mapValues((x): FileEntry[] => {
       return x.map((file): FileEntry => {
         const contents = fs.readFileSync(
-          path.join(process.env.REMASTER_PROJECT_DIR!, file.path),
+          path.join(process.env.REMASTERED_PROJECT_DIR!, file.path),
           "utf8"
         );
         const { attributes } =

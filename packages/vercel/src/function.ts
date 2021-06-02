@@ -15,7 +15,7 @@ export function createVercelFunction({
   rootDir: string;
   serverEntry: unknown;
 }): VercelApiHandler {
-  process.env.REMASTER_PROJECT_DIR = rootDir;
+  process.env.REMASTERED_PROJECT_DIR = rootDir;
   const renderContext$ = getRenderContext({ rootDir, serverEntry });
 
   return async (req, res) => {
