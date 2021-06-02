@@ -14,6 +14,11 @@ function isRoute(rootPath: string, filepath: string) {
 
 /**
  * Removes all the `export const ...` from routes, so it won't use server side stuff in client side
+ *
+ * TODO this code uses SWC. Maybe we should use Babel?
+ * We also use `print` by SWC which I do not want. I would want to only parse using SWC.
+ * Unfortunately, the spans SWC produces do not reflect the actual code we send to it.
+ * Meaning that if we use MagicString with it, it blows up: https://github.com/swc-project/swc/issues/1366
  */
 export function routeTransformers(): PluginOption[] {
   const acceptSelfCode = `
@@ -23,7 +28,6 @@ export function routeTransformers(): PluginOption[] {
       });
     }
   `;
-  // let server: ViteDevServer | undefined;
   let resolvedConfig: ResolvedConfig | undefined;
 
   return [
@@ -33,9 +37,6 @@ export function routeTransformers(): PluginOption[] {
       configResolved(given) {
         resolvedConfig = given;
       },
-      // configureServer(given) {
-      //   server = given;
-      // },
       load(id) {
         if (!resolvedConfig) {
           this.error(`Config is not resolved`);
