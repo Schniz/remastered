@@ -1,6 +1,7 @@
 {
   "name": "plain-test-app",
   "version": "1.0.0",
+  "private": true,
   "main": "index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
