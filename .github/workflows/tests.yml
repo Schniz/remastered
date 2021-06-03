@@ -41,3 +41,24 @@ jobs:
           lerna run start --scope=@remastered/docs-site &
           npx wait-port 3000
           yarn test
+
+  plain-test-app:
+    name: 'plain-test-app'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: yarn --frozen-lockfile
+      - name: Build dependencies
+        run: |
+          cd packages/remastered
+          yarn build
+      - name: Run e2e tests
+        run: |
+          cd test-packages/plain-test-app
+          yarn install --frozen-lockfile
+          yarn dev &
+          npx wait-port 3000
+          yarn test
