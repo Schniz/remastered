@@ -14,7 +14,7 @@ Each [Route](./0_routing.md) can expose a `loader` function, which is essentiall
 The `loader` function _provides_ the data in the back-end, and the `useRouteData` can be used to _consume_ the loader data.
 
 ```tsx
-import type { LoaderFn, useRouteData } from "remastered";
+import { LoaderFn, useRouteData } from "remastered";
 
 export const loader: LoaderFn<string> = async () => {
   return `Page was rendered at ${new Date()}`;
