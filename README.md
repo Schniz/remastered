@@ -6,7 +6,9 @@ Modern front-end tools have changed the way we expect the web platform to behave
 
 Remastered is a full-stack framework based on React, that puts routing as the center of your application. That means owning back the entire stack, leveraging HTTP to its fullest capabilities and shipping faster with great confidence, without risking developer experience.
 
-https://remastered.hagever.com
+🏠 [Homepage: https://remastered.hagever.com](https://remastered.hagever.com)
+
+📝 [Documentation: https://remastered.hagever.com/docs](https://remastered.hagever.com/docs)
 
 #### 🎁 Open source
 
@@ -62,4 +64,4 @@ understand what they are going to experience.
 #### 👐 And so much more.
 
 So many more stuff are baked in. Just come and
-[read the docs to learn more!](https://remastered.hagever.com/)
+[read the docs to learn more!](https://remastered.hagever.com/docs)
