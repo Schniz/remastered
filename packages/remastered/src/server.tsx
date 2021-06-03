@@ -42,6 +42,11 @@ export async function createServer(
 
   app.use(express.static(path.join(root, "public")));
 
+  const hmrClientPort =
+    typeof process.env.HMR_CLIENT_PORT === "string"
+      ? Number(process.env.HMR_CLIENT_PORT)
+      : undefined;
+
   const vite = isProd
     ? undefined
     : await createViteServer({
@@ -49,7 +54,12 @@ export async function createServer(
         configFile: getViteConfigPath({ ssr: false }),
         server: {
           middlewareMode: "ssr",
-          hmr: { server, port, path: "/@vite/_hmr_" },
+          hmr: {
+            server,
+            port,
+            path: "/@vite/_hmr_",
+            clientPort: hmrClientPort,
+          },
         },
       });
 
