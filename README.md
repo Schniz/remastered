@@ -2,7 +2,7 @@
 
 > A full-stack approach to React development.
 
-Modern front-end tools have changed the way we expect the web platform to behave. They also made us forgot some of the fundamentals and kinda make shipping.. harder.
+Modern front-end tools have changed the way we expect the web platform to behave. They also made us forget some of the fundamentals and kinda make shipping.. harder.
 
 Remastered is a full-stack framework based on React, that puts routing as the center of your application. That means owning back the entire stack, leveraging HTTP to its fullest capabilities and shipping faster with great confidence, without risking developer experience.
 
@@ -37,7 +37,7 @@ from a modern web-app.
 
 Don't squint! See the changes on your development environment once
 you save a file! By leveraging [Vite](https://vitejs.dev), a futuristic JavaScript bundler that ensures you get the best
-and fastest developer experience, no matter what size is your app.
+and fastest developer experience, no matter what size your app is.
 
 #### ✨ Convenient data fetching
 
@@ -54,7 +54,7 @@ interactions as soon as they are needed.
 
 #### 🤩 Titles and Meta Tags... HTTP!
 
-The `<title>` and the `<meta>` are
+The `<title>` and `<meta>` tags are
 the way to share metadata about the current page in the web
 platform. They can't be an afterthought! Remastered takes it very
 seriously and provides and easy way to declare metadata for the
