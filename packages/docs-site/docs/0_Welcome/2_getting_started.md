@@ -29,7 +29,7 @@ export default function Home() {
 Now we can run the following command to launch a dev session:
 
 ```sh
-$ remastered dev
+$ npx remastered dev
 ```
 
 Open the browser in `http://localhost:3000` and witness, your new route!
