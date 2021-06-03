@@ -63,5 +63,5 @@ understand what they are going to experience.
 
 #### 👐 And so much more.
 
-So many more stuff are baked in. Just come and
+So many more things are baked in. Just come and
 [read the docs to learn more!](https://remastered.hagever.com/docs)
