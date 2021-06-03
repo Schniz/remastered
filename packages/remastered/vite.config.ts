@@ -55,6 +55,7 @@ const config = defineConfig({
       "cryptr",
       "@vitejs/plugin-react-refresh",
       "debug",
+      "node-fetch",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
