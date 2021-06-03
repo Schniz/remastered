@@ -6,7 +6,6 @@
   "license": "MIT",
   "scripts": {
     "dev": "remastered dev",
-    "test:prepare": "cd ../.. && lerna run build --scope=remastered",
     "test": "jest --runInBand"
   },
   "dependencies": {
