@@ -56,6 +56,7 @@ const config = defineConfig({
       "@vitejs/plugin-react-refresh",
       "debug",
       "node-fetch",
+      "history",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
