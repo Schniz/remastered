@@ -57,7 +57,7 @@ interactions as soon as they are needed.
 The `<title>` and `<meta>` tags are
 the way to share metadata about the current page in the web
 platform. They can't be an afterthought! Remastered takes it very
-seriously and provides and easy way to declare metadata for the
+seriously and provides an easy way to declare metadata for the
 current page, allowing search engines and screen-readers to easily
 understand what they are going to experience.
 
