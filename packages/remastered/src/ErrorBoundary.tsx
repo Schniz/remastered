@@ -1,27 +1,19 @@
 import { ErrorBoundaryShim, ErrorBoundaryShimProps } from "./ErrorBoundaryShim";
 import React from "react";
+import { useLocation } from "react-router";
+import { ErrorBoundary as ErrorBoundaryClientImpl } from "react-error-boundary";
 
-type ErrorBoundaryClientState = {
-  error?: Error;
-};
-
-class ErrorBoundaryClient extends React.Component<
-  ErrorBoundaryShimProps,
-  ErrorBoundaryClientState
-> {
-  state = {} as ErrorBoundaryClientState;
-
-  static getDerivedStateFromError(error: null | Error) {
-    return { error };
-  }
-
-  render() {
-    if (this.state.error) {
-      return <this.props.fallbackComponent error={this.state.error} />;
-    }
-
-    return <>{this.props.children}</>;
-  }
+function ErrorBoundaryClient(props: ErrorBoundaryShimProps) {
+  const location = useLocation();
+  return (
+    <ErrorBoundaryClientImpl
+      fallbackRender={({ error }) => {
+        return <props.fallbackComponent error={error} />;
+      }}
+      resetKeys={[location]}
+      children={props.children}
+    />
+  );
 }
 
 export const ErrorBoundary = import.meta.env.SSR

@@ -1,8 +1,6 @@
 import React from "react";
-import {
-  create as createRenderer,
-  ReactTestRendererJSON,
-} from "react-test-renderer";
+import $ from "cheerio";
+import { renderToStaticMarkup } from "react-dom/server";
 
 /**
  * An error boundary shim for SSR.
@@ -24,8 +22,9 @@ import {
  * I realized that in order to return a valid React component, I will have to parse
  * the HTML back into a JSON. Then I remembered -- this is exactly how the React test renderer works.
  *
- * So we render a JSON tree from the children passed to the `ErrorBoundaryShim` element.
- * If we have an error,
+ * Unfortunately, the React test renderer didn't worked out because it failed to have nested error boundaries.
+ * So I used Cheerio to parse HTML. Maybe there's something faster! I really wish we had a fast HTML parser
+ * that had `span`s like we have in JS parsers: then we can just use the containing HTMLs and remove them from the original string. bah.
  *
  * Maybe that's bad, maybe it's not performant, but it works.
  * We can make it faster later on!
@@ -34,12 +33,35 @@ export function ErrorBoundaryShim(
   props: ErrorBoundaryShimProps
 ): React.ReactElement | null {
   try {
-    const renderer = createRenderer(withAllContexts(props.children));
-    const markup = renderer.toJSON();
-    return convertTestRendererJsonToReactElement(markup);
+    const html = renderToStaticMarkup(withAllContexts(props.children));
+    return convertHtmlToReactElements(html);
   } catch (error) {
     return <props.fallbackComponent error={error} />;
   }
+}
+
+function convertHtmlToReactElements(html: string): React.ReactElement {
+  const $$ = $.load(html, { xmlMode: true });
+  const elements: React.ReactNode[] = [];
+
+  for (const node of $$.root().children()) {
+    const attributes: Record<string, unknown> = {
+      ...node.attribs,
+      key: elements.length,
+    };
+    const children = $$(node).children;
+    let text: string | undefined = undefined;
+
+    if (children.length === 0) {
+      text = $$(node).text();
+    } else {
+      attributes.dangerouslySetInnerHTML = { __html: $$(node).html() };
+    }
+
+    elements.push(React.createElement(node.name, attributes, text));
+  }
+
+  return React.createElement(React.Fragment, {}, elements);
 }
 
 export type ErrorBoundaryShimProps = {
@@ -89,33 +111,4 @@ function withAllContexts(child: React.ReactElement): React.ReactElement {
       return <Provider value={value}>{innerValue}</Provider>;
     }, child);
   return wrappedInContexts;
-}
-
-/**
- * Simply converts a result of `react-test-renderer` into a React.ReactElement
- */
-function convertTestRendererJsonToReactElement(
-  output: ReactTestRendererJSON | ReactTestRendererJSON[] | null
-): React.ReactElement | null {
-  if (!output) return null;
-  const jsons = Array.isArray(output) ? output : [output];
-  const elements: React.ReactElement[] = [];
-
-  for (const json of jsons) {
-    const children = json.children?.map((child) =>
-      typeof child === "string"
-        ? child
-        : convertTestRendererJsonToReactElement(child)
-    );
-    const element = React.createElement(json.type, json.props, children);
-    elements.push(element);
-  }
-
-  if (elements.length === 0) {
-    return null;
-  } else if (elements.length === 1) {
-    return elements[0];
-  } else {
-    return React.createElement(React.Fragment, {}, elements);
-  }
 }
