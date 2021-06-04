@@ -73,15 +73,21 @@ export function routeTransformers(): PluginOption[] {
           target: "es2020",
         });
 
+        const allowedExports = ["handle", "meta", "ErrorBoundary"];
+
         for (const item of parsed.body) {
           if (item.type !== "ExportDeclaration") {
             body.push(item);
+          } else if (item.declaration.type === "FunctionDeclaration") {
+            if (allowedExports.includes(item.declaration.identifier.value)) {
+              body.push(item);
+            }
           } else if (item.declaration.type === "VariableDeclaration") {
             const declarations = item.declaration.declarations.filter(
               (declaration) => {
                 return (
                   declaration.id.type === "Identifier" &&
-                  ["handle", "meta"].includes(declaration.id.value)
+                  allowedExports.includes(declaration.id.value)
                 );
               }
             );

@@ -5,7 +5,12 @@ import { LoaderContext } from "./LoaderContext";
 import { MetaFn } from "./routeTypes";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 
-export type RouteDef = { hasLoader: boolean; handle?: unknown; meta?: MetaFn };
+export type RouteDef = {
+  hasLoader: boolean;
+  handle?: unknown;
+  meta?: MetaFn;
+  errorBoundary?: React.ComponentType;
+};
 export const MatchesContext = React.createContext<Map<string, RouteDef>>(
   new Map()
 );

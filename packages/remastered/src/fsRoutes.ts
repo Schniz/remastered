@@ -15,6 +15,8 @@ export type RouteFile = {
   meta?: MetaFn<unknown>;
   /** A route can export anything using the `handle` named export */
   handle?: unknown;
+  /** An error boundary to be rendered if there was an error rendering this page */
+  ErrorBoundary?: React.ComponentType;
 };
 
 function loadFiles(): Record<string, () => Promise<RouteFile>> {

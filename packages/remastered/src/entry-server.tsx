@@ -1,3 +1,6 @@
+import { globalPatch } from "./globalPatch";
+globalPatch();
+
 import React from "react";
 import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
@@ -8,7 +11,6 @@ import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
 import { MatchesContext, RouteDef } from "./useMatches";
-import { globalPatch } from "./globalPatch";
 import { wrapRoutes } from "./wrapRoutes";
 import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
@@ -23,8 +25,6 @@ import { RemasteredAppServer } from "./RemasteredAppServer";
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
 const mainFile = `node_modules/.remastered/entry.client.js`;
-
-globalPatch();
 
 type RequestContext = {
   request: HttpRequest;
@@ -56,7 +56,10 @@ async function onGet({
     [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
   };
 
-  const url = request.url.replace(/\.loader\.json$/, "");
+  const url = new URL(request.url, "http://example.com").pathname.replace(
+    /\.loader\.json$/,
+    ""
+  );
   const isLoaderJsonResponse =
     request.url.endsWith(".loader.json") ||
     request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT);
@@ -85,7 +88,10 @@ async function onGet({
     foundRouteKeys,
     routesObject
   );
-  const loadedComponents = mapValues(relevantRoutes, (x) => x.component);
+  const loadedComponents = mapValues(relevantRoutes, (x) => ({
+    component: x.component,
+    errorBoundary: x.errorBoundary,
+  }));
   const loaderContext = new Map<string, unknown>();
   const links: AllLinkTags[] = [];
   const headers = new Headers();
@@ -167,7 +173,12 @@ async function onGet({
       routesObject
     ),
     (v): RouteDef => {
-      return { hasLoader: Boolean(v.loader), handle: v.handle, meta: v.meta };
+      return {
+        hasLoader: Boolean(v.loader),
+        handle: v.handle,
+        meta: v.meta,
+        errorBoundary: v.errorBoundary,
+      };
     }
   );
 

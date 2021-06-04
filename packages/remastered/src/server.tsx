@@ -8,6 +8,9 @@ import _ from "lodash";
 import { getViteConfigPath } from "./getViteConfig";
 import type { HttpRequest, HttpResponse } from "./HttpTypes";
 import type { Server } from "http";
+import { shim } from "./shimReactContext";
+
+shim();
 
 const isProd = process.env.NODE_ENV === "production";
 

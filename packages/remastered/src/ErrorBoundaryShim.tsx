@@ -5,52 +5,6 @@ import {
 } from "react-test-renderer";
 
 /**
- * This set holds a weak reference to all the contexts
- * that will be created in the application.
- *
- * Why a WeakRef? Because it's awesome.
- * The real question is why is it so awesome?
- *
- * Holding the contexts in memory can cause memory leaks.
- * Using `WeakRef`s allow us to hold a weak reference so the contexts
- * can be GC'd any time.
- */
-const contextMap = new Set<WeakRef<React.Context<any>>>();
-
-function getAllContexts(): React.Context<any>[] {
-  const contexts: React.Context<any>[] = [];
-
-  for (const ref of [...contextMap]) {
-    const context = ref.deref();
-    if (!context) {
-      contextMap.delete(ref);
-    } else {
-      contexts.push(context);
-    }
-  }
-
-  return contexts;
-}
-
-/**
- * Listen to all contexts being created!
- */
-export function shim() {
-  const oldCreateContext = React.createContext;
-
-  React.createContext = function createContext<T>(t: T) {
-    const ctx = oldCreateContext(t);
-    contextMap.add(new WeakRef(ctx));
-    return ctx;
-  };
-
-  return () => {
-    contextMap.clear();
-    React.createContext = oldCreateContext;
-  };
-}
-
-/**
  * An error boundary shim for SSR.
  *
  * This is obviously not supported in React DOM, but it does not mean we should
@@ -76,10 +30,9 @@ export function shim() {
  * Maybe that's bad, maybe it's not performant, but it works.
  * We can make it faster later on!
  */
-export function ErrorBoundaryShim(props: {
-  children: React.ReactElement;
-  fallbackComponent: React.ComponentType<{ error: any }>;
-}): React.ReactElement | null {
+export function ErrorBoundaryShim(
+  props: ErrorBoundaryShimProps
+): React.ReactElement | null {
   try {
     const renderer = createRenderer(withAllContexts(props.children));
     const markup = renderer.toJSON();
@@ -87,6 +40,34 @@ export function ErrorBoundaryShim(props: {
   } catch (error) {
     return <props.fallbackComponent error={error} />;
   }
+}
+
+export type ErrorBoundaryShimProps = {
+  children: React.ReactElement;
+  fallbackComponent: React.ComponentType<{ error: any }>;
+};
+
+let g: {
+  $$remasteredContextMap?: Set<WeakRef<React.Context<any>>>;
+} = {};
+
+if (typeof global !== "undefined") {
+  g = global as any;
+}
+
+function getAllContexts(): React.Context<any>[] {
+  const contexts: React.Context<any>[] = [];
+
+  for (const ref of [...g.$$remasteredContextMap!]) {
+    const context = ref.deref();
+    if (!context) {
+      g.$$remasteredContextMap!.delete(ref);
+    } else {
+      contexts.push(context);
+    }
+  }
+
+  return contexts;
 }
 
 /**

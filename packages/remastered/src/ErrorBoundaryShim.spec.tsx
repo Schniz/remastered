@@ -1,16 +1,29 @@
-import React from "react";
-import { ErrorBoundaryShim, shim } from "./ErrorBoundaryShim";
+import * as React from "react";
+import { ErrorBoundaryShim } from "./ErrorBoundaryShim";
 import { renderToStaticMarkup } from "react-dom/server";
+import { StaticRouter } from "react-router-dom/server";
 
-let removeShim: Function;
-beforeEach(() => {
-  removeShim = shim();
-});
-afterEach(() => {
-  removeShim?.();
+// for some reason we can't use the shim here, so we
+// mock it inline... this is not fun!
+jest.mock("react", () => {
+  let g = global as {
+    $$remasteredContextMap?: Set<WeakRef<React.Context<any>>>;
+  };
+  g.$$remasteredContextMap = new Set();
+  const set = g.$$remasteredContextMap;
+
+  const ActualReact = jest.requireActual("react");
+  return {
+    ...ActualReact,
+    createContext(v: unknown) {
+      const ctx = ActualReact.createContext(v);
+      set.add(new WeakRef(ctx));
+      return ctx;
+    },
+  };
 });
 
-test("smoke", () => {});
+afterEach(() => jest.resetAllMocks());
 
 test("renders the child", () => {
   const SuccessfulComponent = () => <div>Success!</div>;
@@ -53,4 +66,29 @@ test("propagates contexts", () => {
     </MyContext.Provider>
   );
   expect(output).toEqual(`<div>Value is cool</div>`);
+});
+
+test("works with router", async () => {
+  const { Route, Routes, useLocation } = require("react-router");
+  const ErrorComponent = (props: { error: any }) => (
+    <div>{String(props.error)}</div>
+  );
+  const SuccessfulComponent = () => {
+    const location = useLocation();
+    return <div>My location is {location.pathname}</div>;
+  };
+  const output = renderToStaticMarkup(
+    <StaticRouter location="/">
+      <Routes>
+        <Route
+          element={
+            <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+              <SuccessfulComponent />
+            </ErrorBoundaryShim>
+          }
+        />
+      </Routes>
+    </StaticRouter>
+  );
+  expect(output).toEqual("<div>My location is /</div>");
 });

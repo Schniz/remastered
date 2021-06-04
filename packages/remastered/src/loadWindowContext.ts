@@ -30,7 +30,10 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     ...getRoutesObject(),
     [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
   });
-  const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
+  const loadedComponents = mapValues(loadedRoutes, (x) => ({
+    component: x.component,
+    errorBoundary: x.errorBoundary,
+  }));
   const matchesContext = new Map(ctx.routeDefs);
 
   for (const route of loadedRoutes.values()) {
@@ -64,5 +67,6 @@ function applyRouteHandlesToCtx(
     ...ctx.get(routeDefinition.key),
     handle: routeDefinition.handle,
     meta: routeDefinition.meta,
+    errorBoundary: routeDefinition.errorBoundary,
   });
 }

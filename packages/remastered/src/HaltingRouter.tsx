@@ -23,6 +23,7 @@ import {
   deserializeResponse,
   isSerializedResponse,
 } from "./SerializedResponse";
+import { RemasteredAppContext } from "./WrapWithContext";
 
 /**
  * An in-progress transaction value
@@ -87,7 +88,7 @@ export function HaltingRouter(props: {
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
   initialLoaderContext: Map<string, unknown>;
-  loadedComponentContext: Map<string, React.ComponentType>;
+  loadedComponentContext: RemasteredAppContext["loadedComponentsContext"];
 }) {
   const historyResponseState = React.useContext(
     NotFoundAndSkipRenderOnServerContext
@@ -193,7 +194,7 @@ async function handlePendingState(
   signal: AbortSignal,
   setLoaderContext: (map: Map<string, unknown>) => void,
   loaderContext: Map<string, unknown>,
-  componentContext: Map<string, React.ComponentType>,
+  componentContext: RemasteredAppContext["loadedComponentsContext"],
   matchesContext: React.ContextType<typeof MatchesContext>,
   onNotFound: () => void
 ) {
@@ -212,7 +213,10 @@ async function handlePendingState(
       return;
     }
     if (entry.default) {
-      componentContext.set(routeFile, entry.default);
+      componentContext.set(routeFile, {
+        component: entry.default,
+        errorBoundary: entry.ErrorBoundary,
+      });
     }
     matchesContext.set(routeFile, {
       hasLoader: false,
