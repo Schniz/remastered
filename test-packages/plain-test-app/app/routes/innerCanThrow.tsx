@@ -1,6 +1,5 @@
-import { Outlet, NavLink } from "remastered";
+import { Outlet, NavLink, ErrorBoundary as EB } from "remastered";
 import React from "react";
-import { ErrorBoundary as EB } from "remastered/dist/ErrorBoundary";
 
 export default function InnerThrows() {
   return (

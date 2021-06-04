@@ -21,3 +21,4 @@ export type {
   RenderClientEntryFn,
   RenderClientEntryOptions,
 } from "./defaultClientEntry";
+export { ErrorBoundary } from "./ErrorBoundary";
