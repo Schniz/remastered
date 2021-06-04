@@ -58,6 +58,8 @@ const config = defineConfig({
       "node-fetch",
       "history",
       "react-error-boundary",
+      "cheerio",
+      "react-dom/server",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
