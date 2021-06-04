@@ -57,6 +57,7 @@ const config = defineConfig({
       "debug",
       "node-fetch",
       "history",
+      "react-test-renderer",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
