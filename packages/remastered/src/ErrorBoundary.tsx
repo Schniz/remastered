@@ -16,6 +16,11 @@ function ErrorBoundaryClient(props: ErrorBoundaryShimProps) {
   );
 }
 
+/**
+ * An error boundary component that works both on the client and in SSR
+ *
+ * Wrap any bad-behaving component to avoid a broken website!
+ */
 export const ErrorBoundary = import.meta.env.SSR
   ? ErrorBoundaryShim
   : ErrorBoundaryClient;
