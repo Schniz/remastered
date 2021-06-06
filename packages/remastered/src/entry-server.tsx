@@ -6,7 +6,10 @@ import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import { chain } from "lodash";
-import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
+import {
+  buildRouteDefinitionBag,
+  RouteDefinition,
+} from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
@@ -21,6 +24,11 @@ import createDebugger from "debug";
 import { RemasteredAppContext } from "./WrapWithContext";
 import userCreateResponse from "glob-first:/app/entry.server.{t,j}s{x,};./defaultServerEntry.js";
 import { RemasteredAppServer } from "./RemasteredAppServer";
+import { RenderServerEntryOptions } from "./defaultServerEntry";
+import {
+  NotFoundAndSkipRenderOnServerContext,
+  ResponseState,
+} from "./NotFoundAndSkipRenderOnServerContext";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -92,35 +100,51 @@ async function onGet({
     component: x.component,
     errorBoundary: x.errorBoundary,
   }));
-  const loaderContext = new Map<string, unknown>();
+  const loaderContext: RemasteredAppContext["loaderContext"] = new Map();
   const links: AllLinkTags[] = [];
   const headers = new Headers();
+  let erroredRoute: RouteDefinition<EnhancedRoute> | undefined;
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
-      const params = relevantRoute.givenRoute.params;
-      const loader = relevantRoute.loader;
-      const loaderResult = await checkTime(`${relevantRoute.key} loader`, () =>
-        loader({
-          params,
-          request,
-        })
-      );
-      loaderContext.set(relevantRoute.key, loaderResult);
+      try {
+        const params = relevantRoute.givenRoute.params;
+        const loader = relevantRoute.loader;
+        const loaderResult = await checkTime(
+          `${relevantRoute.key} loader`,
+          () =>
+            loader({
+              params,
+              request,
+            })
+        );
+        loaderContext.set(relevantRoute.key, {
+          tag: "ok",
+          value: loaderResult,
+        });
 
-      if (loaderResult === null || loaderResult === undefined) {
-        loaderNotFound = true;
-      }
-
-      if (isHttpResponse(loaderResult)) {
-        if (loaderResult.headers.get("Content-Type") === "application/json") {
-          loaderContext.set(relevantRoute.key, await loaderResult.json());
-        } else if (isLoaderJsonResponse) {
-          const serializedResponse = await serializeResponse(loaderResult);
-          loaderContext.set(relevantRoute.key, serializedResponse);
-        } else {
-          return loaderResult;
+        if (loaderResult === null || loaderResult === undefined) {
+          loaderNotFound = true;
         }
+
+        if (isHttpResponse(loaderResult)) {
+          if (loaderResult.headers.get("Content-Type") === "application/json") {
+            loaderContext.set(relevantRoute.key, {
+              tag: "ok",
+              value: await loaderResult.json(),
+            });
+          } else if (isLoaderJsonResponse) {
+            const serializedResponse = await serializeResponse(loaderResult);
+            loaderContext.set(relevantRoute.key, {
+              tag: "ok",
+              value: serializedResponse,
+            });
+          } else {
+            return loaderResult;
+          }
+        }
+      } catch (e) {
+        loaderContext.set(relevantRoute.key, { tag: "err", error: String(e) });
       }
     }
   }
@@ -147,6 +171,8 @@ async function onGet({
 
   if (loaderNotFound) {
     status = 404;
+  } else if (erroredRoute) {
+    status = 500;
   }
 
   if (isLoaderJsonResponse) {
@@ -201,10 +227,16 @@ async function onGet({
 
   scripts.push(...(await mainScript(clientManifest, viteDevServer)));
 
+  const routingRenderState: ResponseState = loaderNotFound
+    ? { tag: "not_found" }
+    : erroredRoute
+    ? { tag: "error", routeKey: erroredRoute.key }
+    : { tag: "ok" };
+
   const inlineScript = await buildWindowValues(
     found,
     loaderContext,
-    status,
+    new Map([["@default@", routingRenderState]]),
     links,
     scripts,
     matchesContext
@@ -213,14 +245,15 @@ async function onGet({
   scripts.unshift(inlineScript);
 
   const remasteredAppContext: RemasteredAppContext = {
-    loadingErrorContext: new Map([
-      ["default", loaderNotFound ? "not_found" : "ok"],
-    ]),
+    loadingErrorContext: new Map([["default", routingRenderState]]),
     links,
     loaderContext: mapKeys(loaderContext, (a) => `default@${a}`),
     loadedComponentsContext: loadedComponents,
     scripts,
     matchesContext,
+    setStatusCode(number) {
+      status = number;
+    },
   };
 
   if (typeof userCreateResponse !== "function") {
@@ -235,13 +268,19 @@ async function onGet({
     );
   }
 
-  const response = await userCreateResponse({
+  const renderServerEntryOptions: RenderServerEntryOptions = {
     request,
     Component: RemasteredAppServer,
     ctx: remasteredAppContext,
-    httpStatus: status,
-    httpHeaders: headers,
-  });
+    getHttpStatus() {
+      return status;
+    },
+    getHttpHeaders() {
+      return headers;
+    },
+  };
+
+  const response = await userCreateResponse(renderServerEntryOptions);
 
   return response;
 }
@@ -355,8 +394,8 @@ function buildScripts(
 
 async function buildWindowValues(
   routes: RouteMatch[],
-  loaderContext: Map<string, unknown>,
-  splashState: number,
+  loaderContext: RemasteredAppContext["loaderContext"],
+  routingErrors: React.ContextType<typeof NotFoundAndSkipRenderOnServerContext>,
   links: AllLinkTags[],
   scripts: ScriptTag[],
   matchesContext: React.ContextType<typeof MatchesContext>
@@ -370,7 +409,7 @@ async function buildWindowValues(
   const data: typeof __REMASTERED_CTX = {
     linkTags: links,
     scriptTags: scripts,
-    splashState: splashState,
+    routingErrors: [...routingErrors],
     ssrRoutes: routeFiles,
     loadCtx: [...loaderContext.entries()],
     routeDefs: [...matchesContext],

@@ -3,6 +3,10 @@ import { DynamicImportComponentContext } from "./DynamicImportComponent";
 import { LinkTagsContext, ScriptTagsContext } from "./JsxForDocument";
 import { LoaderContext } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
+import {
+  SetStatusCodeContext,
+  SetStatusCodeProvider,
+} from "./SetStatusCodeContext";
 import { MatchesContext } from "./useMatches";
 
 export type RemasteredAppContext = {
@@ -16,6 +20,7 @@ export type RemasteredAppContext = {
     typeof DynamicImportComponentContext
   >;
   matchesContext: React.ContextType<typeof MatchesContext>;
+  setStatusCode?: React.ContextType<typeof SetStatusCodeContext>;
 };
 
 export function WrapWithContext({
@@ -33,11 +38,13 @@ export function WrapWithContext({
             value={ctx.loadingErrorContext}
           >
             <LoaderContext.Provider value={ctx.loaderContext}>
-              <DynamicImportComponentContext.Provider
-                value={ctx.loadedComponentsContext}
-              >
-                {children}
-              </DynamicImportComponentContext.Provider>
+              <SetStatusCodeProvider value={ctx.setStatusCode}>
+                <DynamicImportComponentContext.Provider
+                  value={ctx.loadedComponentsContext}
+                >
+                  {children}
+                </DynamicImportComponentContext.Provider>
+              </SetStatusCodeProvider>
             </LoaderContext.Provider>
           </NotFoundAndSkipRenderOnServerContext.Provider>
         </LinkTagsContext.Provider>

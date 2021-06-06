@@ -13,7 +13,7 @@ import {
 } from "history";
 import React from "react";
 import { getRouteElements, getRoutesObject } from "./fsRoutes";
-import { LoaderContext } from "./LoaderContext";
+import { LoaderContext, Result } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 import { PendingLocationContext } from "./PendingLocation";
@@ -87,7 +87,7 @@ function useTransactionalState<T>(initialValue: T): {
 export function HaltingRouter(props: {
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
-  initialLoaderContext: Map<string, unknown>;
+  initialLoaderContext: React.ContextType<typeof LoaderContext>;
   loadedComponentContext: RemasteredAppContext["loadedComponentsContext"];
 }) {
   const historyResponseState = React.useContext(
@@ -153,7 +153,9 @@ export function HaltingRouter(props: {
         props.loadedComponentContext,
         matchesContext,
         () =>
-          historyResponseState.set(pendingState.value.location.key, "not_found")
+          historyResponseState.set(pendingState.value.location.key, {
+            tag: "not_found",
+          })
       );
     }
 
@@ -192,8 +194,8 @@ async function handlePendingState(
   commit: (tx: string) => void,
   navigator: Navigator,
   signal: AbortSignal,
-  setLoaderContext: (map: Map<string, unknown>) => void,
-  loaderContext: Map<string, unknown>,
+  setLoaderContext: (map: RemasteredAppContext["loaderContext"]) => void,
+  loaderContext: RemasteredAppContext["loaderContext"],
   componentContext: RemasteredAppContext["loadedComponentsContext"],
   matchesContext: React.ContextType<typeof MatchesContext>,
   onNotFound: () => void
@@ -226,7 +228,7 @@ async function handlePendingState(
     });
   });
 
-  const newMap = new Map<string, unknown>();
+  const newMap: RemasteredAppContext["loaderContext"] = new Map();
   let hold = false;
 
   keepRoutes.forEach((route) => {
@@ -236,7 +238,7 @@ async function handlePendingState(
     const currentStorageKey = `${currentState.location.key}@${routeFile}`;
 
     if (loaderContext.has(currentStorageKey)) {
-      newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
+      newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey)!);
     } else {
       if (routeInfo && routeInfo.hasLoader) {
         newRoutes.unshift(route);
@@ -261,7 +263,7 @@ async function handlePendingState(
         const url = `${lastMatch.pathname}.loader.json`;
 
         const { data: result, status } = await fetching(url, signal);
-        const migrated = (result as [string, unknown][]).map(
+        const migrated = (result as [string, Result<unknown, unknown>][]).map(
           ([key, value]) =>
             [`${pendingState.value.location.key}@${key}`, value] as const
         );

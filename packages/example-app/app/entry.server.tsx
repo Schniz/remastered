@@ -7,10 +7,10 @@ const render: RenderServerEntryFn = async (opts) => {
     <opts.Component ctx={opts.ctx} requestedUrl={opts.request.url} />
   );
   return new Response(`<!DOCTYPE html><!-- example -->${html}`, {
-    status: opts.httpStatus,
+    status: opts.getHttpStatus(),
     headers: {
       "Content-Type": "text/html",
-      ...opts.httpHeaders,
+      ...opts.getHttpHeaders(),
     },
   });
 };

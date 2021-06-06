@@ -44,9 +44,11 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     links: ctx.linkTags,
     scripts: [{ _tag: "eager", contents: "" }, ...ctx.scriptTags],
     loadedComponentsContext: loadedComponents,
-    loadingErrorContext: new Map([
-      [historyKey, ctx.splashState === 404 ? "not_found" : "ok"],
-    ]),
+    loadingErrorContext: new Map(
+      __REMASTERED_CTX.routingErrors.map(([key, value]) => {
+        return [key === "@default@" ? historyKey : key, value] as const;
+      })
+    ),
     loaderContext: loadCtx,
     matchesContext: matchesContext,
   };
