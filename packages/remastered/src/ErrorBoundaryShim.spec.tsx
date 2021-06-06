@@ -92,3 +92,31 @@ test("works with router", async () => {
   );
   expect(output).toEqual("<div>My location is /</div>");
 });
+
+test("nested boundaries", () => {
+  const FailingComponent: React.ComponentType = () => {
+    throw new Error("I am an error!");
+  };
+  const SuccessfulComponent: React.ComponentType = () => {
+    return <div>All good!</div>;
+  };
+  const ErrorComponent = (props: { error: unknown }) => (
+    <div>Oh no: {String(props.error)}</div>
+  );
+  const output = renderToStaticMarkup(
+    <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+      <>
+        <SuccessfulComponent />
+        <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+          <>
+            <div>This will not be seen</div>
+            <FailingComponent />
+          </>
+        </ErrorBoundaryShim>
+      </>
+    </ErrorBoundaryShim>
+  );
+  expect(output).toEqual(
+    `<div>All good!</div><div>Oh no: Error: I am an error!</div>`
+  );
+});
