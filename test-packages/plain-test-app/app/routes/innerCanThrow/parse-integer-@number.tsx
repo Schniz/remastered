@@ -18,5 +18,5 @@ export default function ParseInteger() {
 }
 
 export function ErrorBoundary({ error }: { error: any }) {
-  return <p>Can't parse: {error}</p>;
+  return <p>Can't parse: {String(error)}</p>;
 }

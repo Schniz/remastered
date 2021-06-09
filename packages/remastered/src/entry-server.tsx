@@ -29,6 +29,7 @@ import {
   NotFoundAndSkipRenderOnServerContext,
   ResponseState,
 } from "./NotFoundAndSkipRenderOnServerContext";
+import { serializeError } from "./SerializableError";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -144,7 +145,10 @@ async function onGet({
           }
         }
       } catch (e) {
-        loaderContext.set(relevantRoute.key, { tag: "err", error: String(e) });
+        loaderContext.set(relevantRoute.key, {
+          tag: "err",
+          error: serializeError(e),
+        });
       }
     }
   }
@@ -239,7 +243,8 @@ async function onGet({
     new Map([["@default@", routingRenderState]]),
     links,
     scripts,
-    matchesContext
+    matchesContext,
+    url
   );
 
   scripts.unshift(inlineScript);
@@ -398,7 +403,8 @@ async function buildWindowValues(
   routingErrors: React.ContextType<typeof NotFoundAndSkipRenderOnServerContext>,
   links: AllLinkTags[],
   scripts: ScriptTag[],
-  matchesContext: React.ContextType<typeof MatchesContext>
+  matchesContext: React.ContextType<typeof MatchesContext>,
+  url: string
 ): Promise<ScriptTag> {
   const routeFiles = chain(routes)
     .map((route) => {
@@ -413,6 +419,7 @@ async function buildWindowValues(
     ssrRoutes: routeFiles,
     loadCtx: [...loaderContext.entries()],
     routeDefs: [...matchesContext],
+    path: url,
   };
   return {
     _tag: "eager",

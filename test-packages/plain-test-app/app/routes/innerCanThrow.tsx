@@ -10,6 +10,8 @@ export default function InnerThrows() {
         <NavLink to="">Doesn't throw</NavLink>{" "}
         <NavLink to="throws">throws</NavLink>{" "}
         <NavLink to="critical">critical (don't catch in outlet)</NavLink>{" "}
+        <NavLink to="parse-integer-hello">backend throws a string</NavLink>{" "}
+        <NavLink to="parse-integer-3.14">backend throws an error</NavLink>{" "}
       </p>
       <EB fallbackComponent={OutletBoundary}>
         <Outlet />

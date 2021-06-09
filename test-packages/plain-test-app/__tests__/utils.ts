@@ -16,6 +16,13 @@ export function createBrowserBeforeAndAfter() {
     const pages = [...pagesToDelete];
     pagesToDelete.clear();
     for (const page of pages) {
+      const testName = expect
+        .getState()
+        .currentTestName.replace(/[^a-z]/g, "-");
+      await page.screenshot({
+        fullPage: true,
+        path: `tmp/test-screenshots/${testName}.png`,
+      });
       await page.close();
     }
   });

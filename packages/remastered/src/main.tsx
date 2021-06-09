@@ -25,6 +25,8 @@ declare global {
 
     /** Link tags */
     scriptTags: ScriptTag[];
+
+    path: string;
   };
 
   const __DEV__: boolean;
@@ -38,6 +40,9 @@ document
   .querySelectorAll(`html > script[src^='chrome-extension://']`)
   .forEach((x) => x.remove());
 
-loadWindowContext().then(() => {
-  return renderClientEntry({ Component: RemasteredApp });
+console.log("a");
+loadWindowContext().then(async () => {
+  console.log("b");
+  await renderClientEntry({ Component: RemasteredApp });
+  console.log("c");
 });

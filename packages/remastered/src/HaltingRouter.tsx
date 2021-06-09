@@ -47,13 +47,20 @@ function useTransactionalState<T>(initialValue: T): {
   rollback(tx: string): void;
   /** Start a new transaction */
   begin(t: T): void;
+  /** Immediately commit after beginning a session */
+  setCurrentValueImmediately(t: T): void;
 } {
   const [pendingState, setPendingState] =
     React.useState<PendingState<T> | null>(null);
   const [currentValue, setCurrentValue] = React.useState(initialValue);
 
+  React.useEffect(() => {
+    console.log({ pendingState, currentValue });
+  }, [pendingState, currentValue]);
+
   const commit = React.useCallback(
     (tx: string) => {
+      console.log("committing tx", tx);
       if (pendingState && pendingState.tx === tx) {
         setCurrentValue(pendingState.value);
         setPendingState(null);
@@ -62,10 +69,15 @@ function useTransactionalState<T>(initialValue: T): {
     [pendingState]
   );
   const rollback = React.useCallback(() => setPendingState(null), []);
-  const begin = React.useCallback(
-    (t: T) => setPendingState({ value: t, tx: String(Math.random) }),
-    []
-  );
+  const begin = React.useCallback((t: T) => {
+    const tx = String(Math.random());
+    console.log("starting tx", tx);
+    setPendingState({ value: t, tx });
+  }, []);
+  const setCurrentValueImmediately = React.useCallback((t: T) => {
+    rollback();
+    setCurrentValue(t);
+  }, []);
 
   return {
     currentValue,
@@ -73,6 +85,17 @@ function useTransactionalState<T>(initialValue: T): {
     commit,
     rollback,
     begin,
+    setCurrentValueImmediately,
+  };
+}
+
+function initialLocation(): Location {
+  return {
+    key: "default",
+    state: window.history.state?.usr,
+    search: "",
+    hash: "",
+    pathname: __REMASTERED_CTX.path,
   };
 }
 
@@ -108,9 +131,10 @@ export function HaltingRouter(props: {
     commit,
     pendingState,
     begin,
+    setCurrentValueImmediately,
   } = useTransactionalState({
-    action: history.action,
-    location: history.location,
+    action: Action.Pop,
+    location: initialLocation(),
   });
 
   React.useEffect(() => {
@@ -119,9 +143,20 @@ export function HaltingRouter(props: {
         history.replace(history.location);
     }
 
-    return history.listen((state) => {
+    setCurrentValueImmediately({
+      action: history.action,
+      location: history.location,
+    });
+
+    const unsubscribe = history.listen((state) => {
       begin(state);
     });
+
+    if (history.location.pathname !== state.location.pathname) {
+      history.replace(history.location);
+    }
+
+    return unsubscribe;
   }, []);
 
   React.useEffect(() => {
