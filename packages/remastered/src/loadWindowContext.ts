@@ -22,7 +22,7 @@ export let readyContext: { value?: RemasteredAppContext } =
 
 export async function loadWindowContext(): Promise<RemasteredAppContext> {
   const ctx = __REMASTERED_CTX;
-  const historyKey = window.history.state?.key ?? "default";
+  const historyKey = "default";
   const loadCtx = new Map(
     ctx.loadCtx.map(([key, value]) => [`${historyKey}@${key}`, value])
   );

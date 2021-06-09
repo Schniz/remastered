@@ -54,13 +54,12 @@ function useTransactionalState<T>(initialValue: T): {
     React.useState<PendingState<T> | null>(null);
   const [currentValue, setCurrentValue] = React.useState(initialValue);
 
-  React.useEffect(() => {
-    console.log({ pendingState, currentValue });
-  }, [pendingState, currentValue]);
+  /* React.useEffect(() => { */
+  /*   console.log({ pendingState, currentValue }); */
+  /* }, [pendingState, currentValue]); */
 
   const commit = React.useCallback(
     (tx: string) => {
-      console.log("committing tx", tx);
       if (pendingState && pendingState.tx === tx) {
         setCurrentValue(pendingState.value);
         setPendingState(null);
@@ -71,7 +70,6 @@ function useTransactionalState<T>(initialValue: T): {
   const rollback = React.useCallback(() => setPendingState(null), []);
   const begin = React.useCallback((t: T) => {
     const tx = String(Math.random());
-    console.log("starting tx", tx);
     setPendingState({ value: t, tx });
   }, []);
   const setCurrentValueImmediately = React.useCallback((t: T) => {
@@ -89,7 +87,9 @@ function useTransactionalState<T>(initialValue: T): {
   };
 }
 
-function initialLocation(): Location {
+function getInitialLocation(
+  _initialLoaderContext: React.ContextType<typeof LoaderContext>
+): Location {
   return {
     key: "default",
     state: window.history.state?.usr,
@@ -131,10 +131,9 @@ export function HaltingRouter(props: {
     commit,
     pendingState,
     begin,
-    setCurrentValueImmediately,
   } = useTransactionalState({
     action: Action.Pop,
-    location: initialLocation(),
+    location: getInitialLocation(loaderContextRef.current),
   });
 
   React.useEffect(() => {
@@ -142,11 +141,6 @@ export function HaltingRouter(props: {
       (window as any).__$$refresh_remastered$$__ = () =>
         history.replace(history.location);
     }
-
-    setCurrentValueImmediately({
-      action: history.action,
-      location: history.location,
-    });
 
     const unsubscribe = history.listen((state) => {
       begin(state);
@@ -214,12 +208,15 @@ export function HaltingRouter(props: {
 async function fetching(
   url: string,
   signal: AbortSignal
-): Promise<{ data: unknown; status: number }> {
+): Promise<{ data: [string, Result<unknown, unknown>][]; status: number }> {
   const response = await fetch(url, {
     headers: { Accept: REMASTERED_JSON_ACCEPT },
     signal,
   });
   const json = await response.json();
+  if (!Array.isArray(json.data)) {
+    throw new Error("Incompatible response");
+  }
   return { data: json.data, status: response.status };
 }
 
@@ -282,15 +279,17 @@ async function handlePendingState(
   });
 
   const loaders = newRoutes.map(async (lastMatch) => {
-    const isExact = lastMatch.pathname === pendingState.value.location.pathname;
+    const isExact =
+      lastMatch.pathname.replace(/\/$/, "") ===
+      pendingState.value.location.pathname;
     const { routeFile } = lastMatch.route;
     const routeInfo = matchesContext.get(routeFile);
     const storageKey = `${pendingState.value.location.key}@${routeFile}`;
 
     if (routeInfo && routeInfo.hasLoader) {
-      if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) {
-        return;
-      }
+      /* if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) { */
+      /*   return; */
+      /* } */
       if (
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
@@ -298,16 +297,18 @@ async function handlePendingState(
         const url = `${lastMatch.pathname}.loader.json`;
 
         const { data: result, status } = await fetching(url, signal);
-        const migrated = (result as [string, Result<unknown, unknown>][]).map(
+        const migrated = result.map(
           ([key, value]) =>
             [`${pendingState.value.location.key}@${key}`, value] as const
         );
 
-        for (const [, value] of result as [string, unknown][]) {
-          if (isSerializedResponse(value) && isExact) {
-            const response = deserializeResponse(value);
-            if (applyResponse(response, navigator)) {
-              hold = true;
+        for (const [, loaderResult] of result) {
+          if (loaderResult.tag === "ok") {
+            if (isSerializedResponse(loaderResult.value) && isExact) {
+              const response = deserializeResponse(loaderResult.value);
+              if (applyResponse(response, navigator)) {
+                hold = true;
+              }
             }
           }
         }

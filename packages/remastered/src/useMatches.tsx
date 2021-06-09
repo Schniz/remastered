@@ -56,12 +56,15 @@ export function useMatches(): Match[] {
     if (!value) {
       return [];
     }
+    const dataResult = loaderContext.get(`${location.key}@${routeFile}`);
+    const data = dataResult?.tag === "ok" ? dataResult.value : undefined;
+
     return [
       {
         handle: value.handle,
         pathname: route.pathname,
         params: route.params,
-        data: loaderContext.get(`${location.key}@${routeFile}`),
+        data,
         meta: value.meta,
       },
     ];
