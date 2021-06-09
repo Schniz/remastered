@@ -17,6 +17,7 @@ Remix has a live-reload component/hook that will listen to file changes and trig
 Remastered does no guarantee 100% compatibility with Remix. It's not a goal. It's more about sharing concepts and ideas.
 
 - Remix is using `$` prefixes in file-system routing. I find this a problem in experience because `ls app/routes/$user.tsx` is not the same as `ls 'app/routes/$user.tsx'`, so Remastered is using `@` to determine a dynamic component in the URL.
+- Remix uses `.` for nesting URLs without nesting layouts. Dots are important for URLs! They are used for extensions. What if you want to generate a `.xml` file? Or `.png` file? Do you need to avoid using the file-system routing? This is why Remastered is using tilde `~` instead.
 - Remix has no special care for CSS imports. In Remastered, CSS imports are simply `import './file.css'`. CSS modules also work the same way.
 - Remastered Vercel deploy target can export static pages for better performance. This is opt-in behavior.
 
