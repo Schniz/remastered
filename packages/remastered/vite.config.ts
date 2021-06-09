@@ -60,6 +60,7 @@ const config = defineConfig({
       "react-error-boundary",
       "cheerio",
       "react-dom/server",
+      "serialize-error",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
