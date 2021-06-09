@@ -120,3 +120,19 @@ test("nested boundaries", () => {
     `<div>All good!</div><div>Oh no: Error: I am an error!</div>`
   );
 });
+
+test("html attributes", () => {
+  jest.spyOn(console, "error");
+  const ErrorComponent = () => <div>not going to show</div>;
+  const output = renderToStaticMarkup(
+    <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+      <div tabIndex={10} aria-label="hello" className="hi" data-hello="howdy">
+        Hey
+      </div>
+    </ErrorBoundaryShim>
+  );
+  expect(output).toEqual(
+    `<div tabindex="10" aria-label="hello" class="hi" data-hello="howdy">Hey</div>`
+  );
+  expect(console.error).not.toHaveBeenCalled();
+});

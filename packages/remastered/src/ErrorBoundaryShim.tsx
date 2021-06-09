@@ -40,15 +40,36 @@ export function ErrorBoundaryShim(
   }
 }
 
+function camelCasify(str: string): string {
+  if (str in DOM_ATTRS_OVERRIDE) {
+    return DOM_ATTRS_OVERRIDE[str];
+  }
+
+  if (str.startsWith("aria-") || str.startsWith("data-")) {
+    return str;
+  }
+
+  return str.replace(/([A-z])-([A-z])/g, (_a, b, c) => {
+    return b.toLowerCase() + c.toUpperCase();
+  });
+}
+
+const DOM_ATTRS_OVERRIDE: Record<string, string> = {
+  tabindex: "tabIndex",
+  class: "className",
+  contenteditable: "contentEditable",
+};
+
 function convertHtmlToReactElements(html: string): React.ReactElement {
   const $$ = $.load(html, { xmlMode: true });
   const elements: React.ReactNode[] = [];
 
   for (const node of $$.root().children()) {
-    const attributes: Record<string, unknown> = {
-      ...node.attribs,
-      key: elements.length,
-    };
+    const attributes: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(node.attribs)) {
+      attributes[camelCasify(key)] = value;
+    }
+    attributes.key = elements.length;
     const children = $$(node).children;
     let text: string | undefined = undefined;
 
