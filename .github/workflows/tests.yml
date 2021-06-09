@@ -62,3 +62,8 @@ jobs:
           yarn dev &
           npx wait-port 3000
           yarn test
+      - uses: actions/upload-artifact@v2
+        with:
+          name: plain-test-app test-screenshots
+          path: test-packages/plain-test-app/tmp/test-screenshots # or path/to/artifact
+        if: always()
