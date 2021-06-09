@@ -1,4 +1,3 @@
-import { getRoutesObject } from "./fsRoutes";
 import { LoaderFn, ActionFn, LinksFn, HeadersFn, MetaFn } from "./routeTypes";
 
 export type RouteDefinition<T = unknown> = {
@@ -11,6 +10,7 @@ export type RouteDefinition<T = unknown> = {
   headers?: HeadersFn;
   key: string;
   givenRoute: T;
+  errorBoundary?: React.ComponentType;
 };
 
 export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
@@ -38,6 +38,7 @@ export async function buildRouteDefinitionBag<T extends { routeKey: string }>(
         meta: routeDef.meta,
         key,
         givenRoute: route,
+        errorBoundary: routeDef.ErrorBoundary,
       });
     });
   await Promise.all(loadedComponents);

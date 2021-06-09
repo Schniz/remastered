@@ -22,7 +22,7 @@ export let readyContext: { value?: RemasteredAppContext } =
 
 export async function loadWindowContext(): Promise<RemasteredAppContext> {
   const ctx = __REMASTERED_CTX;
-  const historyKey = window.history.state?.key ?? "default";
+  const historyKey = "default";
   const loadCtx = new Map(
     ctx.loadCtx.map(([key, value]) => [`${historyKey}@${key}`, value])
   );
@@ -30,7 +30,10 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     ...getRoutesObject(),
     [LAYOUT_ROUTE_KEY]: async () => LayoutObject,
   });
-  const loadedComponents = mapValues(loadedRoutes, (x) => x.component);
+  const loadedComponents = mapValues(loadedRoutes, (x) => ({
+    component: x.component,
+    errorBoundary: x.errorBoundary,
+  }));
   const matchesContext = new Map(ctx.routeDefs);
 
   for (const route of loadedRoutes.values()) {
@@ -41,9 +44,11 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     links: ctx.linkTags,
     scripts: [{ _tag: "eager", contents: "" }, ...ctx.scriptTags],
     loadedComponentsContext: loadedComponents,
-    loadingErrorContext: new Map([
-      [historyKey, ctx.splashState === 404 ? "not_found" : "ok"],
-    ]),
+    loadingErrorContext: new Map(
+      __REMASTERED_CTX.routingErrors.map(([key, value]) => {
+        return [key === "@default@" ? historyKey : key, value] as const;
+      })
+    ),
     loaderContext: loadCtx,
     matchesContext: matchesContext,
   };
@@ -64,5 +69,6 @@ function applyRouteHandlesToCtx(
     ...ctx.get(routeDefinition.key),
     handle: routeDefinition.handle,
     meta: routeDefinition.meta,
+    errorBoundary: routeDefinition.errorBoundary,
   });
 }

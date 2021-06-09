@@ -13,7 +13,7 @@ import {
 } from "history";
 import React from "react";
 import { getRouteElements, getRoutesObject } from "./fsRoutes";
-import { LoaderContext } from "./LoaderContext";
+import { LoaderContext, Result } from "./LoaderContext";
 import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
 import { MatchesContext } from "./useMatches";
 import { PendingLocationContext } from "./PendingLocation";
@@ -23,6 +23,7 @@ import {
   deserializeResponse,
   isSerializedResponse,
 } from "./SerializedResponse";
+import { RemasteredAppContext } from "./WrapWithContext";
 
 /**
  * An in-progress transaction value
@@ -46,10 +47,16 @@ function useTransactionalState<T>(initialValue: T): {
   rollback(tx: string): void;
   /** Start a new transaction */
   begin(t: T): void;
+  /** Immediately commit after beginning a session */
+  setCurrentValueImmediately(t: T): void;
 } {
   const [pendingState, setPendingState] =
     React.useState<PendingState<T> | null>(null);
   const [currentValue, setCurrentValue] = React.useState(initialValue);
+
+  /* React.useEffect(() => { */
+  /*   console.log({ pendingState, currentValue }); */
+  /* }, [pendingState, currentValue]); */
 
   const commit = React.useCallback(
     (tx: string) => {
@@ -61,10 +68,14 @@ function useTransactionalState<T>(initialValue: T): {
     [pendingState]
   );
   const rollback = React.useCallback(() => setPendingState(null), []);
-  const begin = React.useCallback(
-    (t: T) => setPendingState({ value: t, tx: String(Math.random) }),
-    []
-  );
+  const begin = React.useCallback((t: T) => {
+    const tx = String(Math.random());
+    setPendingState({ value: t, tx });
+  }, []);
+  const setCurrentValueImmediately = React.useCallback((t: T) => {
+    rollback();
+    setCurrentValue(t);
+  }, []);
 
   return {
     currentValue,
@@ -72,6 +83,19 @@ function useTransactionalState<T>(initialValue: T): {
     commit,
     rollback,
     begin,
+    setCurrentValueImmediately,
+  };
+}
+
+function getInitialLocation(
+  _initialLoaderContext: React.ContextType<typeof LoaderContext>
+): Location {
+  return {
+    key: "default",
+    state: window.history.state?.usr,
+    search: "",
+    hash: "",
+    pathname: __REMASTERED_CTX.path,
   };
 }
 
@@ -86,8 +110,8 @@ function useTransactionalState<T>(initialValue: T): {
 export function HaltingRouter(props: {
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
-  initialLoaderContext: Map<string, unknown>;
-  loadedComponentContext: Map<string, React.ComponentType>;
+  initialLoaderContext: React.ContextType<typeof LoaderContext>;
+  loadedComponentContext: RemasteredAppContext["loadedComponentsContext"];
 }) {
   const historyResponseState = React.useContext(
     NotFoundAndSkipRenderOnServerContext
@@ -108,8 +132,8 @@ export function HaltingRouter(props: {
     pendingState,
     begin,
   } = useTransactionalState({
-    action: history.action,
-    location: history.location,
+    action: Action.Pop,
+    location: getInitialLocation(loaderContextRef.current),
   });
 
   React.useEffect(() => {
@@ -118,9 +142,15 @@ export function HaltingRouter(props: {
         history.replace(history.location);
     }
 
-    return history.listen((state) => {
+    const unsubscribe = history.listen((state) => {
       begin(state);
     });
+
+    if (history.location.pathname !== state.location.pathname) {
+      history.replace(history.location);
+    }
+
+    return unsubscribe;
   }, []);
 
   React.useEffect(() => {
@@ -152,7 +182,9 @@ export function HaltingRouter(props: {
         props.loadedComponentContext,
         matchesContext,
         () =>
-          historyResponseState.set(pendingState.value.location.key, "not_found")
+          historyResponseState.set(pendingState.value.location.key, {
+            tag: "not_found",
+          })
       );
     }
 
@@ -176,12 +208,15 @@ export function HaltingRouter(props: {
 async function fetching(
   url: string,
   signal: AbortSignal
-): Promise<{ data: unknown; status: number }> {
+): Promise<{ data: [string, Result<unknown, unknown>][]; status: number }> {
   const response = await fetch(url, {
     headers: { Accept: REMASTERED_JSON_ACCEPT },
     signal,
   });
   const json = await response.json();
+  if (!Array.isArray(json.data)) {
+    throw new Error("Incompatible response");
+  }
   return { data: json.data, status: response.status };
 }
 
@@ -191,9 +226,9 @@ async function handlePendingState(
   commit: (tx: string) => void,
   navigator: Navigator,
   signal: AbortSignal,
-  setLoaderContext: (map: Map<string, unknown>) => void,
-  loaderContext: Map<string, unknown>,
-  componentContext: Map<string, React.ComponentType>,
+  setLoaderContext: (map: RemasteredAppContext["loaderContext"]) => void,
+  loaderContext: RemasteredAppContext["loaderContext"],
+  componentContext: RemasteredAppContext["loadedComponentsContext"],
   matchesContext: React.ContextType<typeof MatchesContext>,
   onNotFound: () => void
 ) {
@@ -212,7 +247,10 @@ async function handlePendingState(
       return;
     }
     if (entry.default) {
-      componentContext.set(routeFile, entry.default);
+      componentContext.set(routeFile, {
+        component: entry.default,
+        errorBoundary: entry.ErrorBoundary,
+      });
     }
     matchesContext.set(routeFile, {
       hasLoader: false,
@@ -222,7 +260,7 @@ async function handlePendingState(
     });
   });
 
-  const newMap = new Map<string, unknown>();
+  const newMap: RemasteredAppContext["loaderContext"] = new Map();
   let hold = false;
 
   keepRoutes.forEach((route) => {
@@ -232,7 +270,7 @@ async function handlePendingState(
     const currentStorageKey = `${currentState.location.key}@${routeFile}`;
 
     if (loaderContext.has(currentStorageKey)) {
-      newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey));
+      newMap.set(pendingStorageKey, loaderContext.get(currentStorageKey)!);
     } else {
       if (routeInfo && routeInfo.hasLoader) {
         newRoutes.unshift(route);
@@ -241,15 +279,17 @@ async function handlePendingState(
   });
 
   const loaders = newRoutes.map(async (lastMatch) => {
-    const isExact = lastMatch.pathname === pendingState.value.location.pathname;
+    const isExact =
+      lastMatch.pathname.replace(/\/$/, "") ===
+      pendingState.value.location.pathname;
     const { routeFile } = lastMatch.route;
     const routeInfo = matchesContext.get(routeFile);
     const storageKey = `${pendingState.value.location.key}@${routeFile}`;
 
     if (routeInfo && routeInfo.hasLoader) {
-      if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) {
-        return;
-      }
+      /* if (lastMatch.pathname !== "/" && lastMatch.pathname.endsWith("/")) { */
+      /*   return; */
+      /* } */
       if (
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
@@ -257,16 +297,18 @@ async function handlePendingState(
         const url = `${lastMatch.pathname}.loader.json`;
 
         const { data: result, status } = await fetching(url, signal);
-        const migrated = (result as [string, unknown][]).map(
+        const migrated = result.map(
           ([key, value]) =>
             [`${pendingState.value.location.key}@${key}`, value] as const
         );
 
-        for (const [, value] of result as [string, unknown][]) {
-          if (isSerializedResponse(value) && isExact) {
-            const response = deserializeResponse(value);
-            if (applyResponse(response, navigator)) {
-              hold = true;
+        for (const [, loaderResult] of result) {
+          if (loaderResult.tag === "ok") {
+            if (isSerializedResponse(loaderResult.value) && isExact) {
+              const response = deserializeResponse(loaderResult.value);
+              if (applyResponse(response, navigator)) {
+                hold = true;
+              }
             }
           }
         }

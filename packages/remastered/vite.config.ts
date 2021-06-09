@@ -7,6 +7,7 @@ import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
 import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
 import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
 import { redirectRemasteredImports } from "./dist/vite-plugins/redirectRemasteredImports";
+import globby from "globby";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -57,18 +58,19 @@ const config = defineConfig({
       "debug",
       "node-fetch",
       "history",
+      "react-error-boundary",
+      "cheerio",
+      "react-dom/server",
+      "serialize-error",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
       path.join(__dirname, "./dist/entry-server.js"),
+      "app/routes/**/*.{t,j}s",
     ],
     exclude: ["remastered", "glob-first:*"],
   },
   resolve: {
-    // alias: {
-    //   react: require.resolve("react"),
-    //   "react-dom": require.resolve("react-dom"),
-    // },
     dedupe: ["react", "react-dom"],
   },
   ...({

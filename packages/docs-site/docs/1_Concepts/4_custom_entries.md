@@ -32,11 +32,11 @@ export default async function renderServer(
   // You can see we also add doctype, which is not available to do
   // in plain JSX.
   return new Response(`<!DOCTYPE html>` + string, {
-    status: opts.httpStatus,
+    status: opts.getHttpStatus(),
     headers: {
       // Content-Type is important!
       "Content-Type": "text/html",
-      ...Object.fromEntries(opts.httpHeaders.entries()),
+      ...Object.fromEntries(opts.getHttpHeaders().entries()),
     },
   });
 }

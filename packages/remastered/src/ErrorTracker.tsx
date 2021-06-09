@@ -1,16 +1,16 @@
 import React from "react";
-import { Outlet, useLocation } from "react-router";
-import { NotFoundAndSkipRenderOnServerContext } from "./NotFoundAndSkipRenderOnServerContext";
+import { Outlet } from "react-router";
+import { useRenderingError } from "./NotFoundAndSkipRenderOnServerContext";
 import { Error404 } from "./UserOverridableComponents";
+import { Error500 } from "./UserOverridableComponents";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export function ErrorTracker() {
-  const key = useLocation().key;
-  const ctx = React.useContext(NotFoundAndSkipRenderOnServerContext);
-  const shouldShow404 = ctx.get(key);
+  const renderingError = useRenderingError();
 
-  if (shouldShow404 === "not_found") {
-    return <Error404 />;
-  }
-
-  return <Outlet />;
+  return (
+    <ErrorBoundary fallbackComponent={Error500}>
+      {renderingError?.tag === "not_found" ? <Error404 /> : <Outlet />}
+    </ErrorBoundary>
+  );
 }

@@ -5,7 +5,12 @@ import { LoaderContext } from "./LoaderContext";
 import { MetaFn } from "./routeTypes";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 
-export type RouteDef = { hasLoader: boolean; handle?: unknown; meta?: MetaFn };
+export type RouteDef = {
+  hasLoader: boolean;
+  handle?: unknown;
+  meta?: MetaFn;
+  errorBoundary?: React.ComponentType;
+};
 export const MatchesContext = React.createContext<Map<string, RouteDef>>(
   new Map()
 );
@@ -51,12 +56,15 @@ export function useMatches(): Match[] {
     if (!value) {
       return [];
     }
+    const dataResult = loaderContext.get(`${location.key}@${routeFile}`);
+    const data = dataResult?.tag === "ok" ? dataResult.value : undefined;
+
     return [
       {
         handle: value.handle,
         pathname: route.pathname,
         params: route.params,
-        data: loaderContext.get(`${location.key}@${routeFile}`),
+        data,
         meta: value.meta,
       },
     ];

@@ -1,5 +1,6 @@
 import React from "react";
-import { RouteFile } from "./fsRoutes";
+import type { RouteFile } from "./fsRoutes";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 type State =
   | {
@@ -12,17 +13,21 @@ type State =
   | {
       tag: "loaded";
       component: React.ComponentType;
+      errorBoundary?: React.ComponentType;
     };
 
 export function dynamicImportComponent(
   key: string,
-  p: () => Promise<{ default?: React.ComponentType }>
+  p: () => Promise<RouteFile>
 ): React.ComponentType {
   return () => <DynamicImportComponent component={p} contextKey={key} />;
 }
 
 export const DynamicImportComponentContext = React.createContext<
-  Map<string, React.ComponentType>
+  Map<
+    string,
+    { component: React.ComponentType; errorBoundary?: React.ComponentType }
+  >
 >(new Map());
 
 export function DynamicImportComponent({
@@ -33,18 +38,25 @@ export function DynamicImportComponent({
   "initialState"
 > & { contextKey: string }) {
   const ctx = React.useContext(DynamicImportComponentContext);
-  const component = ctx.get(contextKey);
+  const immediate = ctx.get(contextKey);
+
   return (
     <DynamicImportComponentRenderer
       {...props}
-      initialState={component && { tag: "loaded", component }}
+      initialState={
+        immediate && {
+          tag: "loaded",
+          component: immediate.component,
+          errorBoundary: immediate.errorBoundary,
+        }
+      }
       contextKey={contextKey}
     />
   );
 }
 
 export function DynamicImportComponentRenderer(props: {
-  component: () => Promise<{ default?: React.ComponentType }>;
+  component: () => Promise<RouteFile>;
   initialState?: State;
   loadingElement?: React.ReactNode;
   contextKey?: string;
@@ -69,9 +81,16 @@ export function DynamicImportComponentRenderer(props: {
             error: `Module does not have a valid React.Component exported from default export`,
           });
         } else {
-          setState({ tag: "loaded", component: mod.default });
+          setState({
+            tag: "loaded",
+            component: mod.default,
+            errorBoundary: mod.ErrorBoundary,
+          });
           if (props.contextKey) {
-            ctx.set(props.contextKey, mod.default);
+            ctx.set(props.contextKey, {
+              component: mod.default,
+              errorBoundary: mod.ErrorBoundary,
+            });
           }
         }
       })
@@ -88,6 +107,13 @@ export function DynamicImportComponentRenderer(props: {
       return <div>Error: {String(state.error)}</div>;
     }
     case "loaded": {
+      if (state.errorBoundary) {
+        return (
+          <ErrorBoundary fallbackComponent={state.errorBoundary as any}>
+            <state.component />
+          </ErrorBoundary>
+        );
+      }
       return <state.component />;
     }
   }

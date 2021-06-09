@@ -24,7 +24,9 @@ export const loader: LoaderFn<Response> = async ({ request }) => {
   if (!session.has("userId")) {
     session.set("userId", `user-${Math.round(Math.random() * 100000)}`);
   }
-
+  if (request.url.includes("failhaha")) {
+    throw new Error("FAILLLLL");
+  }
   return json<Data>({
     currentUserId: String(session.get("userId")),
     users: [...database.values()],
@@ -84,6 +86,9 @@ export default function Users() {
       <div>
         <NavLink className={s.navLink} to={"not-found"}>
           Missing member
+        </NavLink>
+        <NavLink className={s.navLink} to={"censor"}>
+          Censored user
         </NavLink>
         {data.users.map((user) => (
           <NavLink className={s.navLink} to={user.slug} key={user.slug}>

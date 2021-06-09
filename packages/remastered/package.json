@@ -37,6 +37,7 @@
     "@swc/core": "^1.2.57",
     "@vitejs/plugin-react-refresh": "^1.3.3",
     "acorn-walk": "^8.1.0",
+    "cheerio": "^1.0.0-rc.9",
     "cmd-ts": "^0.6.9",
     "cookie": "^0.4.1",
     "cryptr": "^6.0.2",
@@ -51,8 +52,10 @@
     "node-fetch": "^2.6.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
+    "react-error-boundary": "^3.1.3",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
+    "serialize-error": "^8.1.0",
     "tempy": "^1.0.1",
     "vite": "~2.3.6"
   },
