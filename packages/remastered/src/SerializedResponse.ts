@@ -1,7 +1,7 @@
 import { HttpResponse } from "./HttpTypes";
 
 export function isSerializedResponse(x: any): x is SerializedResponse {
-  return "@remastered/serialized-response" in x;
+  return x && "@remastered/serialized-response" in x;
 }
 
 export type SerializedResponse = {

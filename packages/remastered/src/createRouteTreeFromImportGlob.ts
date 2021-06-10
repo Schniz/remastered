@@ -40,7 +40,7 @@ function replaceDots(rt: RouteTree): RouteTree {
       .replace(/\.[tj]sx?$/, "")
       .replace(/@/g, ":")
       .replace(/@/, ":")
-      .replace(/\./g, "/");
+      .replace(/\~/g, "/");
     let newKey = `/${strippedName}`;
     if (newKey === "/index") {
       newKey = "/";

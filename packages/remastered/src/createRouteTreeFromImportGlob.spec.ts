@@ -6,7 +6,7 @@ test("routes", () => {
     "/app/routes/users.tsx": SomeComponent,
     "/app/routes/about.tsx": SomeComponent,
     "/app/routes/index.tsx": SomeComponent,
-    "/app/routes/users.register.tsx": SomeComponent,
+    "/app/routes/users~register.tsx": SomeComponent,
     "/app/routes/with-nesting/@nestA/@nestB.tsx": SomeComponent,
   });
   expect(result).toEqual({
@@ -47,7 +47,7 @@ test("routes", () => {
     "/users/register": {
       element: SomeComponent,
       children: {},
-      filepath: "/app/routes/users.register.tsx",
+      filepath: "/app/routes/users~register.tsx",
     },
   });
 });

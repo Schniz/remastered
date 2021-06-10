@@ -66,7 +66,7 @@ And the rules are:
 
 - Every `.jsx` and `.tsx` file under `app/routes/` is a route which follows the directory listing
 - Nested layouts are in nested directories
-- To un-nest layouts, use a dot `.` to create nesting, instead of `/`
+- To un-nest layouts, use a tilde `~` to create nesting, instead of `/`
 
 | file                            | url               | component hierarchy                                      |
 | ------------------------------- | ----------------- | -------------------------------------------------------- |
@@ -75,4 +75,4 @@ And the rules are:
 | `app/routes/users.tsx`          | `/users`          | will be used as a nested layout, check `users/index.tsx` |
 | `app/routes/users/index.tsx`    | `/users/`         | `users.tsx` > `users/index.tsx`                          |
 | `app/routes/users/@id.tsx`      | `/users/:id`      | `users.tsx` > `users/@id.tsx`                            |
-| `app/routes/users.register.tsx` | `/users/register` | `users.register.tsx`                                     |
+| `app/routes/users~register.tsx` | `/users/register` | `users~register.tsx`                                     |
