@@ -73,7 +73,7 @@ export function routeTransformers(): PluginOption[] {
           target: "es2020",
         });
 
-        const allowedExports = ["handle", "meta", "ErrorBoundary"];
+        const allowedExports = ["handle", "meta", "ErrorBoundary", "default"];
 
         for (const item of parsed.body) {
           if (item.type !== "ExportDeclaration") {

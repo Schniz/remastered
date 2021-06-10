@@ -30,6 +30,7 @@ import {
   ResponseState,
 } from "./NotFoundAndSkipRenderOnServerContext";
 import { serializeError } from "./SerializableError";
+import { REMASTERED_JSON_FALLBACK_HEADER } from "./httpHelpers";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -129,12 +130,20 @@ async function onGet({
         }
 
         if (isHttpResponse(loaderResult)) {
-          if (loaderResult.headers.get("Content-Type") === "application/json") {
+          if (
+            loaderResult.headers.get(REMASTERED_JSON_FALLBACK_HEADER) === "true"
+          ) {
             loaderContext.set(relevantRoute.key, {
               tag: "ok",
               value: await loaderResult.json(),
             });
+            status = loaderResult.status;
+            for (const [headerName, headerValue] of loaderResult.headers) {
+              if (headerName === REMASTERED_JSON_FALLBACK_HEADER) continue;
+              headers.set(headerName, headerValue);
+            }
           } else if (isLoaderJsonResponse) {
+            console.log([...loaderResult.headers.entries()]);
             const serializedResponse = await serializeResponse(loaderResult);
             loaderContext.set(relevantRoute.key, {
               tag: "ok",
