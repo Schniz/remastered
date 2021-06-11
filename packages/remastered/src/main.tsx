@@ -40,9 +40,6 @@ document
   .querySelectorAll(`html > script[src^='chrome-extension://']`)
   .forEach((x) => x.remove());
 
-console.log("a");
 loadWindowContext().then(async () => {
-  console.log("b");
   await renderClientEntry({ Component: RemasteredApp });
-  console.log("c");
 });

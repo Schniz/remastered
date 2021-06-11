@@ -90,12 +90,13 @@ function useTransactionalState<T>(initialValue: T): {
 function getInitialLocation(
   _initialLoaderContext: React.ContextType<typeof LoaderContext>
 ): Location {
+  const url = new URL(__REMASTERED_CTX.path, window.location.href);
   return {
     key: "default",
     state: window.history.state?.usr,
-    search: "",
+    search: url.search,
     hash: "",
-    pathname: __REMASTERED_CTX.path,
+    pathname: url.pathname,
   };
 }
 
@@ -294,7 +295,7 @@ async function handlePendingState(
         pendingState.value.action !== Action.Pop ||
         !loaderContext.has(storageKey)
       ) {
-        const url = `${lastMatch.pathname}.loader.json`;
+        const url = `${lastMatch.pathname}.loader.json${pendingState.value.location.search}`;
 
         const { data: result, status } = await fetching(url, signal);
         const migrated = result.map(

@@ -138,8 +138,9 @@ async function onGet({
               value: await loaderResult.json(),
             });
             status = loaderResult.status;
+            loaderResult.headers.delete(REMASTERED_JSON_FALLBACK_HEADER);
+            loaderResult.headers.delete("Content-Type");
             for (const [headerName, headerValue] of loaderResult.headers) {
-              if (headerName === REMASTERED_JSON_FALLBACK_HEADER) continue;
               headers.set(headerName, headerValue);
             }
           } else if (isLoaderJsonResponse) {
@@ -253,7 +254,7 @@ async function onGet({
     links,
     scripts,
     matchesContext,
-    url
+    request.url
   );
 
   scripts.unshift(inlineScript);
