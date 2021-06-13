@@ -5,17 +5,15 @@ import { getRenderContext } from "./getRenderContext";
 import { deserializeResponse, getResponsePath } from "./StaticExporting";
 import fs from "fs-extra";
 import path from "path";
-import type { render } from "remastered/dist/entry-server";
 import type { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
-
-type RenderFn = typeof render;
+import { ServerEntry, render } from "./render";
 
 export function createVercelFunction({
   rootDir,
   serverEntry: getServerEntry,
 }: {
   rootDir: string;
-  serverEntry(): Promise<{ render: RenderFn }>;
+  serverEntry(): Promise<ServerEntry>;
 }): VercelApiHandler {
   process.env.REMASTERED_PROJECT_DIR = rootDir;
   const renderContext$ = getRenderContext({ rootDir });
@@ -32,11 +30,10 @@ export function createVercelFunction({
 
     const response =
       (await findExportedResponse(rootDir, request)) ??
-      (await (
-        await serverEntry$
-      ).render({
+      (await render({
+        serverEntry: serverEntry$,
+        renderContext: renderContext$,
         request,
-        ...(await renderContext$),
       }));
 
     res.status(response.status);
