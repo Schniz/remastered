@@ -10,6 +10,9 @@
     "remastered": "^0.1.25",
     "typescript": "^4.2.4"
   },
+  "scripts": {
+    "build": "tsc"
+  },
   "peerDependencies": {
     "remastered": "^0.1.0"
   },
