@@ -10,14 +10,13 @@ import { ServerEntry, render } from "./render";
 
 export function createVercelFunction({
   rootDir,
-  serverEntry: getServerEntry,
+  serverEntry,
 }: {
   rootDir: string;
-  serverEntry(): Promise<ServerEntry>;
+  serverEntry: ServerEntry;
 }): VercelApiHandler {
   process.env.REMASTERED_PROJECT_DIR = rootDir;
   const renderContext$ = getRenderContext({ rootDir });
-  const serverEntry$ = getServerEntry();
 
   return async (req, res) => {
     const method = req.method?.toUpperCase() ?? "GET";
@@ -31,7 +30,7 @@ export function createVercelFunction({
     const response =
       (await findExportedResponse(rootDir, request)) ??
       (await render({
-        serverEntry: serverEntry$,
+        serverEntry: serverEntry,
         renderContext: renderContext$,
         request,
       }));

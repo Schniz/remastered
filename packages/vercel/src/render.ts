@@ -9,12 +9,11 @@ export type ServerEntry = { render: typeof entryRender };
 shim();
 
 export async function render(opts: {
-  serverEntry: Promise<ServerEntry>;
+  serverEntry: ServerEntry;
   renderContext: ReturnType<typeof getRenderContext>;
   request: Request;
 }): Promise<HttpResponse> {
-  const serverEntry = await opts.serverEntry;
-  return serverEntry.render({
+  return opts.serverEntry.render({
     request: opts.request,
     ...(await opts.renderContext),
   });
