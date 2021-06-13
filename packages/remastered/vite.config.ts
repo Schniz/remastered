@@ -7,7 +7,8 @@ import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
 import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
 import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
 import { redirectRemasteredImports } from "./dist/vite-plugins/redirectRemasteredImports";
-import globby from "globby";
+import { environmentSpecificFiles } from "./dist/vite-plugins/environmentSpecificFiles";
+// import rpv from "rollup-plugin-visualizer";
 
 export function fileInCore(name: string): string {
   return path.join(process.cwd(), "node_modules/.remastered", name);
@@ -33,6 +34,8 @@ const config = defineConfig({
     reactRefresh(),
     debugPlugin(),
     redirectRemasteredImports(),
+    environmentSpecificFiles(),
+    // rpv({ open: true }),
   ],
   define: {
     __DEV__: process.env.NODE_ENV !== "production",

@@ -39,3 +39,20 @@ export function shim() {
 
   return clearShim;
 }
+
+/**
+ * Polyfill WeakRef on environments like Cloudflare Workers,
+ * which for some reason do not have this baked in.
+ * It makes it a strong reference, but we can't really polyfill weak reference.
+ */
+if (typeof WeakRef === "undefined") {
+  global.WeakRef = class WeakRef<T> {
+    constructor(private readonly value: T) {}
+
+    deref(): T | undefined {
+      return this.value;
+    }
+
+    [Symbol.toStringTag]: "WeakRef";
+  };
+}

@@ -105,7 +105,6 @@ async function onGet({
   const loaderContext: RemasteredAppContext["loaderContext"] = new Map();
   const links: AllLinkTags[] = [];
   const headers = new Headers();
-  let erroredRoute: RouteDefinition<EnhancedRoute> | undefined;
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
@@ -144,7 +143,6 @@ async function onGet({
               headers.set(headerName, headerValue);
             }
           } else if (isLoaderJsonResponse) {
-            console.log([...loaderResult.headers.entries()]);
             const serializedResponse = await serializeResponse(loaderResult);
             loaderContext.set(relevantRoute.key, {
               tag: "ok",
@@ -185,8 +183,6 @@ async function onGet({
 
   if (loaderNotFound) {
     status = 404;
-  } else if (erroredRoute) {
-    status = 500;
   }
 
   if (isLoaderJsonResponse) {
@@ -243,8 +239,6 @@ async function onGet({
 
   const routingRenderState: ResponseState = loaderNotFound
     ? { tag: "not_found" }
-    : erroredRoute
-    ? { tag: "error", routeKey: erroredRoute.key }
     : { tag: "ok" };
 
   const inlineScript = await buildWindowValues(
@@ -478,7 +472,7 @@ async function mainScript(
   regularManifest?: import("vite").Manifest,
   vite?: ViteDevServer
 ): Promise<ScriptTag[]> {
-  if (vite) {
+  if (!import.meta.env.PROD && vite) {
     const {
       default: { preambleCode },
     } = await import("@vitejs/plugin-react-refresh");

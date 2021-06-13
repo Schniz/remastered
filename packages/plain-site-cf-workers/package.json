@@ -1,0 +1,12 @@
+{
+  "name": "@remastered/play-with-cloudflare-workers",
+  "private": true,
+  "scripts": {
+    "site:build": "cd ../../test-packages/plain-test-app && rm -rf node_modules/remastered && yarn add ../../packages/remastered && remastered build",
+    "site:copy-assets": "rm -rf rdist && cp -r ../../test-packages/plain-test-app/dist/ rdist && rm -rf public/assets && cp -r rdist/client/assets public/assets",
+    "prepare": "build && copy-assets",
+    "dev": "wrangler dev",
+    "build": "wrangler build",
+    "worker:publish": "wrangler publish"
+  }
+}

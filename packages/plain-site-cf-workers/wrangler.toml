@@ -1,0 +1,5 @@
+account_id = "1d06755537d54ed1199660a1218447da"
+name = "docs-site-cf-workers"
+type = "webpack"
+workers_dev = true
+site = { bucket = "./public" }
