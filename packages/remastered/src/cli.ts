@@ -10,7 +10,6 @@ import {
   extendType,
 } from "cmd-ts";
 import path from "path";
-import { SSROptions } from "vite";
 
 async function runPromises<T extends (() => Promise<any>)[]>(
   method: "serial" | "parallel",

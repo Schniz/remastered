@@ -1,4 +1,4 @@
-import { renderRequest } from "remastered/dist/server";
+import { renderRequest } from "remastered/dist/renderRequest";
 import { Request } from "node-fetch";
 import type { VercelApiHandler } from "@vercel/node";
 import _ from "lodash";
@@ -29,11 +29,10 @@ export function createVercelFunction({
 
     const response =
       (await findExportedResponse(rootDir, request)) ??
-      (await renderRequest(
-        await renderContext$,
-        // @ts-ignore
-        request
-      ));
+      (await renderRequest(serverEntry as any, {
+        ...(await renderContext$),
+        request,
+      }));
 
     res.status(response.status);
     for (const [header, value] of response.headers) {

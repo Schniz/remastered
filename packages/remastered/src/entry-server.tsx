@@ -6,10 +6,7 @@ import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import { chain } from "lodash";
-import {
-  buildRouteDefinitionBag,
-  RouteDefinition,
-} from "./buildRouteComponentBag";
+import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
@@ -36,7 +33,7 @@ export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
 const mainFile = `node_modules/.remastered/entry.client.js`;
 
-type RequestContext = {
+export type RequestContext = {
   request: HttpRequest;
   manifest?: Record<string, string[]>;
   viteDevServer?: ViteDevServer;
