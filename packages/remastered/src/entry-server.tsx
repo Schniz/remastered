@@ -6,10 +6,7 @@ import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
 import { chain } from "lodash";
-import {
-  buildRouteDefinitionBag,
-  RouteDefinition,
-} from "./buildRouteComponentBag";
+import { buildRouteDefinitionBag } from "./buildRouteComponentBag";
 import { mapValues, mapKeys } from "./Map";
 import { ModuleNode, ViteDevServer } from "vite";
 import { AllLinkTags, LinkTag, ScriptTag } from "./JsxForDocument";
@@ -36,7 +33,7 @@ export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
 const mainFile = `node_modules/.remastered/entry.client.js`;
 
-type RequestContext = {
+export type RequestContext = {
   request: HttpRequest;
   manifest?: Record<string, string[]>;
   viteDevServer?: ViteDevServer;
@@ -105,7 +102,6 @@ async function onGet({
   const loaderContext: RemasteredAppContext["loaderContext"] = new Map();
   const links: AllLinkTags[] = [];
   const headers = new Headers();
-  let erroredRoute: RouteDefinition<EnhancedRoute> | undefined;
 
   for (const relevantRoute of relevantRoutes.values()) {
     if (relevantRoute.loader) {
@@ -144,7 +140,6 @@ async function onGet({
               headers.set(headerName, headerValue);
             }
           } else if (isLoaderJsonResponse) {
-            console.log([...loaderResult.headers.entries()]);
             const serializedResponse = await serializeResponse(loaderResult);
             loaderContext.set(relevantRoute.key, {
               tag: "ok",
@@ -185,8 +180,6 @@ async function onGet({
 
   if (loaderNotFound) {
     status = 404;
-  } else if (erroredRoute) {
-    status = 500;
   }
 
   if (isLoaderJsonResponse) {
@@ -243,8 +236,6 @@ async function onGet({
 
   const routingRenderState: ResponseState = loaderNotFound
     ? { tag: "not_found" }
-    : erroredRoute
-    ? { tag: "error", routeKey: erroredRoute.key }
     : { tag: "ok" };
 
   const inlineScript = await buildWindowValues(
@@ -478,7 +469,7 @@ async function mainScript(
   regularManifest?: import("vite").Manifest,
   vite?: ViteDevServer
 ): Promise<ScriptTag[]> {
-  if (vite) {
+  if (!import.meta.env.PROD && vite) {
     const {
       default: { preambleCode },
     } = await import("@vitejs/plugin-react-refresh");

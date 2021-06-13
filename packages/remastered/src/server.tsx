@@ -3,14 +3,10 @@ import { createServer as createViteServer, ViteDevServer } from "vite";
 import fs from "fs";
 import path from "path";
 import { Request as NFRequest } from "node-fetch";
-import type { RenderFn } from "./entry-server";
 import _ from "lodash";
 import { getViteConfigPath } from "./getViteConfig";
-import type { HttpRequest, HttpResponse } from "./HttpTypes";
 import type { Server } from "http";
-import { shim } from "./shimReactContext";
-
-shim();
+import { renderRequest } from "./renderRequest";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -85,11 +81,12 @@ export async function createServer(
         .compact()
         .value(),
     });
-    const response = await renderRequest(
-      await getViteHandlers(vite),
-      request as unknown as Request,
-      vite
-    );
+    const { serverEntry, ...handlers } = await getViteHandlers(vite);
+    const response = await renderRequest(serverEntry, {
+      ...handlers,
+      request: request,
+      viteDevServer: vite,
+    });
     const headers = _([...response.headers.entries()])
       .fromPairs()
       .value();
@@ -97,34 +94,6 @@ export async function createServer(
   });
 
   return { app, server };
-}
-
-export async function renderRequest(
-  handlers: ViteHandlers,
-  request: HttpRequest,
-  vite?: ViteDevServer
-): Promise<HttpResponse> {
-  try {
-    const render: RenderFn = handlers.serverEntry.render;
-    return await render({
-      request,
-      manifest: handlers.manifest,
-      viteDevServer: vite,
-      clientManifest: handlers.clientManifest,
-    });
-  } catch (e) {
-    // If an error is caught, let vite fix the stracktrace so it maps back to
-    // your actual source code.
-    vite?.ssrFixStacktrace(e);
-    console.error(e);
-    const message = request.headers.has("x-debug") ? String(e) : e.message;
-    return new Response(message, {
-      status: 500,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
-  }
 }
 
 export async function main(root: string) {
