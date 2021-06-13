@@ -102,6 +102,7 @@ const exportCmd = command({
       "./StaticExporting"
     );
     const { Request } = await import("node-fetch");
+    const { renderRequest } = await import("remastered/dist/server");
     const serverEntry = await import(
       path.join(process.cwd(), "dist/server/entry.server.js")
     );
@@ -113,6 +114,7 @@ const exportCmd = command({
     const { getRenderContext } = await import("./getRenderContext");
     const renderContext = await getRenderContext({
       rootDir: process.cwd(),
+      serverEntry,
     });
     process.env.REMASTERED_PROJECT_DIR = process.cwd();
     const routes: string[] = await getStaticPaths();
@@ -121,10 +123,7 @@ const exportCmd = command({
         return [new Request(route), new Request(`${route}.loader.json`)];
       })
       .map(async (request) => {
-        const response = await serverEntry.render({
-          request,
-          ...renderContext,
-        });
+        const response = await renderRequest(renderContext, request);
         await storeTraffic(exportedDir, request, response);
       });
 

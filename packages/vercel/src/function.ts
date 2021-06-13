@@ -16,7 +16,7 @@ export function createVercelFunction({
   serverEntry: unknown;
 }): VercelApiHandler {
   process.env.REMASTERED_PROJECT_DIR = rootDir;
-  const renderContext$ = getRenderContext({ rootDir });
+  const renderContext$ = getRenderContext({ rootDir, serverEntry });
 
   return async (req, res) => {
     const method = req.method?.toUpperCase() ?? "GET";
@@ -30,10 +30,7 @@ export function createVercelFunction({
     const response =
       (await findExportedResponse(rootDir, request)) ??
       (await renderRequest(
-        {
-          serverEntry,
-          ...(await renderContext$),
-        },
+        await renderContext$,
         // @ts-ignore
         request
       ));
