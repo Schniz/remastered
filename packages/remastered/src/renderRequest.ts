@@ -4,8 +4,10 @@ import { shim } from "./shimReactContext";
 
 shim();
 
+export type Renderer = { render: typeof render };
+
 export async function renderRequest(
-  renderer: { render: typeof render },
+  renderer: Renderer,
   context: RequestContext
 ): Promise<HttpResponse> {
   try {

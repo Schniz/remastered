@@ -1,3 +1,4 @@
-dist
-rdist
-public/assets
+/dist
+/rdist
+/public/assets
+/worker
