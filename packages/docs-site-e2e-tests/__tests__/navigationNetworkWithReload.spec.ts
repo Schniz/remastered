@@ -36,6 +36,7 @@ test.only("refresh after history will re-fetch data", async () => {
   expect(historyRequests).toMatchInlineSnapshot(`
 Array [
   "http://localhost:3000/assets/docs.js",
+  "http://localhost:3000/assets/Spinner.js",
   "http://localhost:3000/assets/@file.js",
   "http://localhost:3000/docs.loader.json",
   "http://localhost:3000/docs/welcome/getting-started.loader.json",
