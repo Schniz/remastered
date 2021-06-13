@@ -7,7 +7,6 @@ import fs from "fs-extra";
 import path from "path";
 import type { render } from "remastered/dist/entry-server";
 import type { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
-import { shim as shimReactContext } from "remastered/dist/shimReactContext";
 
 type RenderFn = typeof render;
 
@@ -18,10 +17,6 @@ export function createVercelFunction({
   rootDir: string;
   serverEntry(): Promise<{ render: RenderFn }>;
 }): VercelApiHandler {
-  if (!("$$remasteredContextMap" in global)) {
-    shimReactContext();
-  }
-
   process.env.REMASTERED_PROJECT_DIR = rootDir;
   const renderContext$ = getRenderContext({ rootDir });
   const serverEntry$ = getServerEntry();

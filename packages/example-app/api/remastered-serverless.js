@@ -1,6 +1,10 @@
-import { createVercelFunction } from "@remastered/vercel";
-import path from "path";
+const {
+  createVercelFunction,
+  shimReactContext,
+} = require("@remastered/vercel");
+const path = require("path");
 
+shimReactContext();
 const rootDir = path.join(__dirname, "..");
 
 export default createVercelFunction({
