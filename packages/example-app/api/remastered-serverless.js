@@ -5,5 +5,5 @@ const rootDir = path.join(__dirname, "..");
 
 export default createVercelFunction({
   rootDir,
-  serverEntry: () => import("../dist/server/entry.server"),
+  serverEntry: () => import("../dist/server/entry.server.js"),
 });
