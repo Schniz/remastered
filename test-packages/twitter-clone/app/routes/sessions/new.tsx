@@ -21,11 +21,11 @@ export const action: ActionFn = async ({ request }) => {
 
   const searchParams = new URLSearchParams(await request.text());
 
-  const email = searchParams.get("email");
+  const username = searchParams.get("username");
   const password = searchParams.get("password");
 
-  if (!email || !password) {
-    session.flash("error", "Missing email or password");
+  if (!username || !password) {
+    session.flash("error", "Missing username or password");
 
     return redirectBack(request, {
       fallback: ".",
@@ -35,7 +35,7 @@ export const action: ActionFn = async ({ request }) => {
     });
   }
 
-  const user = await User.logIn(email, password);
+  const user = await User.logIn(username, password);
 
   if (user) {
     session.set("userId", user.id);
@@ -70,11 +70,11 @@ export default function NewSession() {
         className="p-4 bg-gray-100 space-y-2 max-w-screen-md"
       >
         <label className="flex items-center space-x-4">
-          <span>Email</span>
+          <span>Username</span>
           <input
-            type="email"
-            name="email"
-            placeholder="my@email.com"
+            type="text"
+            name="username"
+            placeholder="john.doe"
             className="flex-1 block p-2 bg-white rounded"
           />
         </label>

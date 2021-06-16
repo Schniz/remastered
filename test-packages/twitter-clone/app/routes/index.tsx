@@ -8,7 +8,7 @@ import { useHref } from "react-router";
 type Data = {
   tweets: Array<
     Tweet & {
-      user: Pick<User, "id" | "display_name">;
+      user: Pick<User, "username" | "display_name">;
     }
   >;
   currentUser: User | null;
@@ -30,7 +30,7 @@ export const loader: LoaderFn<Data> = async ({ request }) => {
       },
       include: {
         user: {
-          select: { id: true, display_name: true },
+          select: { username: true, display_name: true },
         },
       },
     }),
@@ -45,7 +45,7 @@ export default function Home() {
         <div>
           <span className="block">Speak your mind</span>
           <form
-            action={useHref(`users/${routeData.currentUser.id}/tweets/new`)}
+            action={useHref(`@${routeData.currentUser.username}/new`)}
             method="post"
           >
             <textarea
@@ -65,21 +65,25 @@ export default function Home() {
       {routeData.notice && (
         <div className="font-bold text-red-500">{routeData.notice}</div>
       )}
-      <ul className="py-4 space-y-4">
-        {routeData.tweets.map((tweet) => {
-          return (
-            <li key={tweet.id}>
-              <Link to={`users/${tweet.user.id}/tweets/${tweet.id}`}>
-                <blockquote>{tweet.text}</blockquote>
-                <span>
-                  -- {tweet.user.display_name} at{" "}
-                  {tweet.created_at.toISOString()}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {routeData.tweets.length === 0 ? (
+        <div>No tweets yet. Be the first!</div>
+      ) : (
+        <ul className="py-4 space-y-4">
+          {routeData.tweets.map((tweet) => {
+            return (
+              <li key={tweet.id}>
+                <Link to={`@${tweet.user.username}/${tweet.id}`}>
+                  <blockquote>{tweet.text}</blockquote>
+                  <span>
+                    -- {tweet.user.display_name} at{" "}
+                    {tweet.created_at.toISOString()}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

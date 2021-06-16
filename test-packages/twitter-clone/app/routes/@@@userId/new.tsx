@@ -1,7 +1,7 @@
-import { redirectBack } from "../../../../redirectBack";
+import { redirectBack } from "../../redirectBack";
 import { ActionFn, redirectTo } from "remastered";
-import { prisma } from "../../../../db";
-import { getSession, getUser } from "../../../../session";
+import { prisma } from "../../db";
+import { getSession, getUser } from "../../session";
 
 export const action: ActionFn = async ({ request }) => {
   const session = await getSession(request);
@@ -30,7 +30,7 @@ export const action: ActionFn = async ({ request }) => {
   await prisma.tweet.create({
     data: {
       text,
-      userId: user.id,
+      user: { connect: { username: user.username } },
     },
   });
 

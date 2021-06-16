@@ -1,4 +1,4 @@
-import { prisma } from "../../../../db";
+import { prisma } from "../../db";
 import React from "react";
 import { LoaderFn, useRouteData } from "remastered";
 import { Tweet, User } from "@prisma/client";
@@ -10,7 +10,7 @@ export const loader: LoaderFn<Data> = async ({ params }) => {
     where: {
       id: Number(params.tweetId),
       user: {
-        id: Number(params.userId),
+        username: params.userId.toLowerCase(),
       },
     },
   });

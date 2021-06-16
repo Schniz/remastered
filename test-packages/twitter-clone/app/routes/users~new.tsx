@@ -7,7 +7,7 @@ import { useHref } from "react-router";
 export const action: ActionFn = async ({ request }) => {
   const text = new URLSearchParams(await request.text());
   const user$ = parseUser({
-    email: text.get("email"),
+    username: text.get("username"),
     password: text.get("password"),
     passwordConfirmation: text.get("password_confirmation"),
     displayName: text.get("name"),
@@ -22,15 +22,15 @@ export const action: ActionFn = async ({ request }) => {
     });
   }
 
-  const { email, password, displayName } = user$.value;
+  const { password, displayName, username } = user$.value;
   const user = await User.signUp({
-    email,
     plaintextPassword: password,
     displayName,
+    username,
   });
   session.set("userId", user.id);
   session.flash("notice", "Successfuly registered!");
-  return redirectTo(`/users/${user.id}`, {
+  return redirectTo(`/@${user.id}`, {
     headers: {
       "Set-Cookie": await session.commit(),
     },
@@ -52,21 +52,19 @@ export const loader: LoaderFn<Data> = async ({ request }) => {
 };
 
 function parseUser(user: {
-  email: string | null;
+  username: string | null;
   password: string | null;
   passwordConfirmation: string | null;
   displayName: string | null;
-}): Result<{ email: string; password: string; displayName: string }, string[]> {
-  const email = user.email?.trim();
+}): Result<
+  { password: string; displayName: string; username: string },
+  string[]
+> {
   const password = user.password?.trim();
   const displayName = user.displayName?.trim();
+  const username = user.username?.trim();
 
   const errors: string[] = [];
-  if (!email) {
-    errors.push("Email is mandatory");
-  } else if (!email.includes("@")) {
-    errors.push("A user email must contain @");
-  }
 
   if (!password) {
     errors.push("Password is mandatory");
@@ -80,13 +78,25 @@ function parseUser(user: {
     errors.push("Please provide at least 2 letters in the display name");
   }
 
+  if (!username || username.length < 2) {
+    errors.push("Username must be longer than 2 characters");
+  } else if (!/^[A-z._0-9]+$/.test(username)) {
+    errors.push(
+      "Username must be alphanumeric characters (A-z, 0-9) or a dot (.) or an underscore (_)"
+    );
+  }
+
   if (errors.length) {
     return { _tag: "err", error: errors };
   }
 
   return {
     _tag: "ok",
-    value: { email: email!, password: password!, displayName: displayName! },
+    value: {
+      password: password!,
+      displayName: displayName!,
+      username: username!,
+    },
   };
 }
 
@@ -97,7 +107,7 @@ export default function NewUser() {
     <>
       <h1>Register</h1>
       {routeData.errors && (
-        <ul className="list-bullet text-red-500">
+        <ul className="text-red-500 list-bullet">
           {routeData.errors.map((error) => {
             return <li key={error}>{error}</li>;
           })}
@@ -109,20 +119,21 @@ export default function NewUser() {
         className="p-4 bg-gray-100 space-y-2 max-w-screen-md"
       >
         <label className="flex items-center space-x-4">
-          <span>Display Name</span>
+          <span>Username</span>
           <input
-            type="name"
-            name="name"
-            placeholder="John Doe"
+            required
+            type="text"
+            name="username"
+            placeholder="john.doe"
             className="flex-1 block p-2 bg-white rounded"
           />
         </label>
         <label className="flex items-center space-x-4">
-          <span>Email</span>
+          <span>Display Name</span>
           <input
-            type="email"
-            name="email"
-            placeholder="my@email.com"
+            type="text"
+            name="name"
+            placeholder="John Doe"
             className="flex-1 block p-2 bg-white rounded"
           />
         </label>
