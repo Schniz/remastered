@@ -23,3 +23,4 @@ export type {
 } from "./defaultClientEntry";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { useForm } from "./useForm";
+export type { FormComponent } from "./useForm";

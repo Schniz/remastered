@@ -25,6 +25,11 @@ type PendingSubmit = {
   action: string;
 };
 
+/** The `Form` part of `[Form, pendingSubmits]` pair */
+export type FormComponent = React.ComponentType<
+  CustomFormProps & React.ComponentProps<"form">
+>;
+
 /**
  * Returns a `[Form, pendingSubmits]` pair, where:
  *
@@ -44,7 +49,7 @@ type PendingSubmit = {
  *   just enters a couple of things really fast. You can do that
  * * Forms with JavaScript enabled can use `pendingSubmits` to provide an optimistic UI.
  */
-export function useForm() {
+export function useForm(): [FormComponent, PendingSubmit[]] {
   const location = useLocation();
   const [pendingSubmits, setPendingSubmits] = React.useState<PendingSubmit[]>(
     []
@@ -74,8 +79,8 @@ export function useForm() {
     ));
   }, []);
 
-  const response = React.useMemo(() => {
-    return [FormWrapper, pendingSubmits] as const;
+  const response = React.useMemo((): [FormComponent, PendingSubmit[]] => {
+    return [FormWrapper as FormComponent, pendingSubmits];
   }, [FormWrapper, pendingSubmits]);
 
   return response;
@@ -89,7 +94,7 @@ type CustomFormProps = {
   replace?: boolean;
 
   /** Handle responses that do not return 3xx response from a POST request */
-  onUnknownResponse(response: Response): unknown;
+  onUnknownResponse?(response: Response): unknown;
 };
 
 type InternalFormProps = {
