@@ -38,8 +38,14 @@ function replaceDots(rt: RouteTree): RouteTree {
   for (const key in rt) {
     const strippedName = key
       .replace(/\.[tj]sx?$/, "")
-      .replace(/@/g, ":")
-      .replace(/@/, ":")
+      // @[a-z] => :[a-z]
+      // @@ => @
+      .replace(/(@@|@([a-z]))/g, (search, _replaceValue, letter?: string) => {
+        if (letter) {
+          return `:${letter}`;
+        }
+        return search.slice(1);
+      })
       .replace(/\~/g, "/");
     let newKey = `/${strippedName}`;
     if (newKey === "/index") {

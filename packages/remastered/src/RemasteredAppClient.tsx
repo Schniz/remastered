@@ -13,6 +13,7 @@ export function RemasteredApp() {
   return (
     <WrapWithContext ctx={ctx}>
       <HaltingRouter
+        initialUrl={ctx.initialUrl}
         initialLoaderContext={ctx.loaderContext}
         loadedComponentContext={ctx.loadedComponentsContext}
       >

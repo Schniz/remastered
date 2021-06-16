@@ -24,6 +24,7 @@ import {
   isSerializedResponse,
 } from "./SerializedResponse";
 import { RemasteredAppContext } from "./WrapWithContext";
+import * as megajson from "./megajson";
 
 /**
  * An in-progress transaction value
@@ -88,9 +89,10 @@ function useTransactionalState<T>(initialValue: T): {
 }
 
 function getInitialLocation(
-  _initialLoaderContext: React.ContextType<typeof LoaderContext>
+  _initialLoaderContext: React.ContextType<typeof LoaderContext>,
+  initialUrl?: string
 ): Location {
-  const url = new URL(__REMASTERED_CTX.path, window.location.href);
+  const url = new URL(initialUrl ?? "/", window.location.href);
   return {
     key: "default",
     state: window.history.state?.usr,
@@ -109,6 +111,7 @@ function getInitialLocation(
  * mega-function, that we might split in the future.
  */
 export function HaltingRouter(props: {
+  initialUrl?: string;
   children: React.ReactNode | React.ReactNode[];
   window?: Window;
   initialLoaderContext: React.ContextType<typeof LoaderContext>;
@@ -134,7 +137,7 @@ export function HaltingRouter(props: {
     begin,
   } = useTransactionalState({
     action: Action.Pop,
-    location: getInitialLocation(loaderContextRef.current),
+    location: getInitialLocation(loaderContextRef.current, props.initialUrl),
   });
 
   React.useEffect(() => {
@@ -214,7 +217,7 @@ async function fetching(
     headers: { Accept: REMASTERED_JSON_ACCEPT },
     signal,
   });
-  const json = await response.json();
+  const json = megajson.deserialize(await response.json()) as any;
   if (!Array.isArray(json.data)) {
     throw new Error("Incompatible response");
   }

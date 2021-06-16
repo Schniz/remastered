@@ -12,13 +12,13 @@ declare global {
     ssrRoutes: readonly string[];
 
     /** The loading context coming from `loader` functions */
-    loadCtx: readonly [string, Result<unknown, unknown>][];
+    loadCtx: Map<string, Result<unknown, unknown>>;
 
     /** Information about routes */
-    routeDefs: readonly [string, RouteDef][];
+    routeDefs: Map<string, RouteDef>;
 
     /** Should be the status number... crappy name though... */
-    routingErrors: readonly [string, ResponseState][];
+    routingErrors: Map<string, ResponseState>;
 
     /** Link tags */
     linkTags: AllLinkTags[];

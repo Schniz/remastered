@@ -65,6 +65,7 @@ const config = defineConfig({
       "cheerio",
       "react-dom/server",
       "serialize-error",
+      "superjson",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),

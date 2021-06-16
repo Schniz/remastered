@@ -21,6 +21,7 @@ export type RemasteredAppContext = {
   >;
   matchesContext: React.ContextType<typeof MatchesContext>;
   setStatusCode?: React.ContextType<typeof SetStatusCodeContext>;
+  initialUrl?: string;
 };
 
 export function WrapWithContext({
