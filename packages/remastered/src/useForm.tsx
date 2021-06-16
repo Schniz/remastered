@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router";
-import { REMASTERED_JSON_ACCEPT } from "remastered/dist/constants";
-import * as megajson from "remastered/dist/megajson";
+import { REMASTERED_JSON_ACCEPT } from "./constants";
+import * as megajson from "./megajson";
 
 function createTx(): string {
   return String(Math.random());
