@@ -333,7 +333,21 @@ async function onAction({
     return;
   }
 
-  return await route.action({ request });
+  const isLoaderJsonResponse =
+    request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT) ?? false;
+
+  const response = await route.action({ request });
+  if (!isLoaderJsonResponse) {
+    return response;
+  }
+
+  const setCookie = response.headers.get("Set-Cookie");
+  return new Response(await megajson.stringify(response), {
+    headers: {
+      "Content-Type": REMASTERED_JSON_ACCEPT,
+      ...(setCookie && { "Set-Cookie": setCookie }),
+    },
+  });
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {

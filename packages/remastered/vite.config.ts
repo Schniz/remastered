@@ -76,6 +76,9 @@ const config = defineConfig({
   },
   resolve: {
     dedupe: ["react", "react-dom"],
+    alias: {
+      "~app": path.join(process.cwd(), "app"),
+    },
   },
   ...({
     ssr: {
