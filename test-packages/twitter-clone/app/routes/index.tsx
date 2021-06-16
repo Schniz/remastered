@@ -72,13 +72,22 @@ export default function Home() {
           {routeData.tweets.map((tweet) => {
             return (
               <li key={tweet.id}>
-                <Link to={`@${tweet.user.username}/${tweet.id}`}>
-                  <blockquote>{tweet.text}</blockquote>
-                  <span>
-                    -- {tweet.user.display_name} at{" "}
-                    {tweet.created_at.toISOString()}
-                  </span>
-                </Link>
+                <span>
+                  <span>{tweet.user.display_name}</span>{" "}
+                  <Link className="opacity-75" to={`@${tweet.user.username}`}>
+                    @{tweet.user.username}
+                  </Link>{" "}
+                  <Link to={`@${tweet.user.username}/${tweet.id}`}>
+                    at{" "}
+                    <time
+                      suppressHydrationWarning
+                      dateTime={tweet.created_at.toISOString()}
+                    >
+                      {tweet.created_at.toLocaleString()}
+                    </time>
+                  </Link>
+                </span>
+                <blockquote className="pl-2">{tweet.text}</blockquote>
               </li>
             );
           })}
