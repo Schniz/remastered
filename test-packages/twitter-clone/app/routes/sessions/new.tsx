@@ -2,17 +2,8 @@ import { getSession } from "../../session";
 import React from "react";
 import { useHref } from "react-router";
 import { LoaderFn, ActionFn, redirectTo, useRouteData } from "remastered";
-import { prisma } from "../../db";
-import bcrypt from "bcryptjs";
-import { HttpRequest } from "remastered/dist/HttpTypes";
-
-function redirectBack(
-  request: HttpRequest,
-  { fallback, ...opts }: ResponseInit & { fallback: string }
-): Response {
-  const referrer = request.headers.get("referer");
-  return redirectTo(referrer ?? fallback, opts);
-}
+import { redirectBack } from "../../redirectBack";
+import * as User from "../../models/User";
 
 type Data = { error?: string };
 
@@ -44,19 +35,16 @@ export const action: ActionFn = async ({ request }) => {
     });
   }
 
-  const user = await prisma.user.findFirst({ where: { email } });
+  const user = await User.logIn(email, password);
 
-  if (user?.hashed_password) {
-    const allowed = await bcrypt.compare(password, user.hashed_password);
-    if (allowed) {
-      session.set("userId", user.id);
-      session.flash("notice", `Successfuly logged in as ${user.display_name}`);
-      return redirectTo("/", {
-        headers: {
-          "Set-Cookie": await session.commit(),
-        },
-      });
-    }
+  if (user) {
+    session.set("userId", user.id);
+    session.flash("notice", `Successfuly logged in as ${user.display_name}`);
+    return redirectTo("/", {
+      headers: {
+        "Set-Cookie": await session.commit(),
+      },
+    });
   }
 
   session.flash("error", "Wrong username/password");

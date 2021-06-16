@@ -20,9 +20,9 @@ export default function UserTweet() {
   const routeData = useRouteData<Data>();
 
   return (
-    <>
+    <div>
       <h1>{routeData.user.display_name}'s Tweet</h1>
       <pre>{JSON.stringify(routeData, null, 2)}</pre>
-    </>
+    </div>
   );
 }

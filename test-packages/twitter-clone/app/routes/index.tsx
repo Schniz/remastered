@@ -3,6 +3,7 @@ import { getSession, getUser } from "../session";
 import React from "react";
 import { Link, LoaderFn, useRouteData } from "remastered";
 import { prisma } from "../db";
+import { useHref } from "react-router";
 
 type Data = {
   tweets: Array<
@@ -39,13 +40,28 @@ export const loader: LoaderFn<Data> = async ({ request }) => {
 export default function Home() {
   const routeData = useRouteData<Data>();
   return (
-    <>
-      <h1 className="font-bold">
-        Latest Tweets
-        {routeData.currentUser && (
-          <> for {routeData.currentUser.display_name}</>
-        )}
-      </h1>
+    <div>
+      {routeData.currentUser ? (
+        <div>
+          <span className="block">Speak your mind</span>
+          <form
+            action={useHref(`users/${routeData.currentUser.id}/tweets/new`)}
+            method="post"
+          >
+            <textarea
+              placeholder="... I'm thinking about ..."
+              name="text"
+            ></textarea>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      ) : (
+        <div>
+          You are not logged in. <Link to="sessions/new">Log in</Link> or{" "}
+          <Link to="users/new">Sign up</Link>
+        </div>
+      )}
+      <h1 className="font-bold">Latest Tweets</h1>
       {routeData.notice && (
         <div className="font-bold text-red-500">{routeData.notice}</div>
       )}
@@ -57,13 +73,13 @@ export default function Home() {
                 <blockquote>{tweet.text}</blockquote>
                 <span>
                   -- {tweet.user.display_name} at{" "}
-                  {new Date(tweet.created_at).toISOString()}
+                  {tweet.created_at.toISOString()}
                 </span>
               </Link>
             </li>
           );
         })}
       </ul>
-    </>
+    </div>
   );
 }
