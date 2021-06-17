@@ -39,8 +39,6 @@ Array [
   "http://localhost:3000/assets/Spinner.js",
   "http://localhost:3000/assets/@file.js",
   "http://localhost:3000/docs.loader.json",
-  "http://localhost:3000/docs/welcome/getting-started.loader.json",
-  "http://localhost:3000/docs.loader.json",
   "http://localhost:3000/docs/welcome/what-is-remastered.loader.json",
 ]
 `);
