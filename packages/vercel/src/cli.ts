@@ -102,7 +102,7 @@ const exportCmd = command({
       "./StaticExporting"
     );
     const { Request } = await import("node-fetch");
-    const { renderRequest } = await import("remastered/dist/renderRequest");
+    const { renderRequest } = await import("remastered/cjs/renderRequest");
     const serverEntry = await import(
       path.join(process.cwd(), "dist/server/entry.server.js")
     );

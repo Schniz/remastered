@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc && tsc --project tsconfig.cjs.json"
   },
   "bin": {
     "remastered": "./bin/remastered.js"
