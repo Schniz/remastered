@@ -1,7 +1,7 @@
 {
   "name": "@remastered/example-app-1",
   "private": true,
-  "version": "0.1.28",
+  "version": "0.1.29-alpha.0",
   "scripts": {
     "dev": "remastered dev",
     "build": "tsc && remastered build",
@@ -9,7 +9,7 @@
     "vercel-build": "lerna run build --scope=@remastered/example-app-1 --include-dependencies && remastered-vercel postbuild"
   },
   "dependencies": {
-    "@remastered/vercel": "^0.1.28",
+    "@remastered/vercel": "^0.1.29-alpha.0",
     "@swc-node/register": "^1.2.1",
     "@swc/core": "^1.2.55",
     "esm": "^3.2.25",

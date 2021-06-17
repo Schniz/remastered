@@ -1,6 +1,6 @@
 {
   "name": "@remastered/docs-site",
-  "version": "0.1.28",
+  "version": "0.1.29-alpha.0",
   "private": true,
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "main": "lib/docs-site.js",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.1",
-    "@remastered/vercel": "^0.1.28",
+    "@remastered/vercel": "^0.1.29-alpha.0",
     "@stefanprobst/remark-shiki": "^0.1.2",
     "@tabler/icons": "^1.41.2",
     "@tailwindcss/typography": "^0.4.0",
