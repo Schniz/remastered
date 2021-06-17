@@ -29,8 +29,6 @@ export type Routes = {
       return `${JSON.stringify(route)}: ${paramType};`;
     })
     .join("\n")}
-    }
-  }
 }
   `.trim();
 
