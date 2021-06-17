@@ -9,9 +9,7 @@ import {
   SparklesIcon,
 } from "@heroicons/react/solid";
 import React from "react";
-import { Link, route } from "remastered";
-
-const docsRoute = route("/docs");
+import { ParamLink } from "remastered";
 
 export default function Home() {
   return (
@@ -81,7 +79,7 @@ export default function Home() {
             </Feature>
             <Feature title="And so much more." icon={DotsHorizontalIcon}>
               So many more stuff are baked in. Just come and{" "}
-              <Link to={docsRoute.path()}>read the docs to learn more!</Link>
+              <ParamLink route="/docs">read the docs to learn more!</ParamLink>
             </Feature>
           </ul>
         </div>
@@ -115,12 +113,12 @@ function HeroMessage() {
         </p>
         <p className="text-lg">Ready to learn more?</p>
         <div className="flex justify-between lg:p-4">
-          <Link
-            to={docsRoute.path()}
+          <ParamLink
+            route="/docs"
             className="inline-block px-4 py-2 text-sm font-bold text-center text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
           >
             Read the docs
-          </Link>
+          </ParamLink>
           <a
             href="https://github.com/Schniz/remastered"
             target="_blank"

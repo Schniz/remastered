@@ -10,14 +10,18 @@ export function routePath<Route extends keyof Routes>(
   return generatePath(route, params);
 }
 
+type ParamsFor<Route extends keyof Routes> = [Routes[Route]] extends [never]
+  ? { params?: Record<never, never> }
+  : { params: Record<Routes[Route], string> };
+
 export function ParamLink<Route extends keyof Routes>({
   route,
   params,
   ...props
 }: {
   route: Route;
-  params: Record<Routes[Route], string>;
-} & Omit<React.ComponentProps<typeof Link>, "to">) {
+} & ParamsFor<Route> &
+  Omit<React.ComponentProps<typeof Link>, "to">) {
   const path = routePath(route, params);
   return <Link {...props} to={path} />;
 }
