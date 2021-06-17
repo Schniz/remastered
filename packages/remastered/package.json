@@ -5,6 +5,7 @@
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {
+    "postinstall": "remastered generate",
     "test": "jest",
     "build": "tsc"
   },
@@ -41,6 +42,7 @@
     "acorn-walk": "^8.1.0",
     "busboy": "^0.3.1",
     "cheerio": "^1.0.0-rc.9",
+    "chokidar": "^3.5.2",
     "cmd-ts": "^0.6.9",
     "cookie": "^0.4.1",
     "cryptr": "^6.0.2",

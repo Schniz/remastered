@@ -9,7 +9,9 @@ import {
   SparklesIcon,
 } from "@heroicons/react/solid";
 import React from "react";
-import { Link } from "remastered";
+import { Link, route } from "remastered";
+
+const docsRoute = route("/docs");
 
 export default function Home() {
   return (
@@ -79,20 +81,12 @@ export default function Home() {
             </Feature>
             <Feature title="And so much more." icon={DotsHorizontalIcon}>
               So many more stuff are baked in. Just come and{" "}
-              <Link to="docs">read the docs to learn more!</Link>
+              <Link to={docsRoute.path()}>read the docs to learn more!</Link>
             </Feature>
           </ul>
         </div>
       </div>
     </>
-  );
-}
-
-function Check() {
-  return (
-    <span aria-hidden={true} className="inline-block mr-2">
-      ✅
-    </span>
   );
 }
 
@@ -122,7 +116,7 @@ function HeroMessage() {
         <p className="text-lg">Ready to learn more?</p>
         <div className="flex justify-between lg:p-4">
           <Link
-            to="docs"
+            to={docsRoute.path()}
             className="inline-block px-4 py-2 text-sm font-bold text-center text-white uppercase rounded-sm opacity-95 hover:opacity-100 bg-gradient-to-r from-red-400 to-pink-500"
           >
             Read the docs

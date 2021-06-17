@@ -32,27 +32,32 @@ export function createRouteTreeFromImportGlob(
   return replaceDots(routeTree.children);
 }
 
+export function formatRoutePath(key: string): string {
+  const strippedName = key
+    .replace(/\.[tj]sx?$/, "")
+    // @[a-z] => :[a-z]
+    // @@ => @
+    .replace(/(@@|@([a-z]))/g, (search, _replaceValue, letter?: string) => {
+      if (letter) {
+        return `:${letter}`;
+      }
+      return search.slice(1);
+    })
+    .replace(/\~/g, "/");
+  let newKey = `/${strippedName}`;
+  if (newKey === "/index") {
+    newKey = "/";
+  }
+  return newKey;
+}
+
 function replaceDots(rt: RouteTree): RouteTree {
   const newRouteTree: RouteTree = {};
 
   for (const key in rt) {
-    const strippedName = key
-      .replace(/\.[tj]sx?$/, "")
-      // @[a-z] => :[a-z]
-      // @@ => @
-      .replace(/(@@|@([a-z]))/g, (search, _replaceValue, letter?: string) => {
-        if (letter) {
-          return `:${letter}`;
-        }
-        return search.slice(1);
-      })
-      .replace(/\~/g, "/");
-    let newKey = `/${strippedName}`;
-    if (newKey === "/index") {
-      newKey = "/";
-    }
+    const strippedName = formatRoutePath(key);
 
-    newRouteTree[newKey] = {
+    newRouteTree[strippedName] = {
       ...rt[key],
       children: replaceDots(rt[key].children),
     };
