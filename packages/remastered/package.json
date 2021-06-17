@@ -1,6 +1,6 @@
 {
   "name": "remastered",
-  "version": "0.1.27",
+  "version": "0.1.29-alpha.1",
   "main": "./dist/index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
