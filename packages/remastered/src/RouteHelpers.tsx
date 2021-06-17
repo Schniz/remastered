@@ -1,7 +1,7 @@
 import React from "react";
-import type { Routes } from "./_generated_types_";
 import { generatePath } from "react-router";
 import { Link } from "react-router-dom";
+import type { Routes } from "./_generated_types_";
 
 export function routePath<Route extends keyof Routes>(
   route: Route,

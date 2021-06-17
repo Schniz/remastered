@@ -1,1 +1,1 @@
-export type Routes = {};
+export type Routes = Record<string, string>;

@@ -3,24 +3,50 @@ import { formatRoutePath } from "./createRouteTreeFromImportGlob";
 import fs from "fs-extra";
 import path from "path";
 
+function parseRoute(route: string): [string, string[]] {
+  const paramRegex = /:[A-z_][A-z0-9_]*/g;
+  const matches = route.match(paramRegex)?.map((x) => x.slice(1)) ?? [];
+  return [route, matches];
+}
+
 export async function generateTypes(opts: { cwd: string }) {
   const files = await globby("**/*.{t,j}sx", {
     cwd: path.join(opts.cwd, "app", "routes"),
   });
   const routes = files.map((f) => {
-    return f.split("/").map(formatRoutePath).join("");
+    const reactRouterPath = f.split("/").map(formatRoutePath).join("");
+    const parsed = parseRoute(reactRouterPath);
+    return parsed;
   });
   const dtsFile = `
-import type { ParseRoutes } from './generateTypes';
-export type Routes = ParseRoutes<${JSON.stringify(routes)}>;
+export type Routes = {
+  ${routes
+    .map(([route, params]) => {
+      const paramType =
+        params.length === 0
+          ? "never"
+          : params.map((x) => JSON.stringify(x)).join(" | ");
+      return `${JSON.stringify(route)}: ${paramType};`;
+    })
+    .join("\n")}
+    }
+  }
+}
   `.trim();
-  const output = require.resolve("remastered/dist/_generated_types_.d.ts");
-  const currentFile = await fs.readFile(output, "utf8").catch(() => null);
 
-  if (dtsFile !== currentFile) {
-    await fs.outputFile(output, dtsFile);
+  const outputs = [
+    require.resolve("remastered/dist/_generated_types_.d.ts"),
+    require.resolve("remastered/cjs/_generated_types_.d.ts"),
+  ];
 
-    console.log(`🎷 Route types were generated to ${output}`);
+  for (const output of outputs) {
+    const currentFile = await fs.readFile(output, "utf8").catch(() => null);
+
+    if (dtsFile !== currentFile) {
+      await fs.outputFile(output, dtsFile);
+
+      console.log(`🎷 Route types were generated to ${output}`);
+    }
   }
 }
 
