@@ -14,9 +14,11 @@ export type CookieSessionStorage = SessionStore<Serializable>;
 export type CookieSettings = {
   name: string;
   secret: string;
-} & Pick<
-  CookieSerializeOptions,
-  "httpOnly" | "path" | "domain" | "secure" | "maxAge" | "sameSite"
+} & Partial<
+  Pick<
+    CookieSerializeOptions,
+    "httpOnly" | "path" | "domain" | "secure" | "maxAge" | "sameSite"
+  >
 >;
 
 export function createCookieSessionStorage(opts: {

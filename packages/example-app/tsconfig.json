@@ -3,6 +3,9 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "@types/jest"],
+    "paths": {
+      "~app/*": ["./app/*"]
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

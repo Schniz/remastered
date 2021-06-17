@@ -1,6 +1,6 @@
 import React from "react";
 import $ from "cheerio";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderToString } from "react-dom/server";
 
 /**
  * An error boundary shim for SSR.
@@ -33,7 +33,7 @@ export function ErrorBoundaryShim(
   props: ErrorBoundaryShimProps
 ): React.ReactElement | null {
   try {
-    const html = renderToStaticMarkup(withAllContexts(props.children));
+    const html = renderToString(withAllContexts(props.children));
     return convertHtmlToReactElements(html);
   } catch (error) {
     return <props.fallbackComponent error={error} />;
@@ -61,16 +61,16 @@ const DOM_ATTRS_OVERRIDE: Record<string, string> = {
 };
 
 function convertHtmlToReactElements(html: string): React.ReactElement {
-  const $$ = $.load(html, { xmlMode: true });
+  const $$ = $.load(`<remastered-root>${html}</remastered-root>`);
   const elements: React.ReactNode[] = [];
 
-  for (const node of $$.root().children()) {
+  for (const node of $$("remastered-root").children()) {
     const attributes: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(node.attribs)) {
       attributes[camelCasify(key)] = value;
     }
     attributes.key = elements.length;
-    const children = $$(node).children;
+    const children = $$(node).children();
     let text: string | undefined = undefined;
 
     if (children.length === 0) {

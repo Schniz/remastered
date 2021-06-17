@@ -65,6 +65,7 @@ const config = defineConfig({
       "cheerio",
       "react-dom/server",
       "serialize-error",
+      "superjson",
     ],
     entries: [
       path.join(__dirname, "./dist/main.js"),
@@ -75,6 +76,9 @@ const config = defineConfig({
   },
   resolve: {
     dedupe: ["react", "react-dom"],
+    alias: {
+      "~app": path.join(process.cwd(), "app"),
+    },
   },
   ...({
     ssr: {

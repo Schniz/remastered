@@ -8,6 +8,7 @@ import { mapValues } from "./Map";
 import type { MatchesContext } from "./useMatches";
 import { LayoutObject } from "./UserOverridableComponents";
 import type { RemasteredAppContext } from "./WrapWithContext";
+import * as megajson from "./megajson";
 
 declare global {
   interface Window {
@@ -21,10 +22,14 @@ export let readyContext: { value?: RemasteredAppContext } =
     : window.$$remasteredCtx ?? {};
 
 export async function loadWindowContext(): Promise<RemasteredAppContext> {
-  const ctx = __REMASTERED_CTX;
+  megajson.setup();
+  const ctx = (await megajson.deserialize(
+    // @ts-expect-error
+    __REMASTERED_CTX
+  )) as typeof __REMASTERED_CTX;
   const historyKey = "default";
   const loadCtx = new Map(
-    ctx.loadCtx.map(([key, value]) => [`${historyKey}@${key}`, value])
+    [...ctx.loadCtx].map(([key, value]) => [`${historyKey}@${key}`, value])
   );
   const loadedRoutes = await buildRouteComponentBag(ctx.ssrRoutes, {
     ...getRoutesObject(),
@@ -34,7 +39,7 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     component: x.component,
     errorBoundary: x.errorBoundary,
   }));
-  const matchesContext = new Map(ctx.routeDefs);
+  const matchesContext = ctx.routeDefs;
 
   for (const route of loadedRoutes.values()) {
     applyRouteHandlesToCtx(matchesContext, route);
@@ -44,8 +49,9 @@ export async function loadWindowContext(): Promise<RemasteredAppContext> {
     links: ctx.linkTags,
     scripts: [{ _tag: "eager", contents: "" }, ...ctx.scriptTags],
     loadedComponentsContext: loadedComponents,
+    initialUrl: ctx.path,
     loadingErrorContext: new Map(
-      __REMASTERED_CTX.routingErrors.map(([key, value]) => {
+      [...ctx.routingErrors].map(([key, value]) => {
         return [key === "@default@" ? historyKey : key, value] as const;
       })
     ),

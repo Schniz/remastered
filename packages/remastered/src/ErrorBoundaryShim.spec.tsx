@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ErrorBoundaryShim } from "./ErrorBoundaryShim";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderToStaticMarkup, renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 
 // for some reason we can't use the shim here, so we
@@ -135,4 +135,32 @@ test("html attributes", () => {
     `<div tabindex="10" aria-label="hello" class="hi" data-hello="howdy">Hey</div>`
   );
   expect(console.error).not.toHaveBeenCalled();
+});
+
+test("textarea usage", () => {
+  const ErrorComponent = () => <div>not going to show</div>;
+  const output = renderToStaticMarkup(
+    <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+      <>
+        <textarea placeholder="hello" />
+        <button>Hi</button>
+      </>
+    </ErrorBoundaryShim>
+  );
+  expect(output).toEqual(
+    `<textarea placeholder="hello"></textarea><button>Hi</button>`
+  );
+});
+
+test("works with props", () => {
+  const Component = (props: { name: string }) => <div>{props.name} -- div</div>;
+  const ErrorComponent = () => <div>not going to show</div>;
+  const output = renderToString(
+    <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+      <div>
+        <Component name="Gal" />
+      </div>
+    </ErrorBoundaryShim>
+  );
+  expect(output).toEqual(`<div><div>Gal<!-- --> -- div</div></div>`);
 });

@@ -27,6 +27,15 @@ async function runPromises<T extends (() => Promise<any>)[]>(
   return results;
 }
 
+const generate = command({
+  name: "generate",
+  args: {},
+  async handler() {
+    const { generateTypes } = await import("./generateTypes");
+    await generateTypes({ cwd: process.cwd() });
+  },
+});
+
 const build = command({
   name: "build",
   args: {
@@ -40,6 +49,9 @@ const build = command({
     }),
   },
   async handler(args) {
+    const { generateTypes } = await import("./generateTypes");
+    await generateTypes({ cwd: process.cwd() });
+
     const vite = await import("vite");
     const { getViteConfigPath } = await import("./getViteConfig");
 
@@ -119,17 +131,27 @@ const dev = command({
     }),
   },
   async handler({ port }) {
+    const { generateTypes } = await import("./generateTypes");
+    const chokidar = await import("chokidar");
+
     const rootDir = process.cwd();
     if (typeof port === "number") {
       process.env.PORT = String(port);
     }
+    await generateTypes({ cwd: rootDir });
+
+    chokidar
+      .watch("app/routes", { cwd: rootDir })
+      .on("all", () => generateTypes({ cwd: rootDir }))
+      .on("unlink", () => generateTypes({ cwd: rootDir }));
+
     const { main } = await import("./server");
     await main(rootDir);
   },
 });
 
 const cli = subcommands({
-  cmds: { build, serve, dev },
+  cmds: { build, serve, dev, generate },
   name: "remastered",
   description: "A full-stack approach.",
 });

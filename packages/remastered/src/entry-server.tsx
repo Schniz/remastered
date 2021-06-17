@@ -2,6 +2,7 @@ import { globalPatch } from "./globalPatch";
 globalPatch();
 
 import React from "react";
+import * as megajson from "./megajson";
 import { getRouteElements, getRoutesObject } from "./fsRoutes";
 import { matchRoutes, matchPath, RouteMatch } from "react-router";
 import { RouteObjectWithFilename } from "./routeTreeIntoReactRouterRoute";
@@ -32,6 +33,8 @@ import { REMASTERED_JSON_FALLBACK_HEADER } from "./httpHelpers";
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
 const mainFile = `node_modules/.remastered/entry.client.js`;
+
+megajson.setup();
 
 export type RequestContext = {
   request: HttpRequest;
@@ -183,13 +186,16 @@ async function onGet({
   }
 
   if (isLoaderJsonResponse) {
-    return new Response(JSON.stringify({ data: [...loaderContext] }), {
-      status,
-      headers: {
-        "Content-Type": "application/json+loader",
-        ...Object.fromEntries(headers.entries()),
-      },
-    });
+    return new Response(
+      await megajson.stringify({ data: [...loaderContext] }),
+      {
+        status,
+        headers: {
+          "Content-Type": "application/json+loader",
+          ...Object.fromEntries(headers.entries()),
+        },
+      }
+    );
   }
 
   const routeKeys = foundRouteKeys.map((x) => x.routeKey);
@@ -327,7 +333,21 @@ async function onAction({
     return;
   }
 
-  return await route.action({ request });
+  const isLoaderJsonResponse =
+    request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT) ?? false;
+
+  const response = await route.action({ request });
+  if (!isLoaderJsonResponse) {
+    return response;
+  }
+
+  const setCookie = response.headers.get("Set-Cookie");
+  return new Response(await megajson.stringify(response), {
+    headers: {
+      "Content-Type": REMASTERED_JSON_ACCEPT,
+      ...(setCookie && { "Set-Cookie": setCookie }),
+    },
+  });
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
@@ -416,17 +436,17 @@ async function buildWindowValues(
   const data: typeof __REMASTERED_CTX = {
     linkTags: links,
     scriptTags: scripts,
-    routingErrors: [...routingErrors],
+    routingErrors: routingErrors,
     ssrRoutes: routeFiles,
-    loadCtx: [...loaderContext.entries()],
-    routeDefs: [...matchesContext],
+    loadCtx: loaderContext,
+    routeDefs: matchesContext,
     path: url,
   };
   return {
     _tag: "eager",
     type: "text/javascript",
     contents: `window.__REMASTERED_CTX=JSON.parse(${JSON.stringify(
-      JSON.stringify(data)
+      await megajson.stringify(data)
     )});`,
   };
 }
