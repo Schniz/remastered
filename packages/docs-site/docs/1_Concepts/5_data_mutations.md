@@ -78,6 +78,42 @@ Each `PendingSubmit` is an object with:
 - `encType`: the form encoding type (the `Content-Type` being sent to the server). _note: the default content type is `application/x-www-urlencoded`. If you want to upload files, set the `encType` of the `Form` to `form-data/multipart`_
 - `data`: a [`FormData`] instance contains the data that is being sent to the server. _note: highly valuable for optimistic ui!_
 
+#### Optimistic UI
+
+You can use the `data` key to provide optimistic UI:
+
+```tsx
+import { getTweets, Tweet } from "~app/model/Tweet";
+import { useForm, useRouteData, LoaderFn } from "remastered";
+
+export const loader: LoaderFn<Tweet[]> = async () => {
+  return getTweets();
+};
+
+export default function AllTweets() {
+  const storedTweets = useRouteData();
+  const [Form, pendingSubmits] = useForm();
+
+  const pendingTweets = pendingSubmits.map((submit): Tweet => {
+    return {
+      text: submit.data.get("text")!,
+      username: submit.data.get("username")!,
+    };
+  });
+
+  const allTweets = [...pendingTweets, ...storedTweets];
+
+  return (
+    <>
+      <Form>...</Form>
+      <ul>
+        {allTweets.map(tweet => ...)}
+      </ul>
+    </>
+  );
+}
+```
+
 [laravel]: https://laravel.com
 [rails]: https://rubyonrails.org
 [`formdata`]: https://developer.mozilla.org/en-US/docs/Web/API/FormData
