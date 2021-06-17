@@ -49,6 +49,9 @@ const build = command({
     }),
   },
   async handler(args) {
+    const { generateTypes } = await import("./generateTypes");
+    await generateTypes({ cwd: process.cwd() });
+
     const vite = await import("vite");
     const { getViteConfigPath } = await import("./getViteConfig");
 

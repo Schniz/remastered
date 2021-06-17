@@ -5,7 +5,6 @@
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {
-    "postinstall": "remastered generate",
     "test": "jest",
     "build": "tsc"
   },
