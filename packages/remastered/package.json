@@ -1,7 +1,8 @@
 {
   "name": "remastered",
   "version": "0.1.29-alpha.1",
-  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "main": "./cjs/index.js",
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {
@@ -34,7 +35,8 @@
   "files": [
     "*.ts",
     "bin",
-    "dist"
+    "dist",
+    "cjs"
   ],
   "dependencies": {
     "@swc/core": "^1.2.57",
