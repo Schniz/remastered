@@ -1,6 +1,6 @@
 {
   "name": "remastered",
-  "version": "0.1.29-alpha.1",
+  "version": "0.1.29-alpha.2",
   "module": "./dist/index.js",
   "main": "./cjs/index.js",
   "author": "Gal Schlezinger",

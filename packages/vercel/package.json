@@ -1,6 +1,6 @@
 {
   "name": "@remastered/vercel",
-  "version": "0.1.29-alpha.1",
+  "version": "0.1.29-alpha.2",
   "author": "Gal Schlezinger",
   "main": "./dist/index.js",
   "license": "MIT",
@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.169",
     "@vercel/node": "^1.10.0",
-    "remastered": "^0.1.29-alpha.1",
+    "remastered": "^0.1.29-alpha.2",
     "typescript": "^4.2.4"
   },
   "peerDependencies": {
