@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 
-import "../dist/cli.js";
+require = require("esm")(module, { force: true });
+require("../dist/cli");

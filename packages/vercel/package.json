@@ -7,7 +7,6 @@
   "scripts": {
     "build": "tsc"
   },
-  "type": "module",
   "bin": {
     "remastered-vercel": "./bin/remastered-vercel.js"
   },
