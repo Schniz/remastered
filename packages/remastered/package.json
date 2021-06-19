@@ -3,6 +3,7 @@
   "version": "0.1.29-alpha.3",
   "module": "./dist/index.js",
   "main": "./cjs/index.js",
+  "types": "./dist/index.d.ts",
   "author": "Gal Schlezinger",
   "license": "MIT",
   "scripts": {

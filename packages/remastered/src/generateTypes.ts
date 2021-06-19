@@ -32,10 +32,7 @@ export type Routes = {
 }
   `.trim();
 
-  const outputs = [
-    require.resolve("remastered/dist/_generated_types_.d.ts"),
-    require.resolve("remastered/cjs/_generated_types_.d.ts"),
-  ];
+  const outputs = [require.resolve("remastered/dist/_generated_types_.d.ts")];
 
   for (const output of outputs) {
     const currentFile = await fs.readFile(output, "utf8").catch(() => null);
