@@ -69,3 +69,4 @@ dist
 
 # The remastered directory
 .remastered
+cjs

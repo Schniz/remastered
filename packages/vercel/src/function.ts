@@ -1,4 +1,4 @@
-import { renderRequest } from "remastered/dist/renderRequest";
+import { renderRequest } from "remastered/cjs/renderRequest";
 import { Request } from "node-fetch";
 import type { VercelApiHandler } from "@vercel/node";
 import _ from "lodash";
@@ -6,7 +6,7 @@ import { getRenderContext } from "./getRenderContext";
 import { deserializeResponse, getResponsePath } from "./StaticExporting";
 import fs from "fs-extra";
 import path from "path";
-import { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
+import { HttpRequest, HttpResponse } from "remastered/cjs/HttpTypes";
 
 export function createVercelFunction({
   rootDir,

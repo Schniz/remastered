@@ -1,8 +1,8 @@
 import type { Request } from "node-fetch";
-import type { HttpResponse } from "remastered/dist/HttpTypes";
-import type { render as entryRender } from "remastered/dist/entry-server";
+import type { HttpResponse } from "remastered/cjs/HttpTypes";
+import type { render as entryRender } from "remastered/cjs/entry-server";
 import type { getRenderContext } from "./getRenderContext";
-import { shim } from "remastered/dist/shimReactContext";
+import { shim } from "remastered/cjs/shimReactContext";
 
 export type ServerEntry = { render: typeof entryRender };
 

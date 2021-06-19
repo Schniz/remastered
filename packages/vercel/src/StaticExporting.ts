@@ -2,11 +2,11 @@ import { Request } from "node-fetch";
 import path from "path";
 import fs from "fs-extra";
 import crypto from "crypto";
-import { HttpRequest, HttpResponse } from "remastered/dist/HttpTypes";
+import { HttpRequest, HttpResponse } from "remastered/cjs/HttpTypes";
 import {
   serializeResponse,
   deserializeResponse,
-} from "remastered/dist/SerializedResponse";
+} from "remastered/cjs/SerializedResponse";
 
 export { deserializeResponse };
 

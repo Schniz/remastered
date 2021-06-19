@@ -6,7 +6,7 @@
   "author": "Gal Schlezinger <gal@spitfire.co.il>",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "preversion": "lerna run build"
+    "preversion": "rm -rf packages/*/dist packages/*/cjs && lerna run build --concurrency=1"
   },
   "workspaces": {
     "packages": ["packages/*"]
