@@ -37,7 +37,8 @@
     "*.ts",
     "bin",
     "dist",
-    "cjs"
+    "cjs",
+    "src"
   ],
   "dependencies": {
     "@swc/core": "^1.2.57",
