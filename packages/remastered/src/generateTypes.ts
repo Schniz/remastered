@@ -45,7 +45,9 @@ interface Routes {
 }
   `.trim();
 
-  const outputs = [path.join(opts.cwd, "app", "_generated_types_.ts")];
+  const outputs = [
+    path.join(opts.cwd, "node_modules", ".remastered", "routes.d.ts"),
+  ];
 
   for (const output of outputs) {
     const currentFile = await fs.readFile(output, "utf8").catch(() => null);
@@ -53,7 +55,9 @@ interface Routes {
     if (dtsFile !== currentFile) {
       await fs.outputFile(output, dtsFile);
 
-      console.log(`🎷 Route types were generated to ${output}`);
+      console.log(
+        `🎷 Route types were generated to ${path.relative(opts.cwd, output)}`
+      );
     }
   }
 }
