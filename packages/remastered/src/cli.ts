@@ -11,6 +11,8 @@ import {
 } from "cmd-ts";
 import path from "path";
 
+const isCodeSandbox = Boolean(process.env.CODESANDBOX_SSE);
+
 async function runPromises<T extends (() => Promise<any>)[]>(
   method: "serial" | "parallel",
   promises: T
@@ -32,7 +34,7 @@ const generate = command({
   args: {},
   async handler() {
     const { generateTypes } = await import("./generateTypes");
-    await generateTypes({ cwd: process.cwd() });
+    await generateTypes({ cwd: process.cwd(), storeInApp: isCodeSandbox });
   },
 });
 
@@ -50,7 +52,7 @@ const build = command({
   },
   async handler(args) {
     const { generateTypes } = await import("./generateTypes");
-    await generateTypes({ cwd: process.cwd() });
+    await generateTypes({ cwd: process.cwd(), storeInApp: isCodeSandbox });
 
     const vite = await import("vite");
     const { getViteConfigPath } = await import("./getViteConfig");
@@ -138,12 +140,17 @@ const dev = command({
     if (typeof port === "number") {
       process.env.PORT = String(port);
     }
-    await generateTypes({ cwd: rootDir });
+
+    await generateTypes({ cwd: rootDir, storeInApp: isCodeSandbox });
 
     chokidar
       .watch("app/routes", { cwd: rootDir })
-      .on("all", () => generateTypes({ cwd: rootDir }))
-      .on("unlink", () => generateTypes({ cwd: rootDir }));
+      .on("all", () =>
+        generateTypes({ cwd: rootDir, storeInApp: isCodeSandbox })
+      )
+      .on("unlink", () =>
+        generateTypes({ cwd: rootDir, storeInApp: isCodeSandbox })
+      );
 
     const { main } = await import("./server");
     await main(rootDir);

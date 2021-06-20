@@ -15,7 +15,10 @@ type GeneratedRoute = {
   params: string[];
 };
 
-export async function generateTypes(opts: { cwd: string }) {
+export async function generateTypes(opts: {
+  cwd: string;
+  storeInApp: boolean;
+}) {
   const files = await globby("**/*.{t,j}sx", {
     cwd: path.join(opts.cwd, "app", "routes"),
   });
@@ -46,7 +49,9 @@ interface Routes {
   `.trim();
 
   const outputs = [
-    path.join(opts.cwd, "node_modules", ".remastered", "routes.d.ts"),
+    opts.storeInApp
+      ? path.join(opts.cwd, "app", "generated-routes-types.d.ts")
+      : path.join(opts.cwd, "node_modules", ".remastered", "routes.d.ts"),
   ];
 
   for (const output of outputs) {
