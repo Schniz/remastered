@@ -44,6 +44,8 @@ export async function createServer(
   const hmrClientPort =
     typeof process.env.HMR_CLIENT_PORT === "string"
       ? Number(process.env.HMR_CLIENT_PORT)
+      : process.env.CODESANDBOX_SSE
+      ? 443
       : undefined;
 
   const vite = isProd
