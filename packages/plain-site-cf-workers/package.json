@@ -8,7 +8,7 @@
     "site:copy-assets": "rm -rf rdist && cp -r ../../test-packages/plain-test-app/dist/ rdist && rm -rf public/assets && cp -r rdist/client/assets public/assets",
     "prepare": "yarn site:build && yarn site:copy-assets",
     "dev": "wrangler dev",
-    "build": "wrangler build",
+    "build": "yarn prepare && wrangler build",
     "worker:publish": "wrangler publish"
   },
   "dependencies": {
