@@ -10,6 +10,7 @@ export type LoaderFn<Props> = (
 ) => Promise<Props | null | undefined>;
 export type ActionFn = (opts: {
   request: HttpRequest;
+  params: Record<string, string>;
 }) => Promise<HttpResponse>;
 
 export type LinksFn = () => LinkTag[] | Promise<LinkTag[]>;

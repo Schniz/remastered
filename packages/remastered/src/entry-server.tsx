@@ -28,6 +28,7 @@ import {
   ResponseState,
 } from "./NotFoundAndSkipRenderOnServerContext";
 import { REMASTERED_JSON_FALLBACK_HEADER } from "./httpHelpers";
+import { readMagicMethodQueryParam } from "./magicMethodSetter";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
 
@@ -311,10 +312,24 @@ export async function render(ctx: RequestContext): Promise<HttpResponse> {
 
 export type RenderFn = typeof render;
 
-async function onAction({
-  request,
-}: RequestContext): Promise<HttpResponse | undefined> {
+async function onAction(
+  ctx: RequestContext
+): Promise<HttpResponse | undefined> {
   const routes = getRouteElements();
+
+  const givenUrl = new URL(ctx.request.url, "https://example.com");
+  const [overrideMethod, searchParams] = readMagicMethodQueryParam(
+    givenUrl.searchParams
+  );
+  const searchParamsString = searchParams.toString();
+  const newUrlString =
+    ctx.request.url.split("?")[0] +
+    (searchParamsString ? `?${searchParamsString}` : "");
+  const request = new Request(newUrlString, {
+    headers: ctx.request.headers as any,
+    body: ctx.request.body as any,
+    method: overrideMethod ?? ctx.request.method,
+  });
 
   const url = request.url.replace(/\.json$/, "");
   const found = matchRoutes(routes, url) ?? [];
@@ -335,18 +350,27 @@ async function onAction({
   const isLoaderJsonResponse =
     request.headers.get("accept")?.includes(REMASTERED_JSON_ACCEPT) ?? false;
 
-  const response = await route.action({ request });
+  const response$ = route.action({ request, params: foundRouteKey.params });
   if (!isLoaderJsonResponse) {
-    return response;
+    return response$;
   }
 
-  const setCookie = response.headers.get("Set-Cookie");
-  return new Response(await megajson.stringify(response), {
-    headers: {
-      "Content-Type": REMASTERED_JSON_ACCEPT,
-      ...(setCookie && { "Set-Cookie": setCookie }),
-    },
-  });
+  try {
+    const response = await response$;
+    const setCookie = response.headers.get("Set-Cookie");
+    return new Response(await megajson.stringify(response), {
+      headers: {
+        "Content-Type": REMASTERED_JSON_ACCEPT,
+        ...(setCookie && { "Set-Cookie": setCookie }),
+      },
+    });
+  } catch (err) {
+    return new Response(await megajson.stringify(err), {
+      headers: {
+        "Content-Type": REMASTERED_JSON_ACCEPT,
+      },
+    });
+  }
 }
 
 function getRouteKeys(routes: RouteMatch[]): EnhancedRoute[] {
