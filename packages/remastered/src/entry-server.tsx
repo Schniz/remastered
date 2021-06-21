@@ -27,7 +27,6 @@ import {
   NotFoundAndSkipRenderOnServerContext,
   ResponseState,
 } from "./NotFoundAndSkipRenderOnServerContext";
-import { serializeError } from "./SerializableError";
 import { REMASTERED_JSON_FALLBACK_HEADER } from "./httpHelpers";
 
 export const configs = import.meta.glob("/config/**/*.{t,j}s{x,}");
@@ -155,7 +154,7 @@ async function onGet({
       } catch (e) {
         loaderContext.set(relevantRoute.key, {
           tag: "err",
-          error: serializeError(e),
+          error: e,
         });
       }
     }

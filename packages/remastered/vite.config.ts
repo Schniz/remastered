@@ -64,7 +64,6 @@ const config = defineConfig({
       "react-error-boundary",
       "cheerio",
       "react-dom/server",
-      "serialize-error",
       "superjson",
     ],
     entries: [

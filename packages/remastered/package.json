@@ -64,7 +64,6 @@
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
     "rollup-plugin-visualizer": "^5.5.0",
-    "serialize-error": "^8.1.0",
     "superjson": "^1.7.4",
     "tempy": "^1.0.1",
     "vite": "~2.3.6"
