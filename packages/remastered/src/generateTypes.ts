@@ -6,6 +6,9 @@ import path from "path";
 function parseRoute(route: string): string[] {
   const paramRegex = /:[A-z_][A-z0-9_]*/g;
   const matches = route.match(paramRegex)?.map((x) => x.slice(1)) ?? [];
+  if (route.includes("*")) {
+    matches.push("*");
+  }
   return matches;
 }
 
@@ -15,6 +18,16 @@ type GeneratedRoute = {
   params: string[];
 };
 
+export function getGeneratedRoutes(opts: {
+  files: readonly string[];
+}): GeneratedRoute[] {
+  return opts.files.map((f): GeneratedRoute => {
+    const reactRouterPath = f.split("/").map(formatRoutePath).join("");
+    const parsed = parseRoute(reactRouterPath);
+    return { filePath: f, route: reactRouterPath, params: parsed };
+  });
+}
+
 export async function generateTypes(opts: {
   cwd: string;
   storeInApp: boolean;
@@ -22,11 +35,7 @@ export async function generateTypes(opts: {
   const files = await globby("**/*.{t,j}sx", {
     cwd: path.join(opts.cwd, "app", "routes"),
   });
-  const routes = files.map((f): GeneratedRoute => {
-    const reactRouterPath = f.split("/").map(formatRoutePath).join("");
-    const parsed = parseRoute(reactRouterPath);
-    return { filePath: f, route: reactRouterPath, params: parsed };
-  });
+  const routes = getGeneratedRoutes({ files });
   const dtsFile = `
 export {};
 declare global {
