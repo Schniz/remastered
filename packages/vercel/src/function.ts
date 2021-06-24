@@ -97,6 +97,8 @@ async function handleStaticFile(
     return "break";
   }
 
+  res.setHeader("Cache-Control", "max-age=31536000");
+
   await new Promise<void>((resolve, reject) => {
     const stream = fs.createReadStream(resolvedPath);
     stream.pipe(res);
