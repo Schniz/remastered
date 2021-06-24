@@ -24,4 +24,4 @@ export type {
 export { ErrorBoundary } from "./ErrorBoundary";
 export { useForm } from "./useForm";
 export type { FormComponent, PendingSubmit } from "./useForm";
-export { routePath, ParamLink } from "./RouteHelpers";
+export { routePath, ParamLink, ParamNavLink } from "./RouteHelpers";
