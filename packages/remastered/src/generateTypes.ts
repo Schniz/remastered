@@ -35,7 +35,9 @@ export async function generateTypes(opts: {
   const files = await globby("**/*.{t,j}sx", {
     cwd: path.join(opts.cwd, "app", "routes"),
   });
-  const routes = getGeneratedRoutes({ files });
+  const routes = getGeneratedRoutes({ files }).sort((a, b) =>
+    a.route.localeCompare(b.route)
+  );
   const dtsFile = `
 export {};
 declare global {
