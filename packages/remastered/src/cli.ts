@@ -70,13 +70,6 @@ const build = command({
             manifest: true,
             ssrManifest: true,
             outDir: path.join(process.cwd(), "dist", "client"),
-            rollupOptions: {
-              output: {
-                entryFileNames: "assets/[name].js",
-                chunkFileNames: "assets/[name].js",
-                assetFileNames: "assets/[name].[ext]",
-              },
-            },
           },
         }),
       () =>

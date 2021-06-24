@@ -1,6 +1,6 @@
 import { renderRequest } from "remastered/cjs/renderRequest";
 import { Request } from "node-fetch";
-import type { VercelApiHandler } from "@vercel/node";
+import type { VercelApiHandler, VercelResponse } from "@vercel/node";
 import _ from "lodash";
 import { getRenderContext } from "./getRenderContext";
 import { deserializeResponse, getResponsePath } from "./StaticExporting";
@@ -26,6 +26,11 @@ export function createVercelFunction({
       // @ts-expect-error
       headers: { ...req.headers },
     });
+
+    const staticConclusion = await handleStaticFile(rootDir, request, res);
+    if (staticConclusion === "break") {
+      return;
+    }
 
     const response =
       (await findExportedResponse(rootDir, request)) ??
@@ -63,4 +68,34 @@ async function findExportedResponse(
     console.error(`Can't read exported file from ${responsePath}`, e);
     return null;
   }
+}
+
+async function handleStaticFile(
+  rootDir: string,
+  request: Request,
+  res: VercelResponse
+): Promise<"continue" | "break"> {
+  const url = new URL(request.url, "https://example.com");
+  const resolvedPath = path.resolve(rootDir, "dist", url.pathname.slice(1));
+  if (!resolvedPath.startsWith(path.join(rootDir, "dist/assets") + "/")) {
+    return "continue";
+  }
+
+  if (!(await fs.pathExists(resolvedPath))) {
+    return "continue";
+  }
+
+  if (request.method !== "GET") {
+    res.status(405).send("Unsupported method");
+    return "break";
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const stream = fs.createReadStream(resolvedPath);
+    stream.pipe(res);
+    stream.on("end", resolve);
+    stream.on("error", reject);
+  });
+
+  return "break";
 }
