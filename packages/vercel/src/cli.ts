@@ -84,13 +84,10 @@ const postbuild = command({
       await fs.copy(publicExportedDir, publicDir);
     }
 
-    // create a public dir
-    await fs.mkdirp(publicDir);
-
-    // console.error(
-    //   `Copying contents of ${assetsDir} into ${publicAssetsDir}...`
-    // );
-    // await fs.copy(assetsDir, publicAssetsDir);
+    console.error(
+      `Copying contents of ${assetsDir} into ${publicAssetsDir}...`
+    );
+    await fs.copy(assetsDir, publicAssetsDir);
   },
 });
 
