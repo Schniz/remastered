@@ -1,7 +1,7 @@
 {
   "name": "@remastered/play-with-cloudflare-workers",
   "private": true,
-  "version": "0.1.31-alpha.6",
+  "version": "0.1.31",
   "main": "./index.js",
   "scripts": {
     "site:build": "cd ../../test-packages/plain-test-app && rm -rf node_modules/remastered && yarn add ../../packages/remastered && remastered build",
@@ -12,6 +12,6 @@
     "worker:publish": "wrangler publish"
   },
   "dependencies": {
-    "@remastered/cloudflare-workers": "^0.1.31-alpha.6"
+    "@remastered/cloudflare-workers": "^0.1.31"
   }
 }
