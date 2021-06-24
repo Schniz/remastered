@@ -72,10 +72,10 @@ const postbuild = command({
   async handler() {
     await exportCmd.handler({});
 
-    // const assetsDir = path.join(process.cwd(), "dist/client/assets");
+    const assetsDir = path.join(process.cwd(), "dist/client/assets");
     const publicExportedDir = path.join(process.cwd(), "dist/exported/public");
     const publicDir = path.join(process.cwd(), "public");
-    // const publicAssetsDir = path.join(publicDir, "assets");
+    const publicAssetsDir = path.join(publicDir, "assets");
 
     if (await fs.pathExists(publicExportedDir)) {
       console.error(
