@@ -23,7 +23,7 @@ test.only("refresh after history will re-fetch data", async () => {
 
   const historyRequests: string[] = [];
   page.on("request", (request) => {
-    historyRequests.push(request.url());
+    historyRequests.push(request.url().replace(/\.[a-z0-9]{8}\./, ".[HASH]."));
   });
 
   await page.goBack();
@@ -35,9 +35,9 @@ test.only("refresh after history will re-fetch data", async () => {
   });
   expect(historyRequests).toMatchInlineSnapshot(`
 Array [
-  "http://localhost:3000/assets/docs.js",
-  "http://localhost:3000/assets/Spinner.js",
-  "http://localhost:3000/assets/@file.js",
+  "http://localhost:3000/assets/docs.[HASH].js",
+  "http://localhost:3000/assets/Spinner.[HASH].js",
+  "http://localhost:3000/assets/@file.[HASH].js",
   "http://localhost:3000/docs.loader.json",
   "http://localhost:3000/docs/welcome/what-is-remastered.loader.json",
 ]
