@@ -76,7 +76,11 @@ async function handleStaticFile(
   res: VercelResponse
 ): Promise<"continue" | "break"> {
   const url = new URL(request.url, "https://example.com");
-  const resolvedPath = path.resolve(rootDir, "dist", url.pathname.slice(1));
+  const joinedPath = path.join(rootDir, "dist", url.pathname.slice(1));
+  const resolvedPath = path.resolve(joinedPath);
+
+  console.log({ rootDir, resolvedPath, joinedPath });
+
   if (!resolvedPath.startsWith(path.join(rootDir, "dist/assets") + "/")) {
     return "continue";
   }
