@@ -1,17 +1,17 @@
 {
   "name": "@remastered/play-with-cloudflare-workers",
   "private": true,
-  "version": "0.1.30",
+  "version": "0.1.31-alpha.6",
   "main": "./index.js",
   "scripts": {
     "site:build": "cd ../../test-packages/plain-test-app && rm -rf node_modules/remastered && yarn add ../../packages/remastered && remastered build",
     "site:copy-assets": "rm -rf rdist && cp -r ../../test-packages/plain-test-app/dist/ rdist && rm -rf public/assets && cp -r rdist/client/assets public/assets",
     "prepare": "yarn site:build && yarn site:copy-assets",
     "dev": "wrangler dev",
-    "build": "wrangler build",
+    "build": "yarn prepare && wrangler build",
     "worker:publish": "wrangler publish"
   },
   "dependencies": {
-    "@remastered/cloudflare-workers": "^0.1.30"
+    "@remastered/cloudflare-workers": "^0.1.31-alpha.6"
   }
 }

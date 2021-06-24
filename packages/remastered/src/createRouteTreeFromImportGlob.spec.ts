@@ -9,6 +9,9 @@ test("routes", () => {
     "/app/routes/users~register.tsx": SomeComponent,
     "/app/routes/with-nesting/@nestA/@nestB.tsx": SomeComponent,
     "/app/routes/@@@username.tsx": SomeComponent,
+    "/app/routes/_nextjs/[param].tsx": SomeComponent,
+    "/app/routes/_nextjs_splat/[...splat].tsx": SomeComponent,
+    "/app/routes/splat/@_splat_.tsx": SomeComponent,
   });
   expect(result).toEqual({
     "/": {
@@ -20,6 +23,33 @@ test("routes", () => {
       element: SomeComponent,
       children: {},
       filepath: "/app/routes/about.tsx",
+    },
+    "/_nextjs": {
+      children: {
+        "/:param": {
+          element: SomeComponent,
+          children: {},
+          filepath: "/app/routes/_nextjs/[param].tsx",
+        },
+      },
+    },
+    "/_nextjs_splat": {
+      children: {
+        "/*": {
+          element: SomeComponent,
+          children: {},
+          filepath: "/app/routes/_nextjs_splat/[...splat].tsx",
+        },
+      },
+    },
+    "/splat": {
+      children: {
+        "/*": {
+          element: SomeComponent,
+          children: {},
+          filepath: "/app/routes/splat/@_splat_.tsx",
+        },
+      },
     },
     "/users": {
       element: SomeComponent,

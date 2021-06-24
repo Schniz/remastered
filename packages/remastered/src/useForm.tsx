@@ -1,6 +1,8 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useHref, useLocation, useNavigate } from "react-router";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
+import { HttpResponse } from "./HttpTypes";
+import { MAGIC_METHOD_QUERY_PARAM } from "./magicMethodSetter";
 import * as megajson from "./megajson";
 
 function createTx(): string {
@@ -8,9 +10,18 @@ function createTx(): string {
 }
 
 /** A pending submit */
-type PendingSubmit = {
-  /** A ticket for the pending submit. Can be used as an ID of the request. */
+export type PendingSubmit = {
+  /**
+   * A "ticket" for the pending submit.
+   * Can be used as a unique ID of the request.
+   */
   tx: string;
+
+  /** The time it was submitted at */
+  submittedAt: Date;
+
+  /** The time it was last submitted at (in case of retry) */
+  lastSubmitAt: Date;
 
   /** The encoding type as declared by the form (and will sent as a Content-Type) */
   encType: string;
@@ -23,6 +34,10 @@ type PendingSubmit = {
 
   /** The form action */
   action: string;
+
+  options: {
+    replace: boolean;
+  };
 };
 
 /** The `Form` part of `[Form, pendingSubmits]` pair */
@@ -49,10 +64,85 @@ export type FormComponent = React.ComponentType<
  *   just enters a couple of things really fast. You can do that
  * * Forms with JavaScript enabled can use `pendingSubmits` to provide an optimistic UI.
  */
-export function useForm(): [FormComponent, PendingSubmit[]] {
+export function useForm(): [
+  FormComponent,
+  PendingSubmit[],
+  { submit: InternalFormProps["submit"] }
+] {
   const location = useLocation();
+  const navigate = useNavigate();
   const [pendingSubmits, setPendingSubmits] = React.useState<PendingSubmit[]>(
     []
+  );
+
+  const submit = React.useCallback<InternalFormProps["submit"]>(
+    async (givenPendingSubmit, opts) => {
+      const pendingSubmit: PendingSubmit = {
+        ...givenPendingSubmit,
+        lastSubmitAt: new Date(),
+      };
+      setPendingSubmits((ps) => [...ps, pendingSubmit]);
+      const newUrl = new URL(pendingSubmit.action, window.location.href);
+      const navigateOptions = {
+        state: { _remastered_submitted_tx: pendingSubmit.tx },
+        replace: pendingSubmit.options.replace,
+      };
+
+      if (pendingSubmit.method.toLowerCase() === "get") {
+        formDataToSearchParams(pendingSubmit.data, newUrl.searchParams);
+        const visitableUrl = `${newUrl.pathname}${newUrl.search}`;
+        navigate(visitableUrl, navigateOptions);
+        return;
+      } else {
+        const body =
+          pendingSubmit.encType === "multipart/form-data"
+            ? pendingSubmit.data
+            : formDataToSearchParams(pendingSubmit.data);
+        const request = new Request(newUrl.toString(), {
+          method: pendingSubmit.method,
+          headers: {
+            "Content-Type": pendingSubmit.encType,
+            Accept: REMASTERED_JSON_ACCEPT,
+          },
+          body,
+        });
+
+        try {
+          const result = await fetch(request);
+          const output = megajson.deserialize(await result.json());
+
+          if (output instanceof Error) {
+            setPendingSubmits((ps) => ps.filter((x) => x !== pendingSubmit));
+            opts?.onSubmitError?.(pendingSubmit);
+          } else {
+            const response = output as Response;
+            const locationHeader = response.headers.get("location");
+            if (
+              response.status >= 300 &&
+              response.status < 400 &&
+              locationHeader
+            ) {
+              try {
+                const resolvedUrl = new URL(locationHeader);
+                navigate(
+                  locationHeader.replace(resolvedUrl.origin, ""),
+                  navigateOptions
+                );
+              } catch {
+                navigate(locationHeader, navigateOptions);
+              }
+            } else {
+              setPendingSubmits((ps) => ps.filter((x) => x !== pendingSubmit));
+              return result;
+            }
+          }
+        } catch (err) {
+          setPendingSubmits((ps) => ps.filter((x) => x !== pendingSubmit));
+          throw err;
+        }
+      }
+    },
+    [setPendingSubmits, navigate]
   );
 
   React.useEffect(() => {
@@ -74,14 +164,16 @@ export function useForm(): [FormComponent, PendingSubmit[]] {
     return React.forwardRef<
       HTMLFormElement,
       React.ComponentProps<"form"> & CustomFormProps
-    >((props, ref) => (
-      <Form ref={ref as any} {...props} setPendingSubmits={setPendingSubmits} />
-    ));
+    >((props, ref) => <Form ref={ref as any} {...props} submit={submit} />);
   }, []);
 
-  const response = React.useMemo((): [FormComponent, PendingSubmit[]] => {
-    return [FormWrapper as FormComponent, pendingSubmits];
-  }, [FormWrapper, pendingSubmits]);
+  const response = React.useMemo((): [
+    FormComponent,
+    PendingSubmit[],
+    { submit: InternalFormProps["submit"] }
+  ] => {
+    return [FormWrapper as FormComponent, pendingSubmits, { submit }];
+  }, [FormWrapper, pendingSubmits, submit]);
 
   return response;
 }
@@ -94,11 +186,23 @@ type CustomFormProps = {
   replace?: boolean;
 
   /** Handle responses that do not return 3xx response from a POST request */
-  onUnknownResponse?(response: Response): unknown;
+  onUnknownResponse?(response: Response, pendingSubmit: PendingSubmit): unknown;
+
+  /** Handle responses that are not successful. Includes the pending submit, that will be removed from the in-flight response tracking. */
+  onSubmitError?(pendingSubmit: PendingSubmit): unknown;
 };
 
 type InternalFormProps = {
-  setPendingSubmits(a: React.SetStateAction<PendingSubmit[]>): void;
+  submit(
+    /**
+     * A pending submit generated by the form (or manually generated)
+     * to be sent to the back-end
+     */
+    pendingSubmit: Omit<PendingSubmit, "lastSubmitAt">,
+    opts?: Partial<{
+      onSubmitError?(pendingSubmit: PendingSubmit): unknown;
+    }>
+  ): Promise<HttpResponse | undefined>;
 };
 
 type FormProps = React.ComponentProps<"form"> &
@@ -108,10 +212,11 @@ type FormProps = React.ComponentProps<"form"> &
 const Form = React.forwardRef<HTMLFormElement, FormProps>(
   (
     {
-      setPendingSubmits,
+      submit,
       forceRefresh,
       replace,
       onUnknownResponse,
+      onSubmitError,
       ...formProps
     },
     ref
@@ -119,9 +224,13 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
     const navigate = useNavigate();
     const onUnknownResponseRef =
       React.useRef<typeof onUnknownResponse>(onUnknownResponse);
+    const onSubmitErrorRef = React.useRef<typeof onSubmitError>(onSubmitError);
     React.useEffect(() => {
       onUnknownResponseRef.current = onUnknownResponse;
     }, [onUnknownResponse]);
+    React.useEffect(() => {
+      onSubmitErrorRef.current = onSubmitError;
+    }, [onSubmitError]);
     const onSubmit = React.useCallback(
       async (event: React.FormEvent<HTMLFormElement>) => {
         if (formProps.onSubmit) {
@@ -138,79 +247,35 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
 
         event.preventDefault();
         if (event.target instanceof HTMLFormElement) {
-          const pendingSubmit: PendingSubmit = {
+          const form = event.target;
+
+          const pendingSubmit = {
             tx: createTx(),
-            action: event.target.action,
-            encType: event.target.enctype,
-            method: event.target.method,
-            data: new FormData(event.target),
+            lastSubmitAt: new Date(),
+            submittedAt: new Date(),
+            action: form.dataset.xhrAction ?? form.action,
+            encType: form.enctype,
+            method: form.dataset.xhrMethod ?? form.method,
+            data: new FormData(form),
+            options: { replace: replace ?? false },
           };
-
-          setPendingSubmits((ps) => [...ps, pendingSubmit]);
-          const newUrl = new URL(event.target.action, window.location.href);
-          const navigateOptions = {
-            state: { _remastered_submitted_tx: pendingSubmit.tx },
-            replace,
-          };
-
-          if (pendingSubmit.method.toLowerCase() === "get") {
-            formDataToSearchParams(pendingSubmit.data, newUrl.searchParams);
-            const visitableUrl = `${newUrl.pathname}${newUrl.search}`;
-            navigate(visitableUrl, navigateOptions);
-          } else {
-            const body =
-              pendingSubmit.encType === "multipart/form-data"
-                ? pendingSubmit.data
-                : formDataToSearchParams(pendingSubmit.data);
-            const request = new Request(newUrl.toString(), {
-              method: event.target.method,
-              headers: {
-                "Content-Type": pendingSubmit.encType,
-                Accept: REMASTERED_JSON_ACCEPT,
-              },
-              body,
-            });
-
-            fetch(request).then(
-              async (result) => {
-                const response = megajson.deserialize(
-                  await result.json()
-                ) as Response;
-
-                const locationHeader = response.headers.get("location");
-                if (
-                  response.status >= 300 &&
-                  response.status < 400 &&
-                  locationHeader
-                ) {
-                  try {
-                    const resolvedUrl = new URL(locationHeader);
-                    navigate(
-                      locationHeader.replace(resolvedUrl.origin, ""),
-                      navigateOptions
-                    );
-                  } catch {
-                    navigate(locationHeader, navigateOptions);
-                  }
-                } else {
-                  onUnknownResponseRef.current?.(response);
-                }
-              },
-              (error) => {
-                console.error("OH NO", error);
-                setPendingSubmits((ps) =>
-                  ps.filter((x) => x !== pendingSubmit)
-                );
-              }
-            );
-          }
+          submit(pendingSubmit, {
+            onSubmitError: (ps) => onSubmitErrorRef.current?.(ps),
+          });
         }
       },
-      [forceRefresh, replace, navigate, setPendingSubmits, formProps.onSubmit]
+      [forceRefresh, replace, navigate, submit, formProps.onSubmit]
     );
 
+    const currentHref = useHref(".");
     const method = formProps.method?.toLowerCase() ?? "get";
     const methodAllowed = ["get", "post"].includes(method);
+    const action = formProps.action ?? currentHref;
+    const newAction = addActionMethodHint({
+      action,
+      isMethodAllowed: methodAllowed,
+      method,
+    });
 
     return (
       <form
@@ -219,10 +284,10 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
         {...formProps}
         onSubmit={onSubmit}
         method={methodAllowed ? method : "post"}
+        action={newAction}
+        data-xhr-method={method}
+        data-xhr-action={action}
       >
-        {!methodAllowed && (
-          <input type="hidden" name="_remastered_method" value={method} />
-        )}
         {formProps.children && formProps.children}
       </form>
     );
@@ -239,4 +304,19 @@ function formDataToSearchParams(
   }
 
   return searchParams;
+}
+
+function addActionMethodHint(opts: {
+  method: string;
+  isMethodAllowed: boolean;
+  action: string;
+}): string {
+  if (opts.isMethodAllowed) {
+    return opts.action;
+  }
+
+  const parts = opts.action.split("?");
+  const queryParams = new URLSearchParams(parts.slice(1).join("?"));
+  queryParams.set(MAGIC_METHOD_QUERY_PARAM, opts.method);
+  return `${parts[0]}?${queryParams}`;
 }

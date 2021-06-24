@@ -32,9 +32,20 @@ export function createRouteTreeFromImportGlob(
   return replaceDots(routeTree.children);
 }
 
+const identifierRegexPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
+
 export function formatRoutePath(key: string): string {
   const strippedName = key
     .replace(/\.[tj]sx?$/, "")
+    // Next.js' `[...splat]` => Remastered `@_splat_`
+    .replace(
+      new RegExp(`\\[\\.\\.\\.${identifierRegexPattern}\\]`, "g"),
+      "@_splat_"
+    )
+    // Next.js' `[param]` => Remastered `@param`
+    .replace(new RegExp(`\\[(${identifierRegexPattern})\\]`, "g"), "@$1")
+    // Turning `@_splat_`, which is a magic filename for `*`
+    .replace(/@_splat_/, "*")
     // @[a-z] => :[a-z]
     // @@ => @
     .replace(/(@@|@([a-z]))/g, (search, _replaceValue, letter?: string) => {

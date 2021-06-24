@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import { PluginOption, ResolvedConfig } from "vite";
 import globby from "globby";
+import { build } from "esbuild";
 
 function isRoute(rootPath: string, filepath: string) {
   const routesPath = path.join(rootPath, "./app/routes/");
@@ -104,7 +105,18 @@ export function routeTransformers(): PluginOption[] {
         }
 
         const result = await print({ ...parsed, body });
-        result.code = result.code;
+
+        const treeshaken = await forceServerTreeShakingWithEsbuild({
+          filepath: id,
+          contents: result.code,
+        });
+
+        if (typeof treeshaken === "string") {
+          return {
+            code: treeshaken,
+          };
+        }
+
         return result;
       },
       async handleHotUpdate(ctx) {
@@ -116,4 +128,36 @@ export function routeTransformers(): PluginOption[] {
       },
     },
   ];
+}
+
+async function forceServerTreeShakingWithEsbuild(opts: {
+  filepath: string;
+  contents: string;
+}): Promise<string | undefined> {
+  const esbuildOutput = await build({
+    stdin: {
+      sourcefile: opts.filepath,
+      contents: opts.contents,
+      loader: opts.filepath.endsWith("tsx") ? "tsx" : "jsx",
+    },
+    format: "esm",
+    bundle: true,
+    jsx: "transform",
+    write: false,
+    plugins: [
+      {
+        name: "all-external",
+        setup(p) {
+          p.onResolve({ filter: /.*/ }, (args) => {
+            return { external: true, path: args.path };
+          });
+        },
+      },
+    ],
+  });
+
+  const outputfile = esbuildOutput.outputFiles?.[0];
+  if (outputfile) {
+    return outputfile.text;
+  }
 }

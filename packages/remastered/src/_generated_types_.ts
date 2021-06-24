@@ -1,1 +1,7 @@
-export type Routes = Record<string, string>;
+declare global {
+  namespace Remastered {
+    interface Routes {}
+  }
+}
+
+export {};
