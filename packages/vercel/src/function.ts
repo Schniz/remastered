@@ -7,6 +7,7 @@ import { deserializeResponse, getResponsePath } from "./StaticExporting";
 import fs from "fs-extra";
 import path from "path";
 import { HttpRequest, HttpResponse } from "remastered/cjs/HttpTypes";
+import globby from "globby";
 
 export function createVercelFunction({
   rootDir,
@@ -79,7 +80,9 @@ async function handleStaticFile(
   const joinedPath = path.join(rootDir, "dist", url.pathname.slice(1));
   const resolvedPath = path.resolve(joinedPath);
 
-  console.log({ rootDir, resolvedPath, joinedPath });
+  const files = await globby("dist/assets/*", { cwd: rootDir });
+
+  console.log({ rootDir, resolvedPath, joinedPath, files });
 
   if (!resolvedPath.startsWith(path.join(rootDir, "dist/assets") + "/")) {
     return "continue";
