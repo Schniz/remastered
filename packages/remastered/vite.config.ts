@@ -15,7 +15,6 @@ export function fileInCore(name: string): string {
 }
 
 const symlinkDir = fileInCore("");
-fs.removeSync(symlinkDir);
 fs.outputFileSync(
   path.join(symlinkDir, "entry.client.js"),
   `import 'remastered/dist/main';`
@@ -74,7 +73,7 @@ const config = defineConfig({
     exclude: ["remastered", "glob-first:*"],
   },
   resolve: {
-    dedupe: ["react", "react-dom"],
+    dedupe: ["react", "react-dom", "react-dom/server"],
     alias: {
       "~app": path.join(process.cwd(), "app"),
     },
