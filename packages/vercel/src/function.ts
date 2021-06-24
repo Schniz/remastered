@@ -82,8 +82,6 @@ async function handleStaticFile(
 
   const files = await globby("dist/assets/*", { cwd: rootDir });
 
-  console.log({ rootDir, resolvedPath, joinedPath, files });
-
   if (!resolvedPath.startsWith(path.join(rootDir, "dist/assets") + "/")) {
     return "continue";
   }
