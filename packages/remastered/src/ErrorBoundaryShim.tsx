@@ -1,6 +1,7 @@
 import React from "react";
 import $ from "cheerio";
 import { renderToString } from "react-dom/server";
+import _ from "lodash";
 
 /**
  * An error boundary shim for SSR.
@@ -68,6 +69,19 @@ function convertHtmlToReactElements(html: string): React.ReactElement {
     const attributes: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(node.attribs)) {
       attributes[camelCasify(key)] = value;
+    }
+    if (attributes.style && typeof attributes.style === "string") {
+      const defs = _(attributes.style)
+        .split(/;\s*/)
+        .map((x) => x.trim())
+        .filter(Boolean)
+        .map((def) => {
+          const [key, value] = def.split(":").map((a) => a.trim());
+          return [_.camelCase(key), value];
+        })
+        .fromPairs()
+        .value();
+      attributes.style = defs;
     }
     attributes.key = elements.length;
     const children = $$(node).children();
