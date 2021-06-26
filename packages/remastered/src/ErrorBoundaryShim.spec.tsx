@@ -164,3 +164,17 @@ test("works with props", () => {
   );
   expect(output).toEqual(`<div><div>Gal<!-- --> -- div</div></div>`);
 });
+
+test("works with style prop", () => {
+  const ErrorComponent = () => <div>not going to show</div>;
+  const output = renderToString(
+    <ErrorBoundaryShim fallbackComponent={ErrorComponent}>
+      <div style={{ display: "block", width: 100, flexDirection: "column" }}>
+        Hello
+      </div>
+    </ErrorBoundaryShim>
+  );
+  expect(output).toEqual(
+    '<div style="display:block;width:100px;flex-direction:column">Hello</div>'
+  );
+});
