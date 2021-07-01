@@ -11,8 +11,5 @@ export default merge(
         input: fileInCore("entry.server.js"),
       },
     },
-    define: {
-      "process.env": `process.env`,
-    },
   })
 );
