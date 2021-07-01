@@ -7,6 +7,7 @@ import { globHmrListener } from "./dist/vite-plugins/globHmrListener";
 import { routeTransformers } from "./dist/vite-plugins/routeTransformers";
 import { debugPlugin } from "./dist/vite-plugins/debugPlugin";
 import { redirectRemasteredImports } from "./dist/vite-plugins/redirectRemasteredImports";
+import { ssrProcessEnv } from "./dist/vite-plugins/ssrProcessEnv";
 import { environmentSpecificFiles } from "./dist/vite-plugins/environmentSpecificFiles";
 // import rpv from "rollup-plugin-visualizer";
 
@@ -27,6 +28,7 @@ fs.outputFileSync(
 // https://vitejs.dev/config/
 const config = defineConfig({
   plugins: [
+    ssrProcessEnv(),
     globFirst(),
     routeTransformers(),
     globHmrListener(),
