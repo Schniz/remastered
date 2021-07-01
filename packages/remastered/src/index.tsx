@@ -25,3 +25,5 @@ export { ErrorBoundary } from "./ErrorBoundary";
 export { useForm } from "./useForm";
 export type { FormComponent, PendingSubmit } from "./useForm";
 export { routePath, ParamLink, ParamNavLink } from "./RouteHelpers";
+export { getQueryParams } from "./getQueryParams";
+export type { HttpRequest, HttpResponse } from "./HttpTypes";
