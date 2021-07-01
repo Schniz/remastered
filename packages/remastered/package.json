@@ -1,6 +1,6 @@
 {
   "name": "remastered",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "module": "./dist/index.js",
   "main": "./cjs/index.js",
   "types": "./index.d.ts",
