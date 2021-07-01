@@ -16,7 +16,7 @@ export function ssrProcessEnv(): Plugin {
       return {
         code: code.replace(/\bprocess\.env\b/g, () => {
           debug("Replaced process.env");
-          return `globalThis?.process?.env`;
+          return `globalThis["process"]["env"]`;
         }),
       };
     },
