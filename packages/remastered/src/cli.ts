@@ -75,10 +75,6 @@ const build = command({
       () =>
         vite.build({
           configFile: getViteConfigPath({ ssr: true }),
-          define: {
-            "process.env.REMASTERED_PROJECT_DIR":
-              "process.env.REMASTERED_PROJECT_DIR",
-          },
           build: {
             ssr: "src/entry-server.tsx",
             outDir: path.join(process.cwd(), "dist", "server"),
@@ -104,6 +100,9 @@ const serve = command({
       process.env.PORT = String(port);
     }
     process.env.NODE_ENV = "production";
+
+    const dotenv = await import("dotenv");
+    dotenv.config();
 
     const { main } = await import("./server");
     await main(process.cwd());
@@ -144,6 +143,9 @@ const dev = command({
       .on("unlink", () =>
         generateTypes({ cwd: rootDir, storeInApp: isCodeSandbox })
       );
+
+    const dotenv = await import("dotenv");
+    dotenv.config();
 
     const { main } = await import("./server");
     await main(rootDir);
