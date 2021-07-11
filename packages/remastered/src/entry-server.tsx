@@ -16,7 +16,6 @@ import { wrapRoutes } from "./wrapRoutes";
 import { LayoutObject } from "./UserOverridableComponents";
 import { LAYOUT_ROUTE_KEY } from "./magicConstants";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
-import { serializeResponse } from "./SerializedResponse";
 import { HttpRequest, HttpResponse, isHttpResponse } from "./HttpTypes";
 import createDebugger from "debug";
 import { RemasteredAppContext } from "./WrapWithContext";
@@ -143,10 +142,9 @@ async function onGet({
               headers.set(headerName, headerValue);
             }
           } else if (isLoaderJsonResponse) {
-            const serializedResponse = await serializeResponse(loaderResult);
             loaderContext.set(relevantRoute.key, {
               tag: "ok",
-              value: serializedResponse,
+              value: loaderResult,
             });
           } else {
             return loaderResult;

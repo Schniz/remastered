@@ -19,10 +19,6 @@ import { MatchesContext } from "./useMatches";
 import { PendingLocationContext } from "./PendingLocation";
 import { REMASTERED_JSON_ACCEPT } from "./constants";
 import { wrapRoutes } from "./wrapRoutes";
-import {
-  deserializeResponse,
-  isSerializedResponse,
-} from "./SerializedResponse";
 import { RemasteredAppContext } from "./WrapWithContext";
 import * as megajson from "./megajson";
 
@@ -285,7 +281,7 @@ async function handlePendingState(
   const loaders = newRoutes.map(async (lastMatch) => {
     const isExact =
       lastMatch.pathname.replace(/\/$/, "") ===
-      pendingState.value.location.pathname;
+      pendingState.value.location.pathname.replace(/\/$/, "");
     const { routeFile } = lastMatch.route;
     const routeInfo = matchesContext.get(routeFile);
     const storageKey = `${pendingState.value.location.key}@${routeFile}`;
@@ -308,9 +304,8 @@ async function handlePendingState(
 
         for (const [, loaderResult] of result) {
           if (loaderResult.tag === "ok") {
-            if (isSerializedResponse(loaderResult.value) && isExact) {
-              const response = deserializeResponse(loaderResult.value);
-              if (applyResponse(response, navigator)) {
+            if (loaderResult.value instanceof Response && isExact) {
+              if (applyResponse(loaderResult.value, navigator)) {
                 hold = true;
               }
             }
